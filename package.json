@@ -1,0 +1,22 @@
+{
+  "name": "qind",
+  "version": "1.0.0",
+  "description": "QIND is not Dixit.",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sanraith/qind.git"
+  },
+  "keywords": [
+    "dixit"
+  ],
+  "author": "Soma Zsják",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sanraith/qind/issues"
+  },
+  "homepage": "https://github.com/sanraith/qind#readme"
+}
