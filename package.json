@@ -2,9 +2,11 @@
   "name": "qind",
   "version": "1.0.0",
   "description": "QIND is not Dixit.",
-  "main": "index.js",
+  "main": "dist/app.js",
   "scripts": {
-    "test": "test"
+    "start": "tsc && node dist/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc"
   },
   "repository": {
     "type": "git",
@@ -18,5 +20,13 @@
   "bugs": {
     "url": "https://github.com/sanraith/qind/issues"
   },
-  "homepage": "https://github.com/sanraith/qind#readme"
+  "homepage": "https://github.com/sanraith/qind#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.6",
+    "tslint": "^6.1.2",
+    "typescript": "^3.9.3"
+  }
 }
