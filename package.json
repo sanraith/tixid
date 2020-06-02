@@ -4,7 +4,7 @@
   "description": "QIND is not Dixit.",
   "main": "dist/app.js",
   "scripts": {
-    "start": "tsc && node dist/app.js",
+    "start": "node ./build.js && node ./bin/www",
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc"
   },
@@ -22,10 +22,22 @@
   },
   "homepage": "https://github.com/sanraith/qind#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "child_process": "^1.0.2",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "ejs": "~2.6.1",
+    "express": "^4.17.1",
+    "fs-extra": "^9.0.0",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1",
+    "node-sass-middleware": "0.11.0"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.2",
     "@types/express": "^4.17.6",
+    "@types/http-errors": "^1.6.3",
+    "@types/morgan": "^1.9.0",
+    "@types/node-sass-middleware": "0.0.31",
     "tslint": "^6.1.2",
     "typescript": "^3.9.3"
   }
