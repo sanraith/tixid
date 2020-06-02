@@ -102,3 +102,12 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Generated Sass
+.sass-cache/
+*.css.map
+*.sass.map
+*.scss.map
+
+# Generated CSS
+src/public/stylesheets/**/*.css
