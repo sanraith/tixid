@@ -4,8 +4,8 @@
   "description": "QIND is not Dixit.",
   "main": "dist/app.js",
   "scripts": {
-    "start": "node ./build.js && node ./dist/start.js",
-    "start-dev": "nodemon --config \"./util/nodemon.json\"/",
+    "start": "node ./util/build.js && node ./dist/start.js",
+    "start-dev": "SET DEBUG=qind:* && nodemon --config \"./util/nodemon.json\"/",
     "update-types": "types-installer -D --packageManager npm",
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc"
