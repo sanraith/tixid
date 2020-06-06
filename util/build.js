@@ -14,7 +14,7 @@ try {
     fs.copySync('./src/views', './dist/views');
 
     // Transpile the typescript files
-    childProcess.exec('npx tsc');
+    childProcess.exec('npx ttsc');
 } catch (err) {
     console.log(err);
 } finally {

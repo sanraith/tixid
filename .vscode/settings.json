@@ -1,6 +1,7 @@
 {
     "cSpell.ignorePaths": [
         "**/package-lock.json",
+        "**/package.json",
         "**/node_modules/**",
         "**/vscode-extension/**",
         "**/.git/objects/**",
@@ -8,7 +9,8 @@
         "tsconfig.json"
     ],
     "cSpell.words": [
-        "qind"
+        "qind",
+        "ttsc"
     ],
     "files.exclude": {
         "**/.git": true,
@@ -16,6 +18,6 @@
         "**/.hg": true,
         "**/CVS": true,
         "**/.DS_Store": true,
-        "node_modules":true
+        "node_modules": true
     }
 }

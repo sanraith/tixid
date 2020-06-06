@@ -5,9 +5,8 @@
   "main": "dist/app.js",
   "scripts": {
     "start": "node ./util/build.js && node ./dist/start.js",
-    "start-dev": "SET DEBUG=qind:* && nodemon --config \"./util/nodemon.json\"/",
-    "update-types": "types-installer -D --packageManager npm",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "SET DEBUG=qind:* && nodemon --config \"./util/nodemon.json\"/",
+    "types": "types-installer install",
     "tsc": "tsc"
   },
   "repository": {
@@ -45,9 +44,11 @@
     "@types/node-sass-middleware": "0.0.31",
     "@types/nodemon": "^1.19.0",
     "@types/typescript": "^2.0.0",
+    "@zerollup/ts-transform-paths": "^1.7.17",
     "nodemon": "^2.0.4",
     "ts-node": "^8.10.2",
     "tslint": "^6.1.2",
+    "ttypescript": "^1.5.10",
     "types-installer": "^1.6.3",
     "typescript": "^3.9.3"
   }
