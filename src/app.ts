@@ -5,9 +5,9 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import sassMiddleware from 'node-sass-middleware';
 
-import indexRouter from 'routes/index';
-import usersRouter from 'routes/users';
-import roomsRouter from 'routes/rooms';
+import indexRouter from 'routes/indexRouter';
+import usersRouter from 'routes/usersRouter';
+import roomsRouter from 'routes/roomsRouter';
 
 import 'services/testDataGenerator';
 

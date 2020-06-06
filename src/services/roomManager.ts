@@ -18,11 +18,7 @@ class RoomManager {
     }
 
     getRooms(): Room[] {
-        const result: Room[] = [];
-        for (const key in this._rooms) {
-            result.push(this._rooms[key]);
-        }
-        return result;
+        return Object.values(this._rooms);
     }
 
     getRoom(id: string): Room | undefined {
@@ -30,10 +26,14 @@ class RoomManager {
     }
 
     joinRoom(room: Room, player: UserInfo) {
-        if (!room.players.some(x => x.secret == player.secret)) {
-            room.players.push(player);
+        const existingUserIndex = room.players.findIndex(x => x.id == player.id);
+        if (existingUserIndex >= 0) {
+            // Always overwrite user data in case of name refresh
+            room.players[existingUserIndex] = player;
             return true;
         }
+
+        room.players.push(player);
         return false;
     }
 

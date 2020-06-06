@@ -1,10 +1,18 @@
 <%- include('partials/header.ejs'); -%>
 
+Player name: <input id="userNameTextBox" type="text" value="Player" onchange="updateUserNameCookie()" />
+<script>updateUserNameField();</script>
+Create room: <button>Create room</button>
+<hr>
+
 List of available rooms:
 <ul>
   <%if (rooms.length > 0) { 
       for(const room of rooms){ %>
-  <li>Id: <%= room.id %>, Owner: <%= room.owner.name %></li>
+  <li>Id: <%= room.id %>, Owner: <%= room.owner.name %>
+    <a href="/rooms/<%= room.id %>">join</a>
+    Players: <%= room.players.map(x => x.name).join(", ") %>
+  </li>
   <%  } 
     } else { %>
   <li>No rooms available.</li>

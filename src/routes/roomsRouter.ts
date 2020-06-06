@@ -16,12 +16,12 @@ router.get("/", (req, res) => {
 router.post("/create", (req, res) => {
     const owner = UserInfo.createFrom(req.cookies);
     const room = roomManager.createRoom(owner);
-    debug(`Room: ${room.id} Owner: ${owner.name} ${owner.id} ${owner.secret}`);
+    debug(`Room: ${room.id} Owner: ${owner.name} ${owner.publicId} ${owner.id}`);
 
     res.json(room);
 });
 
-router.get("/join/:id", (req, res) => {
+router.get("/:id", (req, res) => {
     const roomId = req.params.id;
     const room = roomManager.getRoom(roomId);
     if (!room) {
