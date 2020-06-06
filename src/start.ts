@@ -7,7 +7,7 @@
 import app from 'app';
 import http from 'http';
 import _debug from 'debug';
-const debug = _debug('qind:server');
+const debug = _debug('qind:start');
 
 /**
  * Get port from environment and store in Express.
