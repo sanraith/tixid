@@ -1,0 +1,12 @@
+<%- include('partials/header.ejs'); -%>
+
+<p>Joined room: <%= room.id %></p>
+<p>Owner: <%= room.owner.name %></p>
+<p>Players:</p>
+<ul>
+    <% 	room.players.forEach(player => { %>
+    <li><%= player.name %></li>
+    <% }) %>
+</ul>
+
+<%- include('partials/footer.ejs'); -%>

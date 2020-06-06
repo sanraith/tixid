@@ -5,10 +5,11 @@ import UserInfo from 'models/userInfo';
 const debug = Debug("qind:services:roomManager");
 
 class RoomManager {
-    create(owner: UserInfo): Room {
+    createRoom(owner: UserInfo): Room {
         const newRoom: Room = {
             id: shortid.generate(),
-            owner: owner
+            owner: owner,
+            players: []
         };
         this._rooms[newRoom.id] = newRoom;
 
@@ -24,7 +25,7 @@ class RoomManager {
         return result;
     }
 
-    getRoom(id: string): Room {
+    getRoom(id: string): Room | undefined {
         return this._rooms[id];
     }
 
