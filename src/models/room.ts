@@ -1,3 +1,6 @@
+import UserInfo from "./userInfo";
+
 export default interface Room {
-    id: string
+    id: string,
+    owner: UserInfo
 }

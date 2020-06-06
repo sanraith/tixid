@@ -1,12 +1,14 @@
 import Debug from 'debug';
 import shortid from 'shortid';
 import Room from 'models/room';
+import UserInfo from 'models/userInfo';
 const debug = Debug("qind:services:roomManager");
 
 class RoomManager {
-    create(): Room {
+    create(owner: UserInfo): Room {
         const newRoom: Room = {
-            id: shortid.generate()
+            id: shortid.generate(),
+            owner: owner
         };
         this._rooms[newRoom.id] = newRoom;
 

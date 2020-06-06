@@ -1,11 +1,14 @@
-<%- include('partials/header.ejs'); -%> List of available rooms:
+<%- include('partials/header.ejs'); -%>
 
+List of available rooms:
 <ul>
-  <% if (rooms.length > 0) { for(const room of rooms){%>
-  <li><%= room.id %></li>
-  <% } } else { %>
+  <%if (rooms.length > 0) { 
+      for(const room of rooms){ %>
+  <li>Id: <%= room.id %>, Owner: <%= room.owner.name %></li>
+  <%  } 
+    } else { %>
   <li>No rooms available.</li>
-  <% }%>
+  <%} %>
 </ul>
 
 <%- include('partials/footer.ejs'); -%>

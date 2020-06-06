@@ -21,5 +21,9 @@
         "node_modules": true
     },
     "browser-preview.startUrl": "localhost:3000",
-    "browser-preview.verbose": false
+    "browser-preview.verbose": false,
+    "html.format.unformatted": "wbr,%",
+    "emmet.includeLanguages": {
+        "ejs": "html"
+    }
 }
