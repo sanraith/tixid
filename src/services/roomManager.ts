@@ -26,7 +26,7 @@ class RoomManager {
     }
 
     joinRoom(room: Room, player: UserInfo) {
-        const existingUserIndex = room.players.findIndex(x => x.id == player.id);
+        const existingUserIndex = room.players.findIndex(x => player.idEquals(x));
         if (existingUserIndex >= 0) {
             // Always overwrite user data in case of name refresh
             room.players[existingUserIndex] = player;

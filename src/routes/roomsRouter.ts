@@ -16,7 +16,7 @@ router.get("/", (req, res) => {
 router.post("/create", (req, res) => {
     const owner = UserInfo.createFrom(req.cookies);
     const room = roomManager.createRoom(owner);
-    debug(`Room: ${room.id} Owner: ${owner.name} ${owner.publicId} ${owner.id}`);
+    debug(`Room: ${room.id} Owner: ${owner.name} ${owner.publicId}`);
 
     res.json(room);
 });
@@ -25,7 +25,7 @@ router.get("/:id", (req, res) => {
     const roomId = req.params.id;
     const room = roomManager.getRoom(roomId);
     if (!room) {
-        debug(`Failed to join to ${roomId}.`)
+        debug(`Failed to join to ${roomId}.`);
         res.render("error", new ErrorViewModel("Room does not exists."));
         return;
     }
