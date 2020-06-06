@@ -10,7 +10,9 @@
     ],
     "cSpell.words": [
         "qind",
-        "ttsc"
+        "ttsc",
+        "ttypescript",
+        "uuidv"
     ],
     "files.exclude": {
         "**/.git": true,

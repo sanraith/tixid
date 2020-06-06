@@ -111,3 +111,7 @@ dist
 
 # Generated CSS
 src/public/stylesheets/**/*.css
+
+# Generated Javascript
+src/public/scripts/*.js
+src/public/scripts/*.js.map

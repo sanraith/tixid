@@ -9,12 +9,15 @@ try {
     // Remove current build
     fs.removeSync('./dist/');
 
+    // Transpile client side typescript files
+    childProcess.exec('tsc --project src/client/tsconfig.json');
+
     // Copy front-end files
     fs.copySync('./src/public', './dist/public');
     fs.copySync('./src/views', './dist/views');
 
     // Transpile the typescript files
-    childProcess.exec('npx ttsc');
+    childProcess.exec('ttsc');
 } catch (err) {
     console.log(err);
 } finally {

@@ -1,12 +1,14 @@
-function setCookie(cname, cvalue, exdays) {
+declare function uuidv4(): string;
+
+function setCookie(name: string, value: string, expireDays: number): void {
     var d = new Date();
-    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    d.setTime(d.getTime() + (expireDays * 24 * 60 * 60 * 1000));
     var expires = "expires=" + d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    document.cookie = name + "=" + value + ";" + expires + ";path=/";
 }
 
-function getCookie(cname) {
-    var name = cname + "=";
+function getCookie(name: string): string {
+    var name = name + "=";
     var ca = document.cookie.split(';');
     for (var i = 0; i < ca.length; i++) {
         var c = ca[i];
