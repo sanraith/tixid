@@ -35,7 +35,31 @@ function updateUserNameCookie() {
 function updateUserNameField() {
     const inputBox = <HTMLInputElement>document.getElementById("userNameTextBox");
     inputBox.value = getCookie(userNameCookie);
-    return getCookie(userNameCookie);
+}
+
+function postRequest(url: string, completeCallback: (request: XMLHttpRequest, event: Event) => any) {
+    const request = new XMLHttpRequest();
+    request.onreadystatechange = function (event: Event) {
+        if (this.readyState == 4 && this.status == 200) {
+            completeCallback.call(request, request, event);
+        }
+    }
+    request.open("POST", url, true);
+    request.send();
+}
+
+function createRoom() {
+    postRequest("/rooms/create", (request) => {
+        let room: { id: string | undefined } = { id: undefined };
+        try { room = JSON.parse(request.responseText); } catch { }
+
+        if (room.id) {
+            window.location.href = `/rooms/${room.id}`;
+        } else {
+            console.log(`Cannot create room with this response: ${request.responseText}`);
+            alert("An error occurred while creating the room.");
+        }
+    });
 }
 
 let userInfo = {
