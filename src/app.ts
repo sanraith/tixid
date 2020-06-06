@@ -9,6 +9,8 @@ import indexRouter from 'routes/index';
 import usersRouter from 'routes/users';
 import roomsRouter from 'routes/rooms';
 
+import 'services/testDataGenerator';
+
 var app = express();
 
 // view engine setup

@@ -7,13 +7,13 @@ const debug = Debug("qind:services:roomManager");
 class RoomManager {
     createRoom(owner: UserInfo): Room {
         const newRoom: Room = {
-            id: shortid.generate(),
+            id: this._roomIdGenerator.generate(),
             owner: owner,
             players: []
         };
         this._rooms[newRoom.id] = newRoom;
 
-        debug(`Created: ${newRoom.id}`);
+        debug(`Created: ${newRoom.id} for ${owner.name}`);
         return newRoom;
     }
 
@@ -29,6 +29,15 @@ class RoomManager {
         return this._rooms[id];
     }
 
+    joinRoom(room: Room, player: UserInfo) {
+        if (!room.players.some(x => x.secret == player.secret)) {
+            room.players.push(player);
+            return true;
+        }
+        return false;
+    }
+
+    _roomIdGenerator: { generate(): string } = shortid;
     private _rooms: { [id: string]: Room } = {};
 }
 

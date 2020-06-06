@@ -14,22 +14,26 @@ router.get("/", (req, res) => {
 })
 
 router.post("/create", (req, res) => {
-    debug("Create called!");
+    const owner = UserInfo.createFrom(req.cookies);
+    const room = roomManager.createRoom(owner);
+    debug(`Room: ${room.id} Owner: ${owner.name} ${owner.id} ${owner.secret}`);
 
-    const owner = new UserInfo(req.cookies);
-    debug(`Owner: ${owner.name} ${owner.id} ${owner.secret}`);
-
-    const newRoom = roomManager.createRoom(owner);
-    res.json(newRoom);
+    res.json(room);
 });
 
 router.get("/join/:id", (req, res) => {
     const roomId = req.params.id;
     const room = roomManager.getRoom(roomId);
     if (!room) {
+        debug(`Failed to join to ${roomId}.`)
         res.render("error", new ErrorViewModel("Room does not exists."));
         return;
     }
+
+    const player = UserInfo.createFrom(req.cookies);
+    roomManager.joinRoom(room, player);
+    debug(`Player ${player.name} joined to room ${room.id}`);
+
     res.render("room", new RoomViewModel(room));
 });
 

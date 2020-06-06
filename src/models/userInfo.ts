@@ -5,13 +5,9 @@ interface UserCookies {
 }
 
 export default class UserInfo {
-    public id: string;
-    public secret: string;
-    public name: string;
+    constructor(public name: string, public id: string, public secret: string) { }
 
-    constructor(cookies: UserCookies) {
-        this.id = cookies["qind.userId"];
-        this.secret = cookies["qind.userSecret"];
-        this.name = cookies["qind.userName"];
+    static createFrom(cookies: UserCookies) {
+        return new UserInfo(cookies["qind.userName"], cookies["qind.userId"], cookies["qind.userSecret"])
     }
 }
