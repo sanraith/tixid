@@ -2,6 +2,7 @@ import Debug from 'debug';
 import shortid from 'shortid';
 import Room from 'models/room';
 import UserInfo from 'models/userInfo';
+import socketManager from './socketManager';
 const debug = Debug("tixid:services:roomManager");
 
 class RoomManager {
@@ -27,14 +28,29 @@ class RoomManager {
 
     joinRoom(room: Room, player: UserInfo) {
         const existingUserIndex = room.players.findIndex(x => player.idEquals(x));
-        if (existingUserIndex >= 0) {
+        const playerExists = existingUserIndex >= 0;
+        if (playerExists) {
             // Always overwrite user data in case of name refresh
             room.players[existingUserIndex] = player;
-            return true;
+        } else {
+            room.players.push(player);
         }
 
-        room.players.push(player);
-        return false;
+        socketManager.emitPlayersChanged(room.id, room.players);
+
+        return playerExists;
+    }
+
+    leaveRoom(room: Room, player: UserInfo) {
+        const existingUserIndex = room.players.findIndex(x => player.idEquals(x));
+        if (existingUserIndex < 0) { return; }
+        
+        const leftPlayer = room.players.splice(existingUserIndex, 1)[0];
+        socketManager.emitPlayersChanged(room.id, room.players);
+
+        // TODO handle owner change
+
+        debug(`Client ${leftPlayer.name} left room ${room.id}`);
     }
 
     _roomIdGenerator: { generate(): string } = shortid;

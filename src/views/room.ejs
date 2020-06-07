@@ -1,13 +1,10 @@
 <%- include('partials/header.ejs'); -%>
+<script src="/scripts/socket.js"></script>
 
 <p>Joined room: <%= room.id %></p>
 <p>Owner: <%= room.owner.name %></p>
-<p>Players:</p>
-<ul>
-    <% 	room.players.forEach(player => { %>
-    <li><%= player.name %></li>
-    <% }) %>
-</ul>
+<p>
+    Players: <span id="playerList"></span>
+</p>
 
-<script src="/scripts/socket.js"></script>
 <%- include('partials/footer.ejs'); -%>

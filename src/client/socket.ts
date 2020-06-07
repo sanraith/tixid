@@ -6,6 +6,9 @@ $(function () {
     const userInfo = getUserInfo();
 
     socket.on("connect", () => {
+        socket.on("players_changed", (players: { name: string }[]) => {
+            render.playerList(players);
+        });
         socket.emit("join_room", { roomId: roomId, userPrivateId: userInfo.secret });
     });
 });
