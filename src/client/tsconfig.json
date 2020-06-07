@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "es5",
-		"outDir": "../public/scripts",
+		"outDir": "../server/public/scripts",
 		"sourceMap": false,
 		"rootDir": ".",
 		"typeRoots": ["../../node_modules/@types/"]

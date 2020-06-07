@@ -110,8 +110,8 @@ dist
 *.scss.map
 
 # Generated CSS
-src/public/stylesheets/**/*.css
+src/server/public/stylesheets/**/*.css
 
 # Generated Javascript
-src/public/scripts/*.js
-src/public/scripts/*.js.map
+src/server/public/scripts/*.js
+src/server/public/scripts/*.js.map

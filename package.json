@@ -6,7 +6,6 @@
   "scripts": {
     "start": "node ./util/build.js && node ./dist/start.js",
     "dev": "SET DEBUG=tixid:* && nodemon --config \"./util/nodemon.json\"/",
-    "devb": "SET DEBUG=tixid:* && nodemon --config \"./util/nodemon_backend.json\"/",
     "build": "node ./util/build.js",
     "types": "types-installer install",
     "tsc": "tsc"

@@ -10,14 +10,14 @@ try {
     fs.removeSync('./dist/');
 
     // Transpile client side typescript files
-    childProcess.exec('tsc --project src/client/tsconfig.json');
+    childProcess.exec('tsc -P src/client/tsconfig.json');
 
     // Copy front-end files
-    fs.copySync('./src/public', './dist/public');
-    fs.copySync('./src/views', './dist/views');
+    fs.copySync('./src/server/public', './dist/public');
+    fs.copySync('./src/server/views', './dist/views');
 
     // Transpile the typescript files
-    childProcess.exec('ttsc');
+    childProcess.exec('ttsc -P src/server/tsconfig.json');
 } catch (err) {
     console.log(err);
 } finally {

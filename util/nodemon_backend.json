@@ -1,6 +1,0 @@
-{
-    "watch": ["src"],
-    "ext": "ts",
-    "ignore": ["src/public"],
-    "exec": "set NODE_ENV=development && ts-node -C ttypescript src/start.ts"
-  }
