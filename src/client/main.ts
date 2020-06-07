@@ -62,11 +62,15 @@ function createRoom() {
     });
 }
 
-let userInfo = {
-    id: getCookie(userIdCookie) ?? uuidv4(),
-    secret: getCookie(userSecretCookie) ?? uuidv4(),
-    name: getCookie(userNameCookie) ?? "Player"
-};
+function getUserInfo() {
+    return {
+        id: getCookie(userIdCookie) ?? uuidv4(),
+        secret: getCookie(userSecretCookie) ?? uuidv4(),
+        name: getCookie(userNameCookie) ?? "Player"
+    };
+}
+
+const userInfo = getUserInfo();
 setCookie(userIdCookie, userInfo.id, 365);
 setCookie(userSecretCookie, userInfo.secret, 365);
 setCookie(userNameCookie, userInfo.name, 365);

@@ -12,6 +12,9 @@ class SocketManager {
             socket.on("disconnect", () => {
                 debug(`Client disconnected: ${socket.client.id}`);
             })
+            socket.on("join_room", (data: any) => {
+                debug(`Client joins room`, data);
+            });
         });
 
         this.io = io;

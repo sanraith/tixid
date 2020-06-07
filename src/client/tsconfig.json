@@ -3,6 +3,7 @@
 		"target": "es5",
 		"outDir": "../public/scripts",
 		"sourceMap": false,
-		"rootDir": "."
+		"rootDir": ".",
+		"typeRoots": ["../../node_modules/@types/"]
 	}
 }
