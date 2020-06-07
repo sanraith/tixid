@@ -2,7 +2,7 @@ import Debug from 'debug';
 import shortid from 'shortid';
 import Room from 'models/room';
 import UserInfo from 'models/userInfo';
-const debug = Debug("qind:services:roomManager");
+const debug = Debug("tixid:services:roomManager");
 
 class RoomManager {
     createRoom(owner: UserInfo): Room {

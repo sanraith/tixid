@@ -22,9 +22,9 @@ function getCookie(name: string): string | undefined {
     return undefined;
 }
 
-const userIdCookie = "qind.userId";
-const userSecretCookie = "qind.userSecret";
-const userNameCookie = "qind.userName";
+const userIdCookie = "tixid.userId";
+const userSecretCookie = "tixid.userSecret";
+const userNameCookie = "tixid.userName";
 
 function updateUserNameCookie() {
     const inputBox = <HTMLInputElement>document.getElementById("userNameTextBox");

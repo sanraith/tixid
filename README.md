@@ -1,6 +1,6 @@
-# QIND
+# Tixid
 
-QIND is not Dixit.
+Tixid is an online multiplayer card guessing game.
 
 ## Scripts
 

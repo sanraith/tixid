@@ -1,4 +1,4 @@
-# QIND architecture overview
+# Tixid architecture overview
 
 ## Introduction
 
@@ -15,7 +15,7 @@ subgraph AnyClient
     CK((Cookies))
 end
 
-subgraph QIND Server
+subgraph Tixid Server
     FE[Frontend service]
     MS[Match service]
     MP[Match process]

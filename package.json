@@ -1,18 +1,18 @@
 {
-  "name": "qind",
+  "name": "tixid",
   "version": "1.0.0",
-  "description": "QIND is not Dixit.",
+  "description": "Tixid is an online multiplayer card quessing game.",
   "main": "dist/app.js",
   "scripts": {
     "start": "node ./util/build.js && node ./dist/start.js",
-    "dev": "SET DEBUG=qind:* && nodemon --config \"./util/nodemon.json\"/",
+    "dev": "SET DEBUG=tixid:* && nodemon --config \"./util/nodemon.json\"/",
     "build": "node ./util/build.js",
     "types": "types-installer install",
     "tsc": "tsc"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sanraith/qind.git"
+    "url": "git+https://github.com/sanraith/tixid.git"
   },
   "keywords": [
     "dixit"
@@ -20,9 +20,9 @@
   "author": "Soma Zsják",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/sanraith/qind/issues"
+    "url": "https://github.com/sanraith/tixid/issues"
   },
-  "homepage": "https://github.com/sanraith/qind#readme",
+  "homepage": "https://github.com/sanraith/tixid#readme",
   "dependencies": {
     "child_process": "^1.0.2",
     "cookie-parser": "~1.4.4",

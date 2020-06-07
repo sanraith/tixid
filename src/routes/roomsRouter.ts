@@ -5,7 +5,7 @@ import UserInfo from 'models/userInfo';
 import { RoomViewModel, RoomsViewModel } from 'viewModels/roomViewModel';
 import ErrorViewModel from 'viewModels/errorViewModel';
 
-const debug = Debug('qind:routes:room');
+const debug = Debug('tixid:routes:room');
 const router = express.Router();
 
 router.get("/", (req, res) => {

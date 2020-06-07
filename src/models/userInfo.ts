@@ -1,7 +1,7 @@
 interface UserCookies {
-    "qind.userId": string;
-    "qind.userSecret": string;
-    "qind.userName": string;
+    "tixid.userId": string;
+    "tixid.userSecret": string;
+    "tixid.userName": string;
 }
 
 export default class UserInfo {
@@ -24,13 +24,13 @@ export default class UserInfo {
 
     /**
      * Generates an instance based on a cookie object containing the following properties:
-     * "qind.userName" => name;
-     * "qind.userId" => public id;
-     * "qind.userSecret" => private id;
+     * "tixid.userName" => name;
+     * "tixid.userId" => public id;
+     * "tixid.userSecret" => private id;
      * @param cookies The cookie containing the user data.
      */
     static createFrom(cookies: UserCookies) {
-        return new UserInfo(cookies["qind.userName"], cookies["qind.userId"], cookies["qind.userSecret"]);
+        return new UserInfo(cookies["tixid.userName"], cookies["tixid.userId"], cookies["tixid.userSecret"]);
     }
 
     #id: string;
