@@ -2,10 +2,11 @@
   "name": "tixid",
   "version": "1.0.0",
   "description": "Tixid is an online multiplayer card quessing game.",
-  "main": "dist/app.js",
+  "main": "dist/start.js",
   "scripts": {
     "start": "node ./util/build.js && node ./dist/start.js",
     "dev": "SET DEBUG=tixid:* && nodemon --config \"./util/nodemon.json\"/",
+    "devb": "SET DEBUG=tixid:* && nodemon --config \"./util/nodemon_backend.json\"/",
     "build": "node ./util/build.js",
     "types": "types-installer install",
     "tsc": "tsc"
@@ -33,7 +34,8 @@
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
     "node-sass-middleware": "0.11.0",
-    "shortid": "^2.2.15"
+    "shortid": "^2.2.15",
+    "socket.io": "^2.3.0"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.2",
@@ -46,6 +48,7 @@
     "@types/node-sass-middleware": "0.0.31",
     "@types/nodemon": "^1.19.0",
     "@types/shortid": "0.0.29",
+    "@types/socket.io": "^2.1.8",
     "@types/typescript": "^2.0.0",
     "@zerollup/ts-transform-paths": "^1.7.17",
     "nodemon": "^2.0.4",

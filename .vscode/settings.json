@@ -6,9 +6,11 @@
         "**/vscode-extension/**",
         "**/.git/objects/**",
         ".vscode",
-        "tsconfig.json"
+        "tsconfig.json",
+        "**/lib/**"
     ],
     "cSpell.words": [
+        "devb",
         "tixid",
         "ttsc",
         "ttypescript",
@@ -20,7 +22,7 @@
         "**/.hg": true,
         "**/CVS": true,
         "**/.DS_Store": true,
-        "node_modules": true
+         "node_modules": true
     },
     "browser-preview.startUrl": "localhost:3000",
     "browser-preview.verbose": false,

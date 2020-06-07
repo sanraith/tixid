@@ -1,39 +1,33 @@
 #!/usr/bin/env node
 
-/**
- * Module dependencies.
- */
-
 import app from 'app';
 import http from 'http';
 import _debug from 'debug';
+import socketManager from 'services/socketManager';
 const debug = _debug('tixid:start');
 
 /**
  * Get port from environment and store in Express.
  */
-
 const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
  * Create HTTP server.
  */
-
 const server = http.createServer(app);
 
 /**
  * Listen on provided port, on all network interfaces.
  */
-
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+socketManager.init(server);
 
 /**
  * Normalize a port into a number, string, or false.
  */
-
 function normalizePort(val: any) {
   const port = parseInt(val, 10);
 
@@ -53,7 +47,6 @@ function normalizePort(val: any) {
 /**
  * Event listener for HTTP server "error" event.
  */
-
 function onError(error: any) {
   if (error.syscall !== 'listen') {
     throw error;
@@ -81,7 +74,6 @@ function onError(error: any) {
 /**
  * Event listener for HTTP server "listening" event.
  */
-
 function onListening() {
   const addr = server.address();
   const bind = typeof addr === 'string'
