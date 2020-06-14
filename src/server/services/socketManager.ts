@@ -2,7 +2,7 @@ import SocketIo, { Server } from 'socket.io';
 import { Server as HttpServer } from 'http';
 import Debug from 'debug';
 import roomManager from './roomManager';
-import UserInfo from 'models/userInfo';
+import UserInfo from '../models/userInfo';
 const debug = Debug('tixid:services:socketManager');
 
 enum SocketEvents {

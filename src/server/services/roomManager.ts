@@ -1,7 +1,7 @@
 import Debug from 'debug';
 import shortid from 'shortid';
-import Room from 'models/room';
-import UserInfo from 'models/userInfo';
+import Room from '../models/room';
+import UserInfo from '../models/userInfo';
 import socketManager from './socketManager';
 const debug = Debug("tixid:services:roomManager");
 

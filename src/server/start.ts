@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-import app from 'app';
+import app from './app';
 import http from 'http';
 import _debug from 'debug';
-import socketManager from 'services/socketManager';
+import socketManager from './services/socketManager';
 const debug = _debug('tixid:start');
 
 /**

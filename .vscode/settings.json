@@ -6,7 +6,9 @@
         "**/vscode-extension/**",
         "**/.git/objects/**",
         ".vscode",
-        "tsconfig.json",
+        "tsconfig*.json",
+        "tslint.json",
+        "angular.json",
         "**/lib/**"
     ],
     "cSpell.words": [

@@ -1,5 +1,5 @@
 import express from 'express';
-import PageViewModel from 'viewModels/pageViewModel';
+import PageViewModel from '../viewModels/pageViewModel';
 var router = express.Router();
 
 /* GET home page. */

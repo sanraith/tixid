@@ -1,5 +1,5 @@
 import roomManager from './roomManager';
-import UserInfo from 'models/userInfo';
+import UserInfo from '../models/userInfo';
 import shortid from 'shortid';
 
 const user1 = new UserInfo("user A", "4e2d4e41-4231-40e7-b968-206532253a06", "7c237aa3-6909-4c10-9d75-95c169090c0c");

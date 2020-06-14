@@ -1,5 +1,5 @@
 import PageViewModel from "./pageViewModel"
-import Room from "models/room";
+import Room from "../models/room";
 
 export class RoomsViewModel extends PageViewModel {
     constructor(public rooms: Room[]) {

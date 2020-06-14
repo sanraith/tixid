@@ -1,9 +1,9 @@
 import express from 'express';
 import Debug from 'debug';
-import roomManager from 'services/roomManager';
-import UserInfo from 'models/userInfo';
-import { RoomViewModel, RoomsViewModel } from 'viewModels/roomViewModel';
-import ErrorViewModel from 'viewModels/errorViewModel';
+import roomManager from '../services/roomManager';
+import UserInfo from '../models/userInfo';
+import { RoomViewModel, RoomsViewModel } from '../viewModels/roomViewModel';
+import ErrorViewModel from '../viewModels/errorViewModel';
 
 const debug = Debug('tixid:routes:room');
 const router = express.Router();
