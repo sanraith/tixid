@@ -2,15 +2,13 @@ import express from 'express';
 import Debug from 'debug';
 import roomManager from '../services/roomManager';
 import UserInfo from '../models/userInfo';
-import { RoomViewModel, RoomsViewModel } from '../viewModels/roomViewModel';
-import ErrorViewModel from '../viewModels/errorViewModel';
 
 const debug = Debug('tixid:routes:room');
 const router = express.Router();
 
 router.get("/", (req, res) => {
     const rooms = roomManager.getRooms();
-    res.render("rooms", new RoomsViewModel(rooms));
+    res.json(rooms);
 })
 
 router.post("/create", (req, res) => {
@@ -26,7 +24,7 @@ router.get("/:id", (req, res) => {
     const room = roomManager.getRoom(roomId);
     if (!room) {
         debug(`Failed to join to ${roomId}.`);
-        res.render("error", new ErrorViewModel("Room does not exists."));
+        res.json({ error: `Failed to join to ${roomId}.` }); // TODO better error response
         return;
     }
 
@@ -34,7 +32,7 @@ router.get("/:id", (req, res) => {
     roomManager.joinRoom(room, player);
     debug(`Player ${player.name} joined to room ${room.id}`);
 
-    res.render("room", new RoomViewModel(room));
+    res.json(room);
 });
 
 export default router;

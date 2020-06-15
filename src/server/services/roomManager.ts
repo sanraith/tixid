@@ -3,10 +3,11 @@ import shortid from 'shortid';
 import Room from '../models/room';
 import UserInfo from '../models/userInfo';
 import socketManager from './socketManager';
+import CreateRoomResponse from 'src/shared/responses/createRoomResponse';
 const debug = Debug("tixid:services:roomManager");
 
 class RoomManager {
-    createRoom(owner: UserInfo): Room {
+    createRoom(owner: UserInfo): CreateRoomResponse {
         const newRoom: Room = {
             id: this._roomIdGenerator.generate(),
             owner: owner,
