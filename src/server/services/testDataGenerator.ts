@@ -1,6 +1,7 @@
 import roomManager from './roomManager';
 import UserInfo from '../models/userInfo';
 import shortid from 'shortid';
+import socketManager from './socketManager';
 
 const user1 = new UserInfo("user A", "4e2d4e41-4231-40e7-b968-206532253a06", "7c237aa3-6909-4c10-9d75-95c169090c0c");
 const user2 = new UserInfo("user B", "5e2d4e41-4231-40e7-b968-206532253a06", "8c237aa3-6909-4c10-9d75-95c169090c0c");
@@ -22,3 +23,8 @@ roomManager._roomIdGenerator = new TestIdGenerator();
 const room1 = roomManager.createRoom(user1);
 const room2 = roomManager.createRoom(user2);
 const room3 = roomManager.createRoom(user3);
+socketManager.onInit(() => {
+    roomManager.joinRoom(room1, user1);
+    roomManager.joinRoom(room1, user2);
+    roomManager.joinRoom(room1, user3);
+});

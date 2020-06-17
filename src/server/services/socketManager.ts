@@ -28,13 +28,13 @@ class SocketManager {
                 roomManager.getRooms()
                     .filter(x => x.players.some(p => clientInfo!.idEquals(p)))
                     .forEach(x => roomManager.leaveRoom(x, clientInfo!));
-                
+
                 debug(`Client disconnected: ${socket.client.id}`);
             })
 
             socket.on(SocketEvents.joinRoom, (data: { roomId: string, userPrivateId: string }) => {
                 debug(`Client joins room`, data);
-                clientInfo = new UserInfo("","", data.userPrivateId);
+                clientInfo = new UserInfo("", "", data.userPrivateId);
                 const room = roomManager.getRoom(data.roomId);
                 if (room) {
                     socket.join(this.getRoomChannelId(room.id));
@@ -45,6 +45,7 @@ class SocketManager {
         });
 
         this.io = io;
+        this.notifyOnInitListeners();
     }
 
     emitPlayersChanged(roomId: string, players: UserInfo[]) {
@@ -56,7 +57,19 @@ class SocketManager {
         return `room_${roomId}`;
     }
 
+    onInit(onInitFn: () => void) {
+        this.onInitListeners.push(onInitFn);
+    }
+
+    private notifyOnInitListeners() {
+        for (const onInitFn of this.onInitListeners) {
+            onInitFn();
+        }
+        this.onInitListeners = [];
+    }
+
     private io!: Server;
+    private onInitListeners: (() => void)[] = [];
 }
 
 export default new SocketManager();

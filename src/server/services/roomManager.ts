@@ -3,11 +3,10 @@ import shortid from 'shortid';
 import Room from '../models/room';
 import UserInfo from '../models/userInfo';
 import socketManager from './socketManager';
-import CreateRoomResponse from 'src/shared/responses/createRoomResponse';
 const debug = Debug("tixid:services:roomManager");
 
 class RoomManager {
-    createRoom(owner: UserInfo): CreateRoomResponse {
+    createRoom(owner: UserInfo): Room {
         const newRoom: Room = {
             id: this._roomIdGenerator.generate(),
             owner: owner,
@@ -45,7 +44,7 @@ class RoomManager {
     leaveRoom(room: Room, player: UserInfo) {
         const existingUserIndex = room.players.findIndex(x => player.idEquals(x));
         if (existingUserIndex < 0) { return; }
-        
+
         const leftPlayer = room.players.splice(existingUserIndex, 1)[0];
         socketManager.emitPlayersChanged(room.id, room.players);
 

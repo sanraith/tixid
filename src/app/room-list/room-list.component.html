@@ -1,0 +1,12 @@
+<h2>Available rooms</h2>
+
+<ul *ngIf="rooms">
+    <li *ngFor="let room of rooms">
+        Id: {{room.id}},
+        Owner: {{room.owner.name}},
+        Players:
+        <span *ngFor="let player of room.players; let i=index;">
+            {{player.name}}<span *ngIf="i < room.players.length - 1">,</span>
+        </span>
+    </li>
+</ul>

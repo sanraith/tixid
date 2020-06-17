@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
-import CreateRoomResponse from 'src/shared/responses/createRoomResponse';
 import { HttpClient } from '@angular/common/http';
 import url from 'url';
+import { CreateRoomResponse, GetRoomListResponse } from 'src/shared/responses';
 
 @Injectable({
   providedIn: 'root'
@@ -17,5 +16,10 @@ export class RoomService {
   createRoom(): Observable<CreateRoomResponse> {
     const targetUrl = url.resolve(this.roomUrl, 'create');
     return this.http.post<CreateRoomResponse>(targetUrl, null);
+  }
+
+  getRooms(): Observable<GetRoomListResponse> {
+    const targetUrl = this.roomUrl;
+    return this.http.get<GetRoomListResponse>(targetUrl);
   }
 }

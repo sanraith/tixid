@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get("/", (req, res) => {
     const rooms = roomManager.getRooms();
-    res.json(rooms);
+    res.json({ rooms: rooms });
 })
 
 router.post("/create", (req, res) => {

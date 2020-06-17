@@ -10,7 +10,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "dev": "SET DEBUG=tixid:* && nodemon --config \"./util/nodemon.json\"/"
+    "dev": "SET DEBUG=tixid:* && nodemon --config \"./util/nodemon.json\"",
+    "dev2": "ng build --watch"
   },
   "repository": {
     "type": "git",
