@@ -1,7 +1,7 @@
 interface UserCookies {
-    "tixid.userId": string;
-    "tixid.userSecret": string;
-    "tixid.userName": string;
+    "tixid.user.id": string;
+    "tixid.user.secret": string;
+    "tixid.user.name": string;
 }
 
 export default class UserInfo {
@@ -24,13 +24,13 @@ export default class UserInfo {
 
     /**
      * Generates an instance based on a cookie object containing the following properties:
-     * "tixid.userName" => name;
-     * "tixid.userId" => public id;
-     * "tixid.userSecret" => private id;
+     * "tixid.user.name" => name;
+     * "tixid.user.id" => public id;
+     * "tixid.user.secret" => private id;
      * @param cookies The cookie containing the user data.
      */
     static createFrom(cookies: UserCookies) {
-        return new UserInfo(cookies["tixid.userName"], cookies["tixid.userId"], cookies["tixid.userSecret"]);
+        return new UserInfo(cookies["tixid.user.name"], cookies["tixid.user.id"], cookies["tixid.user.secret"]);
     }
 
     #id: string;

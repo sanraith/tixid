@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { RoomService } from '../services/room.service';
 import { GetRoomListResponse } from 'src/shared/responses';
 
@@ -10,7 +11,9 @@ import { GetRoomListResponse } from 'src/shared/responses';
 export class RoomListComponent implements OnInit {
   rooms: { id: string; owner: { name: string; }; players: { name: string; }[]; }[];
 
-  constructor(private roomService: RoomService) { }
+  constructor(
+    private router: Router,
+    private roomService: RoomService) { }
 
   ngOnInit(): void {
     this.fetchRooms();
@@ -18,5 +21,9 @@ export class RoomListComponent implements OnInit {
 
   fetchRooms() {
     this.roomService.getRooms().subscribe(resp => this.rooms = resp.rooms);
+  }
+
+  joinRoom(id: string) {
+    this.router.navigate(['room', id]);
   }
 }

@@ -2,6 +2,7 @@
 
 <ul *ngIf="rooms">
     <li *ngFor="let room of rooms">
+        <button (click)="this.joinRoom(room.id)">Join</button>
         Id: {{room.id}},
         Owner: {{room.owner.name}},
         Players:
