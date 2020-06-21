@@ -1,15 +1,16 @@
 import SocketIo, { Server } from 'socket.io';
 import { Server as HttpServer } from 'http';
+import cookie from 'cookie';
 import Debug from 'debug';
 import roomManager from './roomManager';
+import userManager, { UserCookies } from './userManager';
 import UserInfo from '../models/userInfo';
+import { ClientActions, JoinRoomData, ClientEvents } from '../../shared/socket';
 const debug = Debug('tixid:services:socketManager');
 
 enum SocketEvents {
     connection = "connection",
     disconnect = "disconnect",
-    joinRoom = "join_room",
-    playersChanged = "players_changed"
 }
 
 class SocketManager {
@@ -17,29 +18,27 @@ class SocketManager {
         const io = SocketIo(httpServer);
 
         io.on(SocketEvents.connection, (socket) => {
-            debug(`Client connected: ${socket.client.id}`);
-
-            let clientInfo: UserInfo | undefined = undefined;
+            debug(`Client connecting: ${socket.client.id}`);
+            const userCookies = <{ [P in keyof UserCookies]: UserCookies[P] }>cookie.parse(socket.handshake.headers.cookie);
+            const userInfo = userManager.getUserFromCookies(userCookies);
+            debug(`Client ${userInfo.name} connected: ${socket.client.id}`);
 
             socket.on(SocketEvents.disconnect, () => {
-                if (!clientInfo) { return; }
-
                 // Leave all rooms
                 roomManager.getRooms()
-                    .filter(x => x.players.some(p => clientInfo!.idEquals(p)))
-                    .forEach(x => roomManager.leaveRoom(x, clientInfo!));
+                    .filter(x => x.players.some(p => userInfo.id === p.id))
+                    .forEach(x => roomManager.leaveRoom(x, userInfo));
 
-                debug(`Client disconnected: ${socket.client.id}`);
+                debug(`Client ${userInfo.name} disconnected: ${socket.client.id}`);
             })
 
-            socket.on(SocketEvents.joinRoom, (data: { roomId: string, userPrivateId: string }) => {
-                debug(`Client joins room`, data);
-                clientInfo = new UserInfo("", "", data.userPrivateId);
+            socket.on(ClientActions.joinRoom, (data: JoinRoomData) => {
+                debug(`Client ${userInfo.name} joins room`, data);
+                
                 const room = roomManager.getRoom(data.roomId);
                 if (room) {
                     socket.join(this.getRoomChannelId(room.id));
-                    // TODO use roomManager to join the room here instead of opening the page.
-                    this.emitPlayersChanged(room.id, room.players);
+                    roomManager.joinRoom(room, userInfo);
                 }
             });
         });
@@ -50,7 +49,7 @@ class SocketManager {
 
     emitPlayersChanged(roomId: string, players: UserInfo[]) {
         this.io.to(this.getRoomChannelId(roomId))
-            .emit(SocketEvents.playersChanged, players);
+            .emit(ClientEvents.playersChanged, players);
     }
 
     getRoomChannelId(roomId: string) {

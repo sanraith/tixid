@@ -1,1 +1,5 @@
 <h2>Room {{id}}</h2>
+Players:
+<span *ngFor="let player of players; let i=index;">
+    {{player.name}}<span *ngIf="i < players.length - 1">,</span>
+</span>

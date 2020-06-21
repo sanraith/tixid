@@ -1,7 +1,7 @@
 import express from 'express';
 import Debug from 'debug';
 import roomManager from '../services/roomManager';
-import UserInfo from '../models/userInfo';
+import userManager from '../services/userManager';
 
 const debug = Debug('tixid:routes:room');
 const router = express.Router();
@@ -12,7 +12,7 @@ router.get("/", (req, res) => {
 })
 
 router.post("/create", (req, res) => {
-    const owner = UserInfo.createFrom(req.cookies);
+    const owner = userManager.getUserFromCookies(req.cookies);
     const room = roomManager.createRoom(owner);
     debug(`Room: ${room.id} Owner: ${owner.name} ${owner.publicId}`);
 
@@ -28,7 +28,7 @@ router.get("/:id", (req, res) => {
         return;
     }
 
-    const player = UserInfo.createFrom(req.cookies);
+    const player = userManager.getUserFromCookies(req.cookies);
     roomManager.joinRoom(room, player);
     debug(`Player ${player.name} joined to room ${room.id}`);
 

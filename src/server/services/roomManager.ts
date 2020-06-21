@@ -27,7 +27,7 @@ class RoomManager {
     }
 
     joinRoom(room: Room, player: UserInfo) {
-        const existingUserIndex = room.players.findIndex(x => player.idEquals(x));
+        const existingUserIndex = room.players.findIndex(x => player.id == x.id);
         const playerExists = existingUserIndex >= 0;
         if (playerExists) {
             // Always overwrite user data in case of name refresh
@@ -42,7 +42,7 @@ class RoomManager {
     }
 
     leaveRoom(room: Room, player: UserInfo) {
-        const existingUserIndex = room.players.findIndex(x => player.idEquals(x));
+        const existingUserIndex = room.players.findIndex(x => player.id == x.id);
         if (existingUserIndex < 0) { return; }
 
         const leftPlayer = room.players.splice(existingUserIndex, 1)[0];
