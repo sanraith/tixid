@@ -24,7 +24,14 @@
         "**/.hg": true,
         "**/CVS": true,
         "**/.DS_Store": true,
-        "node_modules": false
+        // --- Remove some clutter ---
+        "node_modules": true,
+        "e2e/": true, // e2e tests
+        "src/**/*.spec.ts": true, // unit tests
+        "src/environments/": true, // build configuration options for target environments
+        "browserslist": true, // target browser selection
+        "karma.conf.js": true, // test runner config
+        "tsconfig.spec.json": true, // test compiler config
     },
     "browser-preview.startUrl": "localhost:3000",
     "browser-preview.verbose": false,
