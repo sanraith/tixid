@@ -1,1 +1,6 @@
-<p>Lobby placeholder</p>
+<h2>Lobby</h2>
+
+Players:
+<span *ngFor="let player of room.players; let i = index;" [class.owner-name]="player.id === room.owner.id">
+    {{player.name}}<span *ngIf="i < room.players.length - 1">,</span>
+</span>

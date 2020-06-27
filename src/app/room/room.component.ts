@@ -2,10 +2,10 @@ import { Component, OnInit, ViewChild, ComponentFactoryResolver, Type } from '@a
 import { ActivatedRoute, Router } from '@angular/router';
 import { Socket } from 'ngx-socket-io';
 import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse } from 'src/shared/socket';
-import { PublicUserInfo } from 'src/shared/publicUserInfo';
 import { RoomContentDirective } from './roomContentDirective';
 import { LobbyComponent } from './lobby/lobby.component';
 import RoomContentComponent from './roomContentComponent';
+import RoomModel from '../models/roomModel';
 
 @Component({
   selector: 'app-room',
@@ -13,10 +13,10 @@ import RoomContentComponent from './roomContentComponent';
   styleUrls: ['./room.component.sass']
 })
 export class RoomComponent implements OnInit {
-  id: string;
-  owner: PublicUserInfo;
-  players: PublicUserInfo[];
-  @ViewChild(RoomContentDirective, { static: true }) contentHost: RoomContentDirective;
+  room: RoomModel = new RoomModel();
+  
+  @ViewChild(RoomContentDirective, { static: true })
+  contentHost: RoomContentDirective;
 
   constructor(
     private router: Router,
@@ -26,7 +26,7 @@ export class RoomComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.id = this.route.snapshot.paramMap.get('id');
+    this.room.id = this.route.snapshot.paramMap.get('id');
     this.join();
   }
 
@@ -38,11 +38,11 @@ export class RoomComponent implements OnInit {
     this.roomSocket.connect();
 
     this.roomSocket.on(ClientEvents.playersChanged, (args: PlayersChangedData) => {
-      this.owner = args.owner;
-      this.players = args.players;
+      this.room.owner = args.owner;
+      this.room.players = args.players;
     });
 
-    this.roomSocket.emit(ClientActions.joinRoom, <JoinRoomData>{ roomId: this.id }, resp => {
+    this.roomSocket.emit(ClientActions.joinRoom, <JoinRoomData>{ roomId: this.room.id }, resp => {
       if (resp.success) {
         this.loadContent(LobbyComponent);
       } else {
@@ -62,6 +62,6 @@ export class RoomComponent implements OnInit {
     viewContainerRef.clear();
 
     const componentRef = viewContainerRef.createComponent(componentFactory);
-    (<any>componentRef.instance).data = {};
+    componentRef.instance.room = this.room;
   }
 }
