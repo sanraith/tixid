@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Socket } from 'ngx-socket-io';
-import { ClientActions, JoinRoomData, ClientEvents } from 'src/shared/socket';
+import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData } from 'src/shared/socket';
+import { PublicUserInfo } from 'src/shared/publicUserInfo';
 
 @Component({
   selector: 'app-room',
@@ -10,7 +11,8 @@ import { ClientActions, JoinRoomData, ClientEvents } from 'src/shared/socket';
 })
 export class RoomComponent implements OnInit {
   id: string;
-  players: { name: string }[];
+  owner: PublicUserInfo;
+  players: PublicUserInfo[];
 
   constructor(
     private route: ActivatedRoute,
@@ -27,7 +29,10 @@ export class RoomComponent implements OnInit {
 
   private join(): void {
     this.roomSocket.connect();
-    this.roomSocket.on(ClientEvents.playersChanged, (players: { name: string; }[]) => this.players = players);
+    this.roomSocket.on(ClientEvents.playersChanged, (args: PlayersChangedData) => {
+      this.owner = args.owner;
+      this.players = args.players;
+    });
     this.roomSocket.emit(ClientActions.joinRoom, <JoinRoomData>{ roomId: this.id });
   }
 

@@ -15,7 +15,7 @@ class UserManager {
         const userInfo = this.createUserFrom(cookies);
         let existingUser = this.users[userInfo.id];
         if (existingUser) {
-            Object.keys(userInfo).map((k => existingUser[<keyof UserInfo>k] = userInfo[<keyof UserInfo>k]));
+            userInfo.copyTo(existingUser);
         } else {
             this.users[userInfo.id] = userInfo;
             existingUser = userInfo;

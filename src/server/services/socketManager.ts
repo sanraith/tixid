@@ -5,7 +5,8 @@ import Debug from 'debug';
 import roomManager from './roomManager';
 import userManager, { UserCookies } from './userManager';
 import UserInfo from '../models/userInfo';
-import { ClientActions, JoinRoomData, ClientEvents } from '../../shared/socket';
+import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData } from '../../shared/socket';
+import Room from '../models/room';
 const debug = Debug('tixid:services:socketManager');
 
 enum SocketEvents {
@@ -52,9 +53,11 @@ class SocketManager {
         this.notifyOnInitListeners();
     }
 
-    emitPlayersChanged(roomId: string, players: UserInfo[]) {
-        this.io.to(this.getRoomChannelId(roomId))
-            .emit(ClientEvents.playersChanged, players);
+    emitPlayersChanged(room: Room) {
+        this.io.to(this.getRoomChannelId(room.id)).emit(ClientEvents.playersChanged, <PlayersChangedData>{
+            owner: room.owner.publicInfo,
+            players: room.players.map(p => p.publicInfo)
+        });
     }
 
     getRoomChannelId(roomId: string) {

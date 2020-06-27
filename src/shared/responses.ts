@@ -1,3 +1,5 @@
+import { PublicUserInfo } from './publicUserInfo';
+
 export interface CreateRoomResponse {
     id: string
 }
@@ -5,11 +7,7 @@ export interface CreateRoomResponse {
 export interface GetRoomListResponse {
     rooms: {
         id: string,
-        owner: {
-            name: string
-        },
-        players: {
-            name: string
-        }[]
+        owner: PublicUserInfo,
+        players: PublicUserInfo[]
     }[]
 }

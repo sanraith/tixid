@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { RoomService } from '../services/room.service';
-import { GetRoomListResponse } from 'src/shared/responses';
+import { PublicUserInfo } from 'src/shared/publicUserInfo';
 
 @Component({
   selector: 'app-room-list',
@@ -9,7 +9,7 @@ import { GetRoomListResponse } from 'src/shared/responses';
   styleUrls: ['./room-list.component.sass']
 })
 export class RoomListComponent implements OnInit {
-  rooms: { id: string; owner: { name: string; }; players: { name: string; }[]; }[];
+  rooms: { id: string; owner: PublicUserInfo; players: PublicUserInfo[]; }[];
 
   constructor(
     private router: Router,

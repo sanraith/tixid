@@ -1,5 +1,5 @@
 <h2>Room {{id}}</h2>
 Players:
-<span *ngFor="let player of players; let i=index;">
+<span *ngFor="let player of players; let i = index;" [class.owner-name]="player.id === owner.id">
     {{player.name}}<span *ngIf="i < players.length - 1">,</span>
 </span>

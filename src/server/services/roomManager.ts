@@ -26,29 +26,32 @@ class RoomManager {
         return this._rooms[id];
     }
 
-    joinRoom(room: Room, player: UserInfo) {
-        const existingUserIndex = room.players.findIndex(x => player.id == x.id);
-        const playerExists = existingUserIndex >= 0;
-        if (playerExists) {
-            // Always overwrite user data in case of name refresh
-            room.players[existingUserIndex] = player;
-        } else {
+    joinRoom(room: Room, player: UserInfo): boolean {
+        const playerIndex = room.players.findIndex(x => player.id == x.id);
+        const isPlayerAlreadyJoined = playerIndex >= 0;
+        if (!isPlayerAlreadyJoined) {
             room.players.push(player);
         }
 
-        socketManager.emitPlayersChanged(room.id, room.players);
+        socketManager.emitPlayersChanged(room);
 
-        return playerExists;
+        return !isPlayerAlreadyJoined;
     }
 
-    leaveRoom(room: Room, player: UserInfo) {
+    leaveRoom(room: Room, player: UserInfo): void {
         const existingUserIndex = room.players.findIndex(x => player.id == x.id);
         if (existingUserIndex < 0) { return; }
 
         const leftPlayer = room.players.splice(existingUserIndex, 1)[0];
-        socketManager.emitPlayersChanged(room.id, room.players);
+        if (leftPlayer === room.owner) {
+            if (room.players.length > 0) {
+                room.owner = room.players[0];
+            } else {
+                // TODO delete room eventually
+            }
+        }
 
-        // TODO handle owner change
+        socketManager.emitPlayersChanged(room);
 
         debug(`Client ${leftPlayer.name} left room ${room.id}`);
     }
