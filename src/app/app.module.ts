@@ -10,6 +10,8 @@ import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
 import { RoomComponent } from './room/room.component';
 import { RoomListComponent } from './room-list/room-list.component';
+import { LobbyComponent } from './room/lobby/lobby.component';
+import { RoomContentDirective } from './room/roomContentDirective';
 
 const config: SocketIoConfig = { url: '', options: { autoConnect: false } };
 
@@ -18,7 +20,9 @@ const config: SocketIoConfig = { url: '', options: { autoConnect: false } };
     AppComponent,
     HomeComponent,
     RoomComponent,
-    RoomListComponent
+    RoomListComponent,
+    LobbyComponent,
+    RoomContentDirective
   ],
   imports: [
     BrowserModule,
@@ -27,6 +31,7 @@ const config: SocketIoConfig = { url: '', options: { autoConnect: false } };
     FormsModule,
     SocketIoModule.forRoot(config)
   ],
+  entryComponents: [LobbyComponent],
   providers: [CookieService],
   bootstrap: [AppComponent]
 })

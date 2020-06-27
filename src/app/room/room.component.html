@@ -3,3 +3,5 @@ Players:
 <span *ngFor="let player of players; let i = index;" [class.owner-name]="player.id === owner.id">
     {{player.name}}<span *ngIf="i < players.length - 1">,</span>
 </span>
+
+<ng-template room-content></ng-template>

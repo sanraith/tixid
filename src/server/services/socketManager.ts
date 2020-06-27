@@ -5,7 +5,7 @@ import Debug from 'debug';
 import roomManager from './roomManager';
 import userManager, { UserCookies } from './userManager';
 import UserInfo from '../models/userInfo';
-import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData } from '../../shared/socket';
+import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse } from '../../shared/socket';
 import Room from '../models/room';
 const debug = Debug('tixid:services:socketManager');
 
@@ -38,13 +38,16 @@ class SocketManager {
                 debug(`Client ${userInfo.name} disconnected: ${socket.client.id}`);
             })
 
-            socket.on(ClientActions.joinRoom, (data: JoinRoomData) => {
+            socket.on(ClientActions.joinRoom, (data: JoinRoomData, callback: (resp: EmitResponse) => void) => {
                 debug(`Client ${userInfo.name} joins room`, data);
 
                 const room = roomManager.getRoom(data.roomId);
                 if (room) {
                     socket.join(this.getRoomChannelId(room.id));
                     roomManager.joinRoom(room, userInfo);
+                    callback({ success: true });
+                } else {
+                    callback({ success: false });
                 }
             });
         });

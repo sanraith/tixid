@@ -8,6 +8,10 @@ export enum ClientEvents {
     playersChanged = "players_changed"
 }
 
+export interface EmitResponse {
+    success: boolean;
+}
+
 export interface PlayersChangedData {
     owner: PublicUserInfo,
     players: PublicUserInfo[],
