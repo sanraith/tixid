@@ -24,6 +24,11 @@ class UserManager {
         return existingUser;
     }
 
+    isCookiesContainUserInfo(cookie: UserCookies): boolean{
+        const user = this.createUserFrom(cookie);
+        return Object.keys(user).every((k => user[<keyof UserInfo>k]));
+    }
+
     /**
      * Generates an instance based on a cookie object containing the following properties:
      * "tixid.user.name" => name;

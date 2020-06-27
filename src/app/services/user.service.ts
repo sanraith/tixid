@@ -38,6 +38,8 @@ export class UserService {
     const userDataExists = Object.keys(this._user).every(k => this.cookieService.check(this.getCookieName(k)));
     if (userDataExists) {
       Object.keys(this._user).map(k => this._user[k] = this.cookieService.get(this.getCookieName(k)));
+    } else {
+      this.save();
     }
   }
 

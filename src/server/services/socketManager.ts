@@ -19,8 +19,13 @@ class SocketManager {
 
         io.on(SocketEvents.connection, (socket) => {
             debug(`Client connecting: ${socket.client.id}`);
-            const userCookies = <{ [P in keyof UserCookies]: UserCookies[P] }>cookie.parse(socket.handshake.headers.cookie);
-            const userInfo = userManager.getUserFromCookies(userCookies);
+
+            const userInfo = this.getUserFromSocketCookies(socket.handshake.headers.cookie);
+            if (userInfo === undefined) {
+                debug(`Disconnected client, no user data: ${socket.client.id}`)
+                socket.disconnect();
+                return;
+            }
             debug(`Client ${userInfo.name} connected: ${socket.client.id}`);
 
             socket.on(SocketEvents.disconnect, () => {
@@ -34,7 +39,7 @@ class SocketManager {
 
             socket.on(ClientActions.joinRoom, (data: JoinRoomData) => {
                 debug(`Client ${userInfo.name} joins room`, data);
-                
+
                 const room = roomManager.getRoom(data.roomId);
                 if (room) {
                     socket.join(this.getRoomChannelId(room.id));
@@ -58,6 +63,20 @@ class SocketManager {
 
     onInit(onInitFn: () => void) {
         this.onInitListeners.push(onInitFn);
+    }
+
+    private getUserFromSocketCookies(cookies: any): UserInfo | undefined {
+        if (!cookies) {
+            return undefined;
+        }
+
+        const userCookies = <{ [P in keyof UserCookies]: UserCookies[P] }>cookie.parse(cookies);
+
+        if (!userManager.isCookiesContainUserInfo(userCookies)) {
+            return undefined;
+        }
+
+        return userManager.getUserFromCookies(userCookies);
     }
 
     private notifyOnInitListeners() {

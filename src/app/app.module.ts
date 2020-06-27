@@ -11,7 +11,7 @@ import { HomeComponent } from './home/home.component';
 import { RoomComponent } from './room/room.component';
 import { RoomListComponent } from './room-list/room-list.component';
 
-const config: SocketIoConfig = { url: '', options: {} };
+const config: SocketIoConfig = { url: '', options: { autoConnect: false } };
 
 @NgModule({
   declarations: [
@@ -30,5 +30,4 @@ const config: SocketIoConfig = { url: '', options: {} };
   providers: [CookieService],
   bootstrap: [AppComponent]
 })
-export class AppModule {
-}
+export class AppModule { }
