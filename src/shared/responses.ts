@@ -1,4 +1,4 @@
-import { PublicUserInfo } from './publicUserInfo';
+import { PublicUserInfo } from './model/publicUserInfo';
 
 export interface CreateRoomResponse {
     id: string

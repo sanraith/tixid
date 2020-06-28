@@ -1,4 +1,4 @@
-import { PublicUserInfo } from './publicUserInfo';
+import { PublicUserInfo } from './model/publicUserInfo';
 
 export enum ClientActions {
     joinRoom = "join_room"

@@ -1,4 +1,4 @@
-import { PublicUserInfo } from '../../shared/publicUserInfo';
+import { PublicUserInfo } from '../../shared/model/publicUserInfo';
 
 export default class UserInfo {
     /**

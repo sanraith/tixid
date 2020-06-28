@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { RoomService } from '../services/room.service';
-import { PublicUserInfo } from 'src/shared/publicUserInfo';
+import { PublicUserInfo } from 'src/shared/model/publicUserInfo';
 
 @Component({
   selector: 'app-room-list',

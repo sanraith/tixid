@@ -1,4 +1,4 @@
-import { PublicUserInfo } from 'src/shared/publicUserInfo'
+import { PublicUserInfo } from 'src/shared/model/publicUserInfo'
 
 export default class RoomModel {
     id: string;

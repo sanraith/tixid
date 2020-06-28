@@ -115,3 +115,6 @@ src/server/public/stylesheets/**/*.css
 # Generated Javascript
 src/server/public/scripts/*.js
 src/server/public/scripts/*.js.map
+
+# Card images
+src/assets/cardSets/**/*.jpg
