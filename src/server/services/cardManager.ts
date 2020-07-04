@@ -5,8 +5,9 @@ import { uuid } from 'uuidv4';
 import { Card, CardSet } from '../../shared/model/card';
 
 const _appFolder = 'dist/client';
-const _cardDbName = 'cards.json';
+const _contextFolder = 'dist/context'
 const _cardSetsFolder = path.join(_appFolder, 'assets', 'cardSets');
+const _cardDbPath = path.join(_contextFolder, 'cards.json');
 
 
 class CardSetManager {
@@ -41,7 +42,7 @@ class CardSetManager {
             sets: Object.keys(this.sets).map(k => this.sets[k])
         };
         try {
-            await fs.writeFile(path.join(_appFolder, _cardDbName), JSON.stringify(cardsDb));
+            await fs.writeFile(_cardDbPath, JSON.stringify(cardsDb));
         } catch (err) {
             debug(err);
         }
