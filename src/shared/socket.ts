@@ -1,7 +1,8 @@
 import { PublicUserInfo } from './model/publicUserInfo';
 
 export enum ClientActions {
-    joinRoom = "join_room"
+    joinRoom = "join_room",
+    startGame = "start_game"
 }
 
 export enum ClientEvents {

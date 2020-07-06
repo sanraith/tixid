@@ -3,6 +3,8 @@ import shortid from 'shortid';
 import Room from '../models/room';
 import UserInfo from '../models/userInfo';
 import socketManager from './socketManager';
+import { GameStep } from '../../shared/model/gameStep';
+import GameState from '../models/gameState';
 const debug = Debug("tixid:services:roomManager");
 
 class RoomManager {
@@ -10,7 +12,9 @@ class RoomManager {
         const newRoom: Room = {
             id: this._roomIdGenerator.generate(),
             owner: owner,
-            players: []
+            players: [],
+            
+            state: new GameState(),
         };
         this._rooms[newRoom.id] = newRoom;
 
