@@ -1,28 +1,9 @@
 import { GameStep } from '../../shared/model/gameStep';
 import Room from '../models/room';
 import { Card, CardSet } from '../../shared/model/card';
-import UserInfo from '../models/userInfo';
 import GameState, { PlayerGameData } from '../models/gameState';
 import shuffle from 'shuffle-array';
 import { Rules } from '../models/rules';
-
-interface RoundState1 {
-    storyTeller: UserInfo
-}
-
-interface RoundState2 extends RoundState1 {
-    story: string,
-    storyCard: Card
-}
-
-interface RoundState3 extends RoundState2 {
-    playerPicks: Record<string, UserInfo> // identifier is card id
-}
-
-interface RoundState4 extends RoundState3 {
-    playerVotes: Record<string, Card> // identifier is user id
-    points: Record<string, number> // identifier is user id
-}
 
 interface TransitionResult {
     success: boolean,
@@ -47,7 +28,7 @@ export default class GameManager {
         this.state.cardPool = shuffle(sets.reduce((r, set) => r.concat(set.cards), <Card[]>[]));
         this.state.players = [];
         this.state.discardPile = [];
-        this.state.storyTeller = null;
+        this.state.storyTeller = undefined;
 
         if (this.state.cardPool.length === 0) {
             return this.errorResult("Can not start the game with no card pool!");
@@ -73,14 +54,18 @@ export default class GameManager {
 
         // Update the story teller
         const players = this.state.players;
-        this.state.storyTeller = players[(players.indexOf(this.state.storyTeller) + 1) % players.length]
+        if (this.state.storyTeller) {
+            this.state.storyTeller = players[(players.indexOf(this.state.storyTeller) + 1) % players.length];
+        } else {
+            this.state.storyTeller = players[0];
+        }
 
         this.state.step = GameStep.makeStory;
         return this.successResult();
     }
 
     makeStory(story: string, card: Card): TransitionResult {
-        const storyTeller = this.state.storyTeller;
+        const storyTeller = this.state.storyTeller!;
         if (this.state.step !== GameStep.makeStory) {
             return this.errorResult("Can only make a story in the make story step!");
         }

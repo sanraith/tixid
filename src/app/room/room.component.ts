@@ -7,6 +7,7 @@ import { LobbyComponent } from './lobby/lobby.component';
 import RoomContentComponent from './roomContentComponent';
 import RoomModel from '../models/roomModel';
 import { CardsDisplayComponent } from './cards-display/cards-display.component';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-room',
@@ -15,6 +16,7 @@ import { CardsDisplayComponent } from './cards-display/cards-display.component';
 })
 export class RoomComponent implements OnInit {
   room: RoomModel = new RoomModel();
+  isOwner: boolean;
 
   @ViewChild(RoomContentDirective, { static: true })
   contentHost: RoomContentDirective;
@@ -24,10 +26,11 @@ export class RoomComponent implements OnInit {
     private route: ActivatedRoute,
     private roomSocket: Socket,
     private componentFactoryResolver: ComponentFactoryResolver,
+    private userService: UserService
   ) { }
 
   ngOnInit(): void {
-    this.room.id = this.route.snapshot.paramMap.get('id');
+    this.room.id = this.route.snapshot.paramMap.get('id')!;
     this.join();
   }
 
@@ -35,8 +38,18 @@ export class RoomComponent implements OnInit {
     this.leave();
   }
 
-  showCardDisplay() :void{
+  showCardDisplay(): void {
     this.loadContent(CardsDisplayComponent);
+  }
+
+  startGame(): void {
+    this.roomSocket.emit(ClientActions.startGame, {}, (resp: EmitResponse) => {
+      if (resp.success) {
+        this.loadContent(CardsDisplayComponent);
+      } else {
+        alert(resp.message);
+      }
+    });
   }
 
   private join(): void {
@@ -45,6 +58,7 @@ export class RoomComponent implements OnInit {
     this.roomSocket.on(ClientEvents.playersChanged, (args: PlayersChangedData) => {
       this.room.owner = args.owner;
       this.room.players = args.players;
+      this.isOwner = this.userService.userData.id === this.room.owner.id;
     });
 
     this.roomSocket.emit(ClientActions.joinRoom, <JoinRoomData>{ roomId: this.room.id }, (resp: EmitResponse) => {

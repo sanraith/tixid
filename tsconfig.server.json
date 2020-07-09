@@ -9,7 +9,7 @@
     "outDir": "dist/", /* Redirect output structure to the directory. */
     "strict": true, /* Enable all strict type-checking options. */
     "moduleResolution": "node", /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
-    "baseUrl": ".", /* Base directory to resolve non-absolute module names. */
+    "baseUrl": "./", /* Base directory to resolve non-absolute module names. */
     "typeRoots": [
       "node_modules/@types"
     ], /* List of folders to include type definitions from. */

@@ -11,6 +11,7 @@ export enum ClientEvents {
 
 export interface EmitResponse {
     success: boolean;
+    message?: string;
 }
 
 export interface PlayersChangedData {

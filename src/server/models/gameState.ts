@@ -1,7 +1,7 @@
-import { GameStep } from 'src/shared/model/gameStep';
-import { Card } from 'src/shared/model/card';
+import { GameStep } from '../../shared/model/gameStep';
+import { Card } from '../../shared/model/card';
 import UserInfo from './userInfo';
-import { Rules } from './rules';
+import { Rules, defaultRules } from './rules';
 import shuffle from 'shuffle-array';
 
 export class PlayerGameData {
@@ -23,15 +23,15 @@ export class PlayerGameData {
 }
 
 export default class GameState {
-    rules: Rules;
+    rules: Rules = defaultRules;
     step: GameStep = GameStep.lobby;
     cardPool: Card[] = [];
     discardPile: Card[] = [];
-    players: PlayerGameData[];
+    players: PlayerGameData[] = [];
 
-    storyTeller: PlayerGameData;
-    story: string;
-    storyCard: Card;
+    storyTeller?: PlayerGameData;
+    story?: string;
+    storyCard?: Card;
 
     drawCards(count: number): Card[] {
         if (this.cardPool.length < count) {

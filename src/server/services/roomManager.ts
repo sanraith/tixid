@@ -13,7 +13,6 @@ class RoomManager {
             id: this._roomIdGenerator.generate(),
             owner: owner,
             players: [],
-            
             state: new GameState(),
         };
         this._rooms[newRoom.id] = newRoom;
