@@ -1,13 +1,15 @@
 import { Component, OnInit, ViewChild, ComponentFactoryResolver, Type } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Socket } from 'ngx-socket-io';
-import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse } from 'src/shared/socket';
+import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse, PlayerStateChangedData } from 'src/shared/socket';
 import { RoomContentDirective } from './roomContentDirective';
 import { LobbyComponent } from './lobby/lobby.component';
 import RoomContentComponent from './roomContentComponent';
 import RoomModel from '../models/roomModel';
 import { CardsDisplayComponent } from './cards-display/cards-display.component';
 import { UserService } from '../services/user.service';
+import { CardService } from '../services/card.service';
+import { PrivatePlayerState } from 'src/shared/model/playerState';
 
 @Component({
   selector: 'app-room',
@@ -26,7 +28,8 @@ export class RoomComponent implements OnInit {
     private route: ActivatedRoute,
     private roomSocket: Socket,
     private componentFactoryResolver: ComponentFactoryResolver,
-    private userService: UserService
+    private userService: UserService,
+    private cardService: CardService
   ) { }
 
   ngOnInit(): void {
@@ -45,20 +48,27 @@ export class RoomComponent implements OnInit {
   startGame(): void {
     this.roomSocket.emit(ClientActions.startGame, {}, (resp: EmitResponse) => {
       if (resp.success) {
-        this.loadContent(CardsDisplayComponent);
+        // TODO load make story screen
       } else {
         alert(resp.message);
       }
     });
   }
 
-  private join(): void {
+  private async join(): Promise<void> {
+    await this.cardService.init();
     this.roomSocket.connect();
 
     this.roomSocket.on(ClientEvents.playersChanged, (args: PlayersChangedData) => {
       this.room.owner = args.owner;
       this.room.players = args.players;
-      this.isOwner = this.userService.userData.id === this.room.owner.id;
+      this.isOwner = true || this.userService.userData.id === this.room.owner.id;
+    });
+
+    this.roomSocket.on(ClientEvents.playerStateChanged, (args: PlayerStateChangedData) => {
+      const myData = <PrivatePlayerState>args.playerStates.find(x => x.userInfo.id === this.userService.userData.id);
+      this.room.hand = myData.hand.map(id=>this.cardService.cards[id]);
+      console.log(JSON.stringify(args));
     });
 
     this.roomSocket.emit(ClientActions.joinRoom, <JoinRoomData>{ roomId: this.room.id }, (resp: EmitResponse) => {

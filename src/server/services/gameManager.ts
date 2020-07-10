@@ -4,6 +4,9 @@ import { Card, CardSet } from '../../shared/model/card';
 import GameState, { PlayerGameData } from '../models/gameState';
 import shuffle from 'shuffle-array';
 import { Rules } from '../models/rules';
+import socketManager from './socketManager';
+import Debug from 'debug';
+const debug = Debug('tixid:services:gameManager');
 
 interface TransitionResult {
     success: boolean,
@@ -20,7 +23,7 @@ export default class GameManager {
     // Transition operations
 
     startGame(rules: Rules, sets: CardSet[]): TransitionResult {
-        if (this.state.step !== GameStep.lobby) {
+        if (!rules.invalidStateChanges && this.state.step !== GameStep.lobby) {
             return this.errorResult("Can only start a game from the lobby!");
         }
 
@@ -38,11 +41,11 @@ export default class GameManager {
         shuffle(this.room.players).forEach(p => this.state.players.push(new PlayerGameData(p)));
 
         this.state.step = GameStep.dealCards;
-        return this.successResult();
+        return this.startRound();
     }
 
     startRound(): TransitionResult {
-        if (this.state.step !== GameStep.dealCards) {
+        if (!this.state.rules.invalidStateChanges && this.state.step !== GameStep.dealCards) {
             return this.errorResult("Can only start the round after the deal cards step!");
         }
 
@@ -61,12 +64,14 @@ export default class GameManager {
         }
 
         this.state.step = GameStep.makeStory;
+        socketManager.emitPlayerStateChanged(this.room, this.state.players);
+
         return this.successResult();
     }
 
     makeStory(story: string, card: Card): TransitionResult {
         const storyTeller = this.state.storyTeller!;
-        if (this.state.step !== GameStep.makeStory) {
+        if (!this.state.rules.invalidStateChanges && this.state.step !== GameStep.makeStory) {
             return this.errorResult("Can only make a story in the make story step!");
         }
         if (story === null || story === undefined || story.match(/^\s*$/) !== null) {

@@ -1,4 +1,5 @@
 import { PublicUserInfo } from './model/publicUserInfo';
+import { PublicPlayerState, PrivatePlayerState } from './model/playerState';
 
 export enum ClientActions {
     joinRoom = "join_room",
@@ -6,12 +7,17 @@ export enum ClientActions {
 }
 
 export enum ClientEvents {
-    playersChanged = "players_changed"
+    playersChanged = "players_changed",
+    playerStateChanged = "player_state_changed",
 }
 
 export interface EmitResponse {
     success: boolean;
     message?: string;
+}
+
+export interface PlayerStateChangedData {
+    playerStates: (PublicPlayerState | PrivatePlayerState)[]
 }
 
 export interface PlayersChangedData {

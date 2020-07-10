@@ -1,7 +1,7 @@
 import { PublicUserInfo } from './publicUserInfo';
 
 export interface PublicPlayerState {
-    player: PublicUserInfo;
+    userInfo: PublicUserInfo;
     handSize: number;
     points: number;
 }

@@ -5,12 +5,14 @@ import Debug from 'debug';
 import roomManager from './roomManager';
 import userManager, { UserCookies } from './userManager';
 import UserInfo from '../models/userInfo';
-import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse } from '../../shared/socket';
+import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse, PlayerStateChangedData } from '../../shared/socket';
 import Room from '../models/room';
 import { userInfo } from 'os';
 import GameManager from './gameManager';
 import { defaultRules } from '../models/rules';
 import cardManager from './cardManager';
+import { PublicPlayerState, PrivatePlayerState } from 'src/shared/model/playerState';
+import { PlayerGameData } from '../models/gameState';
 const debug = Debug('tixid:services:socketManager');
 
 enum SocketEvents {
@@ -50,7 +52,7 @@ class PlayerSocket {
 
     startGame(data: any): EmitResponse {
         if (!this.room) { return { success: false, message: "Cannot start the game while not being in a room!" }; }
-        if (this.room.owner !== this.userInfo) { return { success: false, message: "Only the owner of the room can start the game!" }; }
+        if (this.room.state.rules.onlyOwnerCanStart && this.room.owner !== this.userInfo) { return { success: false, message: "Only the owner of the room can start the game!" }; }
 
         const manager = new GameManager(this.room);
         debug("Requested deal cards");
@@ -77,9 +79,13 @@ class SocketManager {
                 return;
             }
             const playerSocket = new PlayerSocket(userInfo, socket);
+            this.playerSockets[userInfo.id] = playerSocket;
             debug(`Client ${userInfo.name} connected: ${socket.client.id}`);
 
-            socket.on(SocketEvents.disconnect, () => playerSocket.disconnect());
+            socket.on(SocketEvents.disconnect, () => {
+                playerSocket.disconnect();
+                delete this.playerSockets[userInfo.id];
+            });
             socket.on(ClientActions.joinRoom, (data: JoinRoomData, callback: (resp: EmitResponse) => void) => {
                 callback(playerSocket.joinRoom(data));
             });
@@ -99,6 +105,33 @@ class SocketManager {
         });
     }
 
+    emitPlayerStateChanged(room: Room, changedPlayers: PlayerGameData[]) {
+        const publicPlayerStates: Record<string, PublicPlayerState> = {};
+        debug(`Emitted players changed: ${changedPlayers.map(p => p.userInfo.name).join(', ')}`)
+        changedPlayers
+            .forEach(p => publicPlayerStates[p.userInfo.id] = <PublicPlayerState>{
+                userInfo: p.userInfo.publicInfo,
+                points: p.points,
+                handSize: p.hand.length
+            });
+
+        for (const targetPlayer of room.players) {
+            const targetSocket = this.playerSockets[targetPlayer.id];
+            if (!targetSocket) { debug(`Cannot reach player ${targetPlayer.name}`); continue; }
+
+            const emittedData = <PlayerStateChangedData>{
+                playerStates: changedPlayers.map(p => {
+                    const publicState = publicPlayerStates[p.userInfo.id]
+                    if (p.userInfo === targetPlayer) {
+                        return <PrivatePlayerState>{ ...publicState, hand: p.hand.map(c => c.id) };
+                    }
+                    return publicState;
+                })
+            };
+            targetSocket.socket.emit(ClientEvents.playerStateChanged, emittedData);
+        }
+    }
+
     getRoomChannelId(roomId: string) {
         return `room_${roomId}`;
     }
@@ -108,15 +141,9 @@ class SocketManager {
     }
 
     private getUserFromSocketCookies(cookies: any): UserInfo | undefined {
-        if (!cookies) {
-            return undefined;
-        }
-
+        if (!cookies) { return undefined; }
         const userCookies = <{ [P in keyof UserCookies]: UserCookies[P] }>cookie.parse(cookies);
-
-        if (!userManager.isCookiesContainUserInfo(userCookies)) {
-            return undefined;
-        }
+        if (!userManager.isCookiesContainUserInfo(userCookies)) { return undefined; }
 
         return userManager.getUserFromCookies(userCookies);
     }
@@ -129,6 +156,7 @@ class SocketManager {
     }
 
     private io!: Server;
+    private playerSockets: Record<string, PlayerSocket> = {};
     private onInitListeners: (() => void)[] = [];
 }
 

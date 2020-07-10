@@ -1,4 +1,10 @@
 <h2>Room {{room.id}}</h2>
 <button *ngIf="isOwner" (click)="startGame()">Start game</button>
 <button (click)="showCardDisplay()">Show all cards</button>
+
+<div *ngIf="room.hand">
+    <h2>Hand:</h2>
+    <img *ngFor="let card of room.hand" src="{{card.path}}" style="height: 20vh;">
+</div>
+
 <ng-template room-content></ng-template>

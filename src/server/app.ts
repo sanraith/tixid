@@ -4,6 +4,8 @@ import logger from 'morgan';
 import roomsRouter from './routes/roomsRouter';
 import cardSetManager from './services/cardManager';
 import './services/testDataGenerator';
+import Debug from 'debug';
+const debug = Debug('tixid:app');
 
 const _app_client_folder = 'dist/client';
 const _app_context_folder = 'dist/context';

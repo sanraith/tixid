@@ -5,12 +5,12 @@ import { Rules, defaultRules } from './rules';
 import shuffle from 'shuffle-array';
 
 export class PlayerGameData {
-    info: UserInfo;
+    userInfo: UserInfo;
     points: number = 0;
     hand: Card[] = [];
 
     constructor(info: UserInfo) {
-        this.info = info;
+        this.userInfo = info;
     }
 
     addCards(cards: Card[]) {
