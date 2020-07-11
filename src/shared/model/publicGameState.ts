@@ -8,4 +8,5 @@ export default interface PublicGameState {
 
     storyTeller?: PublicUserInfo,
     story?: string,
+    storyCardId?: string
 }

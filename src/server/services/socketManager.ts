@@ -103,7 +103,8 @@ class SocketManager {
             discardPileCount: state.cardPool.length,
             step: state.step,
             story: state.story,
-            storyTeller: state.storyTeller?.userInfo.publicInfo
+            storyTeller: state.storyTeller?.userInfo.publicInfo,
+            storyCardId: state.storyCard?.id
         };
 
         if (recipient) {

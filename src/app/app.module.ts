@@ -13,6 +13,8 @@ import { RoomListComponent } from './room-list/room-list.component';
 import { LobbyComponent } from './room/lobby/lobby.component';
 import { RoomContentDirective } from './room/roomContentDirective';
 import { MakeStoryComponent } from './room/make-story/make-story.component';
+import { ExtendStoryComponent } from './room/extend-story/extend-story.component';
+import { CardPickerComponent } from './room/card-picker/card-picker.component';
 
 const config: SocketIoConfig = { url: '', options: { autoConnect: false } };
 
@@ -24,7 +26,9 @@ const config: SocketIoConfig = { url: '', options: { autoConnect: false } };
     RoomListComponent,
     LobbyComponent,
     RoomContentDirective,
-    MakeStoryComponent
+    MakeStoryComponent,
+    ExtendStoryComponent,
+    CardPickerComponent
   ],
   imports: [
     BrowserModule,

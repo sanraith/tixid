@@ -26,7 +26,9 @@ export class MakeStoryComponent implements RoomContentComponent, OnInit {
       story: this.story,
       cardId: this.storyCard.id
     }, (resp: EmitResponse) => {
-      alert(`Story success: ${resp.success}`);
+      if (!resp.success) {
+        alert(`Error: ${resp.message}`);
+      }
     });
   }
 }

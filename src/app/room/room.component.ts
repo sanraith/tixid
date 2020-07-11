@@ -11,6 +11,7 @@ import { PrivatePlayerState } from 'src/shared/model/playerState';
 import { Card } from 'src/shared/model/card';
 import { MakeStoryComponent } from './make-story/make-story.component';
 import { GameStep } from 'src/shared/model/gameStep';
+import { ExtendStoryComponent } from './extend-story/extend-story.component';
 
 @Component({
   selector: 'app-room',
@@ -118,6 +119,7 @@ export class RoomComponent implements OnInit {
     switch (newStep) {
       case GameStep.lobby: return LobbyComponent;
       case GameStep.makeStory: return MakeStoryComponent;
+      case GameStep.extendStory: return ExtendStoryComponent;
       default: return null;
     }
   }
