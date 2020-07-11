@@ -1,21 +1,28 @@
 import { PublicUserInfo } from './model/publicUserInfo';
 import { PublicPlayerState, PrivatePlayerState } from './model/playerState';
+import PublicGameState from './model/publicGameState';
 
 export enum ClientActions {
     joinRoom = "join_room",
-    startGame = "start_game"
+    startGame = "start_game",
+    makeStory = "make_story"
 }
 
 export enum ClientEvents {
     playersChanged = "players_changed",
+
     playerStateChanged = "player_state_changed",
-    gameStarted = "game_started"
+    gameStateChanged = "game_state_changed",
+
+    gameStarted = "game_started",
 }
 
 export interface EmitResponse {
     success: boolean;
     message?: string;
 }
+
+export interface GameStateChangedData extends PublicGameState { }
 
 export interface PlayerStateChangedData {
     playerStates: (PublicPlayerState | PrivatePlayerState)[]
@@ -28,4 +35,9 @@ export interface PlayersChangedData {
 
 export interface JoinRoomData {
     roomId: string
+}
+
+export interface MakeStoryData {
+    story: string,
+    cardId: string
 }

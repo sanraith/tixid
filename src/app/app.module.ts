@@ -12,7 +12,6 @@ import { RoomComponent } from './room/room.component';
 import { RoomListComponent } from './room-list/room-list.component';
 import { LobbyComponent } from './room/lobby/lobby.component';
 import { RoomContentDirective } from './room/roomContentDirective';
-import { CardsDisplayComponent } from './room/cards-display/cards-display.component';
 import { MakeStoryComponent } from './room/make-story/make-story.component';
 
 const config: SocketIoConfig = { url: '', options: { autoConnect: false } };
@@ -25,7 +24,6 @@ const config: SocketIoConfig = { url: '', options: { autoConnect: false } };
     RoomListComponent,
     LobbyComponent,
     RoomContentDirective,
-    CardsDisplayComponent,
     MakeStoryComponent
   ],
   imports: [

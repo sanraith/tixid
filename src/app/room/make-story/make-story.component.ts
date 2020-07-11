@@ -1,6 +1,9 @@
 import { Component, OnInit, Input } from '@angular/core';
 import RoomModel from 'src/app/models/roomModel';
 import RoomContentComponent from '../roomContentComponent';
+import { Card } from 'src/shared/model/card';
+import { ClientActions, MakeStoryData, EmitResponse } from 'src/shared/socket';
+import { Socket } from 'ngx-socket-io';
 
 @Component({
   selector: 'app-make-story',
@@ -11,9 +14,19 @@ export class MakeStoryComponent implements RoomContentComponent, OnInit {
   @Input()
   room: RoomModel;
 
-  constructor() { }
+  story?: string;
+  storyCard?: Card;
 
-  ngOnInit(): void {
+  constructor(private roomSocket: Socket) { }
+
+  ngOnInit(): void { }
+
+  sendStory(): void {
+    this.roomSocket.emit(ClientActions.makeStory, <MakeStoryData>{
+      story: this.story,
+      cardId: this.storyCard.id
+    }, (resp: EmitResponse) => {
+      alert(`Story success: ${resp.success}`);
+    });
   }
-
 }

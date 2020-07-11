@@ -66,6 +66,7 @@ export default class GameManager {
         }
 
         this.state.step = GameStep.makeStory;
+        socketManager.emitGameStateChanged(this.room);
         socketManager.emitPlayerStateChanged(this.room, this.state.players);
 
         return this.successResult();
@@ -89,6 +90,8 @@ export default class GameManager {
         this.state.story = story;
         this.state.storyCard = storyTeller.removeCard(card);
         this.state.step = GameStep.extendStory;
+        socketManager.emitPlayerStateChanged(this.room, [storyTeller]);
+        socketManager.emitGameStateChanged(this.room);
 
         return this.successResult();
     }

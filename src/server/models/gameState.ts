@@ -8,6 +8,7 @@ export class PlayerGameData {
     userInfo: UserInfo;
     points: number = 0;
     hand: Card[] = [];
+    isReady: boolean = false;
 
     constructor(info: UserInfo) {
         this.userInfo = info;

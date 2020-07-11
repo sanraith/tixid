@@ -4,6 +4,7 @@ export interface PublicPlayerState {
     userInfo: PublicUserInfo;
     handSize: number;
     points: number;
+    isReady: boolean;
 }
 
 export interface PrivatePlayerState extends PublicPlayerState {

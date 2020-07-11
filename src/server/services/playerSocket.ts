@@ -1,13 +1,13 @@
 import SocketIo from 'socket.io';
 import roomManager from './roomManager';
 import UserInfo from '../models/userInfo';
-import { JoinRoomData, EmitResponse } from '../../shared/socket';
+import { JoinRoomData, EmitResponse, MakeStoryData } from '../../shared/socket';
 import Room from '../models/room';
-import { userInfo } from 'os';
 import GameManager from './gameManager';
 import { defaultRules } from '../models/rules';
 import cardManager from './cardManager';
 import Debug from 'debug';
+import socketManager from './socketManager';
 const debug = Debug('tixid:services:playerSocket');
 
 /**
@@ -24,11 +24,15 @@ export default class PlayerSocket {
     }
 
     joinRoom(data: JoinRoomData): EmitResponse {
-        debug(`Client ${userInfo.name} joins room`, data);
+        debug(`Client ${this.userInfo.name} joins room`, data);
         this.room = roomManager.getRoom(data.roomId);
         if (this.room) {
             this.socket.join(this.getRoomChannelId(this.room.id));
             roomManager.joinRoom(this.room, this.userInfo);
+            socketManager.emitGameStateChanged(this.room, this.userInfo);
+            if ((this.room.state?.players.length ?? 0) > 0) {
+                socketManager.emitPlayerStateChanged(this.room, this.room?.state.players, this.userInfo);
+            }
             return { success: true };
         }
         else {
@@ -47,10 +51,21 @@ export default class PlayerSocket {
     startGame(data: any): EmitResponse {
         if (!this.room) { return { success: false, message: "Cannot start the game while not being in a room!" }; }
         if (this.room.state.rules.onlyOwnerCanStart && this.room.owner !== this.userInfo) { return { success: false, message: "Only the owner of the room can start the game!" }; }
-        
+
         const manager = new GameManager(this.room);
-        debug("Requested deal cards");
+        debug("Requested start game");
         const result = manager.startGame(defaultRules, Object.values(cardManager.sets));
+        return result;
+    }
+
+    makeStory({ story, cardId }: MakeStoryData): EmitResponse {
+        if (!this.room) { return { success: false, message: "Cannot start the game while not being in a room!" }; }
+        if (this.room.state.storyTeller?.userInfo !== this.userInfo) { return { success: false, message: "Only the storyTeller can create a story!" }; }
+
+        const manager = new GameManager(this.room);
+        debug("Requested make story");
+        const result = manager.makeStory(story, cardManager.cards[cardId]);
+
         return result;
     }
 

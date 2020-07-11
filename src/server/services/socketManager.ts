@@ -4,7 +4,7 @@ import cookie from 'cookie';
 import Debug from 'debug';
 import userManager, { UserCookies } from './userManager';
 import UserInfo from '../models/userInfo';
-import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse, PlayerStateChangedData } from '../../shared/socket';
+import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse, PlayerStateChangedData, GameStateChangedData, MakeStoryData } from '../../shared/socket';
 import Room from '../models/room';
 import { PublicPlayerState, PrivatePlayerState } from 'src/shared/model/playerState';
 import { PlayerGameData } from '../models/gameState';
@@ -46,6 +46,9 @@ class SocketManager {
             socket.on(ClientActions.startGame, (data: any, callback: (resp: EmitResponse) => void) => {
                 callback(playerSocket.startGame(data));
             });
+            socket.on(ClientActions.makeStory, (data: MakeStoryData, callback: (resp: EmitResponse) => void) => {
+                callback(playerSocket.makeStory(data));
+            });
         });
 
         this.io = io;
@@ -63,17 +66,19 @@ class SocketManager {
         this.getRoomChannel(room.id).emit(ClientEvents.gameStarted);
     }
 
-    emitPlayerStateChanged(room: Room, changedPlayers: PlayerGameData[]) {
+    emitPlayerStateChanged(room: Room, changedPlayers: PlayerGameData[], recipient?: UserInfo) {
         const publicPlayerStates: Record<string, PublicPlayerState> = {};
-        debug(`Emitted players changed: ${changedPlayers.map(p => p.userInfo.name).join(', ')}`)
+        debug(`Emit players changed: ${changedPlayers.map(p => p.userInfo.name).join(', ')}`);
         changedPlayers
             .forEach(p => publicPlayerStates[p.userInfo.id] = <PublicPlayerState>{
                 userInfo: p.userInfo.publicInfo,
+                handSize: p.hand.length,
                 points: p.points,
-                handSize: p.hand.length
+                isReady: p.isReady
             });
 
-        for (const targetPlayer of room.players) {
+        const recipients = recipient ? [recipient] : room.players;
+        for (const targetPlayer of recipients) {
             const targetSocket = this.playerSockets[targetPlayer.id];
             if (!targetSocket) { debug(`Cannot reach player ${targetPlayer.name}`); continue; }
 
@@ -87,6 +92,26 @@ class SocketManager {
                 })
             };
             targetSocket.socket.emit(ClientEvents.playerStateChanged, emittedData);
+        }
+    }
+
+    emitGameStateChanged(room: Room, recipient?: UserInfo) {
+        debug(`Emitted game state changed: ${room.id}`);
+        const state = room.state;
+        const gameStateData: GameStateChangedData = {
+            cardPoolCount: state.cardPool.length,
+            discardPileCount: state.cardPool.length,
+            step: state.step,
+            story: state.story,
+            storyTeller: state.storyTeller?.userInfo.publicInfo
+        };
+
+        if (recipient) {
+            const playerSocket = this.playerSockets[recipient.id];
+            playerSocket.socket.emit(ClientEvents.gameStateChanged, gameStateData);
+        } else {
+            const roomChannel = this.getRoomChannel(room.id);
+            roomChannel.emit(ClientEvents.gameStateChanged, gameStateData);
         }
     }
 

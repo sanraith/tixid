@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import { uuid } from 'uuidv4';
 
-interface User {
+export interface ClientUser {
   name: string,
   id: string,
   secret: string
@@ -14,7 +14,7 @@ interface User {
 export class UserService {
   constructor(private cookieService: CookieService) { }
 
-  get userData(): User {
+  get userData(): ClientUser {
     if (!this._user) {
       this.loadOrGenerateUserData();
     }
@@ -45,5 +45,5 @@ export class UserService {
 
   private getCookieName(name: string): string { return `tixid.user.${name}`; }
 
-  private _user?: User;
+  private _user?: ClientUser;
 }
