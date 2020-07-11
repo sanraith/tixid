@@ -5,6 +5,7 @@ import roomsRouter from './routes/roomsRouter';
 import cardSetManager from './services/cardManager';
 import cardRouter from './routes/cardRouter';
 import './services/testDataGenerator';
+import process from 'process';
 import Debug from 'debug';
 const debug = Debug('tixid:app');
 
@@ -28,5 +29,7 @@ app.use('/card', cardRouter);
 app.get('*', function (req, res) {
   res.status(200).sendFile(`/`, { root: _app_client_folder });
 });
+
+debug(`Process id: ${process.pid}`);
 
 export default app;
