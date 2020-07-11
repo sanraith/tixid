@@ -4,7 +4,7 @@
 
 <div *ngIf="room.hand">
     <h2>Hand:</h2>
-    <img *ngFor="let card of room.hand" src="{{card.path}}" style="height: 20vh;">
+    <img *ngFor="let card of room.hand" src="card/{{card.path}}" style="height: 20vh;">
 </div>
 
 <ng-template room-content></ng-template>

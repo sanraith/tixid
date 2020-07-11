@@ -8,8 +8,8 @@ import RoomContentComponent from './roomContentComponent';
 import RoomModel from '../models/roomModel';
 import { CardsDisplayComponent } from './cards-display/cards-display.component';
 import { UserService } from '../services/user.service';
-import { CardService } from '../services/card.service';
 import { PrivatePlayerState } from 'src/shared/model/playerState';
+import { Card } from 'src/shared/model/card';
 
 @Component({
   selector: 'app-room',
@@ -29,7 +29,6 @@ export class RoomComponent implements OnInit {
     private roomSocket: Socket,
     private componentFactoryResolver: ComponentFactoryResolver,
     private userService: UserService,
-    private cardService: CardService
   ) { }
 
   ngOnInit(): void {
@@ -56,7 +55,6 @@ export class RoomComponent implements OnInit {
   }
 
   private async join(): Promise<void> {
-    await this.cardService.init();
     this.roomSocket.connect();
 
     this.roomSocket.on(ClientEvents.playersChanged, (args: PlayersChangedData) => {
@@ -67,7 +65,7 @@ export class RoomComponent implements OnInit {
 
     this.roomSocket.on(ClientEvents.playerStateChanged, (args: PlayerStateChangedData) => {
       const myData = <PrivatePlayerState>args.playerStates.find(x => x.userInfo.id === this.userService.userData.id);
-      this.room.hand = myData.hand.map(id=>this.cardService.cards[id]);
+      this.room.hand = myData.hand.map(id => new Card(id, id));
       console.log(JSON.stringify(args));
     });
 
