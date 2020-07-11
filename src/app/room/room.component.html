@@ -2,9 +2,19 @@
 <button *ngIf="isOwner" (click)="startGame()">Start game</button>
 <button (click)="showCardDisplay()">Show all cards</button>
 
-<div *ngIf="room.hand">
+<div *ngIf="room.game.hand">
     <h2>Hand:</h2>
-    <img *ngFor="let card of room.hand" src="card/{{card.path}}" style="height: 20vh;">
+    <img *ngFor="let card of room.game.hand" src="card/{{card.path}}" style="height: 20vh;">
 </div>
 
+<div *ngIf="room.game.players">
+    <h2>Players</h2>
+    <ul>
+        <li *ngFor="let playerState of room.game.players">
+            Name: {{playerState.userInfo.name}},
+            Hand size: {{playerState.handSize}},
+            Points: {{playerState.points}}
+        </li>
+    </ul>
+</div>
 <ng-template room-content></ng-template>

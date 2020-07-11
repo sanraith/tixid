@@ -2,69 +2,23 @@ import SocketIo, { Server } from 'socket.io';
 import { Server as HttpServer } from 'http';
 import cookie from 'cookie';
 import Debug from 'debug';
-import roomManager from './roomManager';
 import userManager, { UserCookies } from './userManager';
 import UserInfo from '../models/userInfo';
 import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse, PlayerStateChangedData } from '../../shared/socket';
 import Room from '../models/room';
-import { userInfo } from 'os';
-import GameManager from './gameManager';
-import { defaultRules } from '../models/rules';
-import cardManager from './cardManager';
 import { PublicPlayerState, PrivatePlayerState } from 'src/shared/model/playerState';
 import { PlayerGameData } from '../models/gameState';
-const debug = Debug('tixid:services:socketManager');
+import PlayerSocket from './playerSocket';
+export const debug = Debug('tixid:services:socketManager');
 
 enum SocketEvents {
     connection = "connection",
     disconnect = "disconnect",
 }
 
-class PlayerSocket {
-    userInfo: UserInfo;
-    room?: Room;
-    socket: SocketIo.Socket;
-
-    constructor(user: UserInfo, socket: SocketIo.Socket) {
-        this.userInfo = user;
-        this.socket = socket;
-    }
-
-    joinRoom(data: JoinRoomData): EmitResponse {
-        debug(`Client ${userInfo.name} joins room`, data);
-        this.room = roomManager.getRoom(data.roomId);
-        if (this.room) {
-            this.socket.join(this.getRoomChannelId(this.room.id));
-            roomManager.joinRoom(this.room, this.userInfo);
-            return { success: true };
-        } else {
-            return { success: false };
-        }
-    }
-
-    disconnect() {
-        this.socket.disconnect();
-        roomManager.getRooms()
-            .filter(x => x.players.some(p => this.userInfo.id === p.id))
-            .forEach(x => roomManager.leaveRoom(x, this.userInfo));
-        debug(`Client ${this.userInfo.name} disconnected: ${this.socket.client.id}`);
-    }
-
-    startGame(data: any): EmitResponse {
-        if (!this.room) { return { success: false, message: "Cannot start the game while not being in a room!" }; }
-        if (this.room.state.rules.onlyOwnerCanStart && this.room.owner !== this.userInfo) { return { success: false, message: "Only the owner of the room can start the game!" }; }
-
-        const manager = new GameManager(this.room);
-        debug("Requested deal cards");
-        const result = manager.startGame(defaultRules, Object.values(cardManager.sets));
-        return result;
-    }
-
-    getRoomChannelId(roomId: string) {
-        return `room_${roomId}`;
-    }
-}
-
+/**
+ * Handles all player socket connections.
+ */
 class SocketManager {
     init(httpServer: HttpServer) {
         const io = SocketIo(httpServer);
@@ -99,10 +53,14 @@ class SocketManager {
     }
 
     emitPlayersChanged(room: Room) {
-        this.io.to(this.getRoomChannelId(room.id)).emit(ClientEvents.playersChanged, <PlayersChangedData>{
+        this.getRoomChannel(room.id).emit(ClientEvents.playersChanged, <PlayersChangedData>{
             owner: room.owner.publicInfo,
             players: room.players.map(p => p.publicInfo)
         });
+    }
+
+    emitGameStarted(room: Room) {
+        this.getRoomChannel(room.id).emit(ClientEvents.gameStarted);
     }
 
     emitPlayerStateChanged(room: Room, changedPlayers: PlayerGameData[]) {
@@ -132,8 +90,8 @@ class SocketManager {
         }
     }
 
-    getRoomChannelId(roomId: string) {
-        return `room_${roomId}`;
+    getRoomChannel(roomId: string): SocketIo.Namespace {
+        return this.io.to(`room_${roomId}`);
     }
 
     onInit(onInitFn: () => void) {

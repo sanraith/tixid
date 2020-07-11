@@ -5,7 +5,7 @@ import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResp
 import { RoomContentDirective } from './roomContentDirective';
 import { LobbyComponent } from './lobby/lobby.component';
 import RoomContentComponent from './roomContentComponent';
-import RoomModel from '../models/roomModel';
+import RoomModel, { GameState } from '../models/roomModel';
 import { CardsDisplayComponent } from './cards-display/cards-display.component';
 import { UserService } from '../services/user.service';
 import { PrivatePlayerState } from 'src/shared/model/playerState';
@@ -63,10 +63,22 @@ export class RoomComponent implements OnInit {
       this.isOwner = true || this.userService.userData.id === this.room.owner.id;
     });
 
+    this.roomSocket.on(ClientEvents.gameStarted, () => {
+      this.room.game = new GameState();
+    });
+
     this.roomSocket.on(ClientEvents.playerStateChanged, (args: PlayerStateChangedData) => {
+      const game = this.room.game;
       const myData = <PrivatePlayerState>args.playerStates.find(x => x.userInfo.id === this.userService.userData.id);
-      this.room.hand = myData.hand.map(id => new Card(id, id));
-      console.log(JSON.stringify(args));
+      game.hand = myData.hand.map(id => new Card(id, id));
+      for (const playerState of args.playerStates) {
+        const localPlayerStateIndex = game.players.findIndex(x => x.userInfo.id === playerState.userInfo.id);
+        if (localPlayerStateIndex >= 0) {
+          game.players[localPlayerStateIndex] = playerState;
+        } else {
+          game.players.push(playerState);
+        }
+      }
     });
 
     this.roomSocket.emit(ClientActions.joinRoom, <JoinRoomData>{ roomId: this.room.id }, (resp: EmitResponse) => {

@@ -9,6 +9,7 @@ export enum ClientActions {
 export enum ClientEvents {
     playersChanged = "players_changed",
     playerStateChanged = "player_state_changed",
+    gameStarted = "game_started"
 }
 
 export interface EmitResponse {

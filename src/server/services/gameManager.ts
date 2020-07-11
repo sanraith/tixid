@@ -41,6 +41,8 @@ export default class GameManager {
         shuffle(this.room.players).forEach(p => this.state.players.push(new PlayerGameData(p)));
 
         this.state.step = GameStep.dealCards;
+        socketManager.emitGameStarted(this.room);
+
         return this.startRound();
     }
 
