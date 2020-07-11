@@ -10,6 +10,7 @@ import { CardsDisplayComponent } from './cards-display/cards-display.component';
 import { UserService } from '../services/user.service';
 import { PrivatePlayerState } from 'src/shared/model/playerState';
 import { Card } from 'src/shared/model/card';
+import { MakeStoryComponent } from './make-story/make-story.component';
 
 @Component({
   selector: 'app-room',
@@ -47,6 +48,7 @@ export class RoomComponent implements OnInit {
   startGame(): void {
     this.roomSocket.emit(ClientActions.startGame, {}, (resp: EmitResponse) => {
       if (resp.success) {
+        this.loadContent(MakeStoryComponent);
         // TODO load make story screen
       } else {
         alert(resp.message);
