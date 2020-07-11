@@ -1,0 +1,19 @@
+<h2>Voting</h2>
+
+<div *ngIf="!room.localState.myVotedCard && !alreadyVoted">
+    <p>
+        Try to pick the card of the story teller!<br />
+        <small>(You can not pick your own cards.)</small>
+    </p>
+    <app-card-picker [cards]="room.localState.voteCards" [(selectedCard)]="voteCard"></app-card-picker>
+    <br />
+
+    <button (click)="voteForCard()"
+        [disabled]="alreadyVoted || !voteCard || voteCard.id === room.localState.mySubmittedCard.id">
+        Vote for card!
+    </button>
+</div>
+
+<div *ngIf="room.localState.myVotedCard || alreadyVoted">
+    <p>Waiting for others to vote...</p>
+</div>

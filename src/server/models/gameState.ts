@@ -3,6 +3,7 @@ import { Card } from '../../shared/model/card';
 import UserInfo from './userInfo';
 import { Rules, defaultRules } from './rules';
 import shuffle from 'shuffle-array';
+import StoryCard from 'src/shared/model/storyCard';
 
 export class PlayerGameData {
     userInfo: UserInfo;
@@ -21,6 +22,10 @@ export class PlayerGameData {
     removeCard(card: Card) {
         return this.hand.splice(this.hand.indexOf(card), 1)[0];
     }
+
+    hasCard(card: Card): boolean {
+        return this.hand.indexOf(card) > -1;
+    }
 }
 
 export default class GameState {
@@ -33,6 +38,8 @@ export default class GameState {
     storyTeller?: PlayerGameData;
     story?: string;
     storyCard?: Card;
+    storyCardPile: { userInfo: UserInfo, card: Card }[] = [];
+    votes: { userInfo: UserInfo, card: Card }[] = [];
 
     drawCards(count: number): Card[] {
         if (this.cardPool.length < count) {

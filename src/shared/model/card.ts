@@ -4,5 +4,11 @@ export class CardSet {
 }
 
 export class Card {
-    constructor(public id: string, public path: string) { }
+    public id: string;
+    public path: string;
+
+    constructor(id: string, path?: string) {
+        this.id = id;
+        this.path = path ?? id;
+    }
 }

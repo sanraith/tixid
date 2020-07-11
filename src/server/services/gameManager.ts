@@ -6,6 +6,7 @@ import shuffle from 'shuffle-array';
 import { Rules } from '../models/rules';
 import socketManager from './socketManager';
 import Debug from 'debug';
+import UserInfo from '../models/userInfo';
 const debug = Debug('tixid:services:gameManager');
 
 interface TransitionResult {
@@ -51,6 +52,11 @@ export default class GameManager {
             return this.errorResult("Can only start the round after the deal cards step!");
         }
 
+        // Reset piles
+        this.state.storyCardPile.forEach(sc => this.state.discardPile.push(sc.card));
+        this.state.storyCardPile = [];
+        this.state.votes = [];
+
         // Draw until everyone has the right amount of cards
         const handSize = this.state.rules.handSize;
         Object.values(this.state.players)
@@ -64,6 +70,9 @@ export default class GameManager {
         } else {
             this.state.storyTeller = players[0];
         }
+
+        this.resetPlayerReadiness(true);
+        this.state.storyTeller.isReady = false;
 
         this.state.step = GameStep.makeStory;
         socketManager.emitGameStateChanged(this.room);
@@ -80,20 +89,85 @@ export default class GameManager {
         if (story === null || story === undefined || story.match(/^\s*$/) !== null) {
             return this.errorResult("Story is empty!");
         }
-        if (!card) {
-            return this.errorResult("Card is empty!");
-        }
-        if (storyTeller.hand.indexOf(card) === -1) {
-            return this.errorResult("Card is not in the storyteller's hand!");
-        }
+        if (!card) { return this.errorResult("Card is empty!"); }
+        if (!storyTeller.hasCard(card)) { return this.errorResult("Card is not in the storyteller's hand!"); }
 
         this.state.story = story;
         this.state.storyCard = storyTeller.removeCard(card);
+        this.state.storyCardPile.push({ userInfo: storyTeller.userInfo, card: this.state.storyCard });
+
+        this.resetPlayerReadiness();
+        storyTeller.isReady = true;
+
         this.state.step = GameStep.extendStory;
         socketManager.emitPlayerStateChanged(this.room, [storyTeller]);
         socketManager.emitGameStateChanged(this.room);
 
         return this.successResult();
+    }
+
+    extendStory(userInfo: UserInfo, card: Card): TransitionResult {
+        const player = this.state.players.find(x => x.userInfo.id === userInfo.id);
+        if (!this.state.rules.invalidStateChanges && this.state.step !== GameStep.extendStory) {
+            return this.errorResult("Can only extend story in the extend story step!");
+        }
+        if (!player) { return this.errorResult("Cannot find user!"); }
+        if (!card) { return this.errorResult("Card is empty!"); }
+        if (!player.hasCard(card)) { return this.errorResult("Card is not in the player's hand!"); }
+        if (player.isReady) { return this.errorResult("Cannot extend the story more than once!"); }
+
+        // Add story card to story card pile
+        player.removeCard(card);
+        this.state.storyCardPile.push({ userInfo: userInfo, card: card });
+        player.isReady = true;
+
+        if (this.areAllPlayersReady()) {
+            this.state.step = GameStep.voteStory;
+            this.resetPlayerReadiness();
+        }
+        socketManager.emitPlayerStateChanged(this.room, [player]);
+        socketManager.emitGameStateChanged(this.room); // TODO remove? Maybe required to re-render common pile...
+
+        return this.successResult();
+    }
+
+    voteStory(userInfo: UserInfo, card: Card): TransitionResult {
+        const player = this.state.players.find(x => x.userInfo.id === userInfo.id);
+        if (!this.state.rules.invalidStateChanges && this.state.step !== GameStep.voteStory) {
+            return this.errorResult("Can only vote in the vote story step!");
+        }
+        if (!player) { return this.errorResult("Cannot find user!"); }
+        if (!card) { return this.errorResult("Card is empty!"); }
+        if (!this.state.storyCardPile.find(sc => sc.card === card)) { return this.errorResult("Card is not in the story card pile!"); }
+        if (player.isReady) { return this.errorResult("Cannot vote more than once!"); }
+
+        // Register vote
+        this.state.votes.push({ userInfo: userInfo, card: card });
+        player.isReady = true;
+
+        if (this.areAllPlayersReady()) {
+            this.state.step = GameStep.voteStoryResults;
+            this.resetPlayerReadiness();
+        }
+        socketManager.emitPlayerStateChanged(this.room, [player]);
+        socketManager.emitGameStateChanged(this.room); // TODO remove? Maybe required to re-render common pile...
+
+        return this.successResult();
+    }
+
+    private areAllPlayersReady(): boolean {
+        for (const player of this.state.players) {
+            if (!player.isReady) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private resetPlayerReadiness(isReady: boolean = false): void {
+        for (const player of this.state.players) {
+            player.isReady = isReady;
+        }
     }
 
     private errorResult(message: string): TransitionResult { return { success: false, message: message }; }

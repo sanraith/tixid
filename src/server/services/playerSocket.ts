@@ -1,7 +1,7 @@
 import SocketIo from 'socket.io';
 import roomManager from './roomManager';
 import UserInfo from '../models/userInfo';
-import { JoinRoomData, EmitResponse, MakeStoryData } from '../../shared/socket';
+import { JoinRoomData, EmitResponse, MakeStoryData, ExtendStoryData, VoteStoryData } from '../../shared/socket';
 import Room from '../models/room';
 import GameManager from './gameManager';
 import { defaultRules } from '../models/rules';
@@ -16,6 +16,7 @@ const debug = Debug('tixid:services:playerSocket');
 export default class PlayerSocket {
     userInfo: UserInfo;
     room?: Room;
+    manager?: GameManager;
     socket: SocketIo.Socket;
 
     constructor(user: UserInfo, socket: SocketIo.Socket) {
@@ -27,6 +28,7 @@ export default class PlayerSocket {
         debug(`Client ${this.userInfo.name} joins room`, data);
         this.room = roomManager.getRoom(data.roomId);
         if (this.room) {
+            this.manager = new GameManager(this.room);
             this.socket.join(this.getRoomChannelId(this.room.id));
             roomManager.joinRoom(this.room, this.userInfo);
             socketManager.emitGameStateChanged(this.room, this.userInfo);
@@ -40,33 +42,52 @@ export default class PlayerSocket {
         }
     }
 
-    disconnect() {
-        this.socket.disconnect();
+    leaveRooms() {
         roomManager.getRooms()
             .filter(x => x.players.some(p => this.userInfo.id === p.id))
             .forEach(x => roomManager.leaveRoom(x, this.userInfo));
+        debug(`Client ${this.userInfo.name} left all rooms.`);
+        return { success: true };
+    }
+
+    disconnect() {
+        this.socket.disconnect();
         debug(`Client ${this.userInfo.name} disconnected: ${this.socket.client.id}`);
     }
 
-    startGame(data: any): EmitResponse {
-        if (!this.room) { return { success: false, message: "Cannot start the game while not being in a room!" }; }
-        if (this.room.state.rules.onlyOwnerCanStart && this.room.owner !== this.userInfo) { return { success: false, message: "Only the owner of the room can start the game!" }; }
+    startGame(): EmitResponse {
+        if (!this.room || !this.manager) { return { success: false, message: "Player is not part of any room!" }; }
+        if (this.room.state.rules.onlyOwnerCanStart && this.room.owner !== this.userInfo) {
+            return { success: false, message: "Only the owner of the room can start the game!" };
+        }
 
-        const manager = new GameManager(this.room);
-        debug("Requested start game");
-        const result = manager.startGame(defaultRules, Object.values(cardManager.sets));
+        debug(`Requested start game by ${this.userInfo.name}`);
+        const result = this.manager.startGame(defaultRules, Object.values(cardManager.sets));
         return result;
     }
 
     makeStory({ story, cardId }: MakeStoryData): EmitResponse {
-        if (!this.room) { return { success: false, message: "Cannot start the game while not being in a room!" }; }
+        if (!this.room || !this.manager) { return { success: false, message: "Player is not part of any room!" }; }
         if (this.room.state.storyTeller?.userInfo !== this.userInfo) { return { success: false, message: "Only the storyTeller can create a story!" }; }
 
-        const manager = new GameManager(this.room);
-        debug("Requested make story");
-        const result = manager.makeStory(story, cardManager.cards[cardId]);
+        debug(`Requested make story by ${this.userInfo.name}`);
+        return this.manager.makeStory(story, cardManager.cards[cardId]);
+    }
 
-        return result;
+    extendStory(data: ExtendStoryData): EmitResponse {
+        if (!this.room || !this.manager) { return { success: false, message: "Player is not part of any room!" }; }
+
+        debug(`Requested extend story by ${this.userInfo.name}`);
+        const card = cardManager.cards[data.cardId];
+        return this.manager.extendStory(this.userInfo, card);
+    }
+
+    voteStory(data: VoteStoryData): EmitResponse {
+        if (!this.room || !this.manager) { return { success: false, message: "Player is not part of any room!" }; }
+
+        debug(`Requested vote story by ${this.userInfo.name}`);
+        const card = cardManager.cards[data.cardId];
+        return this.manager.voteStory(this.userInfo, card);
     }
 
     getRoomChannelId(roomId: string) {

@@ -4,8 +4,11 @@ import PublicGameState from './model/publicGameState';
 
 export enum ClientActions {
     joinRoom = "join_room",
+    leaveRooms = "leave_rooms",
     startGame = "start_game",
-    makeStory = "make_story"
+    makeStory = "make_story",
+    extendStory = "extend_story",
+    voteStory = "vote_story"
 }
 
 export enum ClientEvents {
@@ -41,3 +44,9 @@ export interface MakeStoryData {
     story: string,
     cardId: string
 }
+
+export interface ExtendStoryData {
+    cardId: string
+}
+
+export interface VoteStoryData extends ExtendStoryData { }

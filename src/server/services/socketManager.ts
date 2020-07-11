@@ -4,11 +4,13 @@ import cookie from 'cookie';
 import Debug from 'debug';
 import userManager, { UserCookies } from './userManager';
 import UserInfo from '../models/userInfo';
-import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse, PlayerStateChangedData, GameStateChangedData, MakeStoryData } from '../../shared/socket';
+import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse, PlayerStateChangedData, GameStateChangedData, MakeStoryData, ExtendStoryData, VoteStoryData } from '../../shared/socket';
 import Room from '../models/room';
 import { PublicPlayerState, PrivatePlayerState } from 'src/shared/model/playerState';
 import { PlayerGameData } from '../models/gameState';
 import PlayerSocket from './playerSocket';
+import { GameStep } from '../../shared/model/gameStep';
+import StoryCard from 'src/shared/model/storyCard';
 export const debug = Debug('tixid:services:socketManager');
 
 enum SocketEvents {
@@ -43,11 +45,20 @@ class SocketManager {
             socket.on(ClientActions.joinRoom, (data: JoinRoomData, callback: (resp: EmitResponse) => void) => {
                 callback(playerSocket.joinRoom(data));
             });
+            socket.on(ClientActions.leaveRooms, (data: JoinRoomData, callback: (resp: EmitResponse) => void) => {
+                callback(playerSocket.leaveRooms());
+            });
             socket.on(ClientActions.startGame, (data: any, callback: (resp: EmitResponse) => void) => {
-                callback(playerSocket.startGame(data));
+                callback(playerSocket.startGame());
             });
             socket.on(ClientActions.makeStory, (data: MakeStoryData, callback: (resp: EmitResponse) => void) => {
                 callback(playerSocket.makeStory(data));
+            });
+            socket.on(ClientActions.extendStory, (data: ExtendStoryData, callback: (resp: EmitResponse) => void) => {
+                callback(playerSocket.extendStory(data));
+            });
+            socket.on(ClientActions.voteStory, (data: VoteStoryData, callback: (resp: EmitResponse) => void) => {
+                callback(playerSocket.voteStory(data));
             });
         });
 
@@ -96,23 +107,41 @@ class SocketManager {
     }
 
     emitGameStateChanged(room: Room, recipient?: UserInfo) {
-        debug(`Emitted game state changed: ${room.id}`);
+        debug(`Emitted game state changed: ${room.id} - ${room.state.step}`);
         const state = room.state;
         const gameStateData: GameStateChangedData = {
             cardPoolCount: state.cardPool.length,
             discardPileCount: state.cardPool.length,
+            // storyCardPile => differs by player
             step: state.step,
             story: state.story,
             storyTeller: state.storyTeller?.userInfo.publicInfo,
-            storyCardId: state.storyCard?.id
+            // storyCardId => differs by player
+            // TODO add votes
         };
 
-        if (recipient) {
-            const playerSocket = this.playerSockets[recipient.id];
-            playerSocket.socket.emit(ClientEvents.gameStateChanged, gameStateData);
-        } else {
-            const roomChannel = this.getRoomChannel(room.id);
-            roomChannel.emit(ClientEvents.gameStateChanged, gameStateData);
+        const canRevealAllCards = state.step >= GameStep.voteStory;
+        const canRevealAllCardOwners = state.step >= GameStep.voteStoryResults;
+
+        const recipients = recipient ? [recipient] : room.players;
+        for (const targetPlayer of recipients) {
+            const targetSocket = this.playerSockets[targetPlayer.id];
+            if (!targetSocket) { debug(`Cannot reach player ${targetPlayer.name}`); continue; }
+
+            // Only show card origin to card owner, or after the voting
+            const storyCardPile = state.storyCardPile.map(sc => <StoryCard>{
+                cardId: (canRevealAllCards || sc.userInfo === targetPlayer) ? sc.card.id : undefined,
+                userInfo: (canRevealAllCardOwners || sc.userInfo === targetPlayer) ? sc.userInfo.publicInfo : undefined
+            });
+
+            gameStateData.storyCardPile = storyCardPile;
+
+            // Only show story card to story teller
+            if (targetPlayer === state.storyTeller?.userInfo) {
+                gameStateData.storyCardId = state.storyCard?.id;
+            }
+
+            targetSocket.socket.emit(ClientEvents.gameStateChanged, gameStateData);
         }
     }
 

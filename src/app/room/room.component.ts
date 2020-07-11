@@ -12,6 +12,8 @@ import { Card } from 'src/shared/model/card';
 import { MakeStoryComponent } from './make-story/make-story.component';
 import { GameStep } from 'src/shared/model/gameStep';
 import { ExtendStoryComponent } from './extend-story/extend-story.component';
+import { VoteStoryComponent } from './vote-story/vote-story.component';
+import { VoteStoryResultsComponent } from './vote-story-results/vote-story-results.component';
 
 @Component({
   selector: 'app-room',
@@ -84,6 +86,7 @@ export class RoomComponent implements OnInit {
       const currentGameState = this.room.gameState;
       const newContent = this.pickRoomContent(currentGameState?.step, newState.step);
       this.room.gameState = newState;
+      this.updateLocalState();
       if (newContent) {
         this.loadContent(newContent);
       }
@@ -97,7 +100,23 @@ export class RoomComponent implements OnInit {
     });
   }
 
+  private updateLocalState(): void {
+    const gameState = this.room.gameState;
+    const localState = this.room.localState;
+    if (gameState.storyCardPile) {
+      const mySubmittedCardId = gameState.storyCardPile.find(x => x.userInfo?.id === this.room.currentUser.id)?.cardId;
+      localState.mySubmittedCard = mySubmittedCardId ? new Card(mySubmittedCardId) : undefined;
+      localState.voteCards = gameState.storyCardPile.map(x => new Card(x.cardId));
+    }
+
+    if (gameState.votes) {
+      const myVotedCardId = gameState.votes.find(x => x.userInfo?.id === this.room.currentUser.id)?.cardId;
+      localState.myVotedCard = myVotedCardId ? new Card(myVotedCardId) : undefined;
+    }
+  }
+
   private leave(): void {
+    this.roomSocket.emit(ClientActions.leaveRooms, null, (resp: EmitResponse) => { });
     this.roomSocket.removeAllListeners();
     this.roomSocket.disconnect();
   }
@@ -120,6 +139,8 @@ export class RoomComponent implements OnInit {
       case GameStep.lobby: return LobbyComponent;
       case GameStep.makeStory: return MakeStoryComponent;
       case GameStep.extendStory: return ExtendStoryComponent;
+      case GameStep.voteStory: return VoteStoryComponent;
+      case GameStep.voteStoryResults: return VoteStoryResultsComponent;
       default: return null;
     }
   }
