@@ -8,6 +8,8 @@ export interface Rules {
 
     pointsDeceivedSomebody: number,
     pointsMaxDeceivedSomebody: number,
+
+    pointsToWin: number
 }
 
 export const defaultRules: Rules = {
@@ -18,5 +20,7 @@ export const defaultRules: Rules = {
     pointsSomebodyGuessedRight: 3,
     pointsNobodyOrEverybodyGuessedRight: 2,
     pointsDeceivedSomebody: 1,
-    pointsMaxDeceivedSomebody: 3
+    pointsMaxDeceivedSomebody: 3,
+
+    pointsToWin: 5
 };

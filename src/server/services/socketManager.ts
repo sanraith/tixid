@@ -60,6 +60,12 @@ class SocketManager {
             socket.on(ClientActions.voteStory, (data: VoteStoryData, callback: (resp: EmitResponse) => void) => {
                 callback(playerSocket.voteStory(data));
             });
+            socket.on(ClientActions.partialResults, (data: any, callback: (resp: EmitResponse) => void) => {
+                callback(playerSocket.partialResults());
+            });
+            socket.on(ClientActions.startRound, (data: any, callback: (resp: EmitResponse) => void) => {
+                callback(playerSocket.startRound());
+            });
         });
 
         this.io = io;

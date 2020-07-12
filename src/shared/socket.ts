@@ -8,7 +8,9 @@ export enum ClientActions {
     startGame = "start_game",
     makeStory = "make_story",
     extendStory = "extend_story",
-    voteStory = "vote_story"
+    voteStory = "vote_story",
+    partialResults = "partial_results",
+    startRound = "start_round"
 }
 
 export enum ClientEvents {

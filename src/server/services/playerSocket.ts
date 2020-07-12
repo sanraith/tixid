@@ -90,6 +90,26 @@ export default class PlayerSocket {
         return this.manager.voteStory(this.userInfo, card);
     }
 
+    partialResults(): EmitResponse {
+        if (!this.room || !this.manager) { return { success: false, message: "Player is not part of any room!" }; }
+        if (this.room.state.rules.onlyOwnerCanStart && this.room.owner !== this.userInfo) {
+            return { success: false, message: "Only the owner can show partial results!" };
+        }
+
+        debug(`Requested partial results by ${this.userInfo.name}`);
+        return this.manager.partialResults();
+    }
+
+    startRound(): EmitResponse {
+        if (!this.room || !this.manager) { return { success: false, message: "Player is not part of any room!" }; }
+        if (this.room.state.rules.onlyOwnerCanStart && this.room.owner !== this.userInfo) {
+            return { success: false, message: "Only the owner can start the round!" };
+        }
+
+        debug(`Requested start round by ${this.userInfo.name}`);
+        return this.manager.startRound();
+    }
+
     getRoomChannelId(roomId: string) {
         return `room_${roomId}`;
     }

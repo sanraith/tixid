@@ -17,6 +17,8 @@ import { ExtendStoryComponent } from './room/extend-story/extend-story.component
 import { CardPickerComponent } from './room/card-picker/card-picker.component';
 import { VoteStoryComponent } from './room/vote-story/vote-story.component';
 import { VoteStoryResultsComponent } from './room/vote-story-results/vote-story-results.component';
+import { PartialResultsComponent } from './room/partial-results/partial-results.component';
+import { FinalResultsComponent } from './room/final-results/final-results.component';
 
 const config: SocketIoConfig = { url: '', options: { autoConnect: false } };
 
@@ -32,7 +34,9 @@ const config: SocketIoConfig = { url: '', options: { autoConnect: false } };
     ExtendStoryComponent,
     CardPickerComponent,
     VoteStoryComponent,
-    VoteStoryResultsComponent
+    VoteStoryResultsComponent,
+    PartialResultsComponent,
+    FinalResultsComponent
   ],
   imports: [
     BrowserModule,

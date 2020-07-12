@@ -52,16 +52,26 @@ export default class GameManager {
             return this.errorResult("Can only start the round after the deal cards step!");
         }
 
+        // If somebody has enough points, show the final results instead.
+        if (this.state.players.some(x => x.points >= this.state.rules.pointsToWin)) {
+            this.state.step = GameStep.finalResults;
+            socketManager.emitGameStateChanged(this.room);
+
+            return this.successResult();
+        }
+
         // Reset piles
         this.state.storyCardPile.forEach(sc => this.state.discardPile.push(sc.card));
         this.state.storyCardPile = [];
         this.state.votes = [];
         this.state.roundPoints = [];
+        this.state.storyCard = undefined;
+        this.state.story = undefined;
 
         // Draw until everyone has the right amount of cards
         const handSize = this.state.rules.handSize;
         Object.values(this.state.players)
-            .filter(p => p.hand.length < handSize - 1)
+            .filter(p => p.hand.length < handSize)
             .forEach(p => p.addCards(this.state.drawCards(handSize - p.hand.length)));
 
         // Update the story teller

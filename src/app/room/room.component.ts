@@ -14,6 +14,8 @@ import { ExtendStoryComponent } from './extend-story/extend-story.component';
 import { VoteStoryComponent } from './vote-story/vote-story.component';
 import { VoteStoryResultsComponent } from './vote-story-results/vote-story-results.component';
 import { PublicUserInfo } from 'src/shared/model/publicUserInfo';
+import { PartialResultsComponent } from './partial-results/partial-results.component';
+import { FinalResultsComponent } from './final-results/final-results.component';
 
 @Component({
   selector: 'app-room',
@@ -45,11 +47,13 @@ export class RoomComponent implements OnInit {
     this.leave();
   }
 
-  startGame(): void {
-    this.roomSocket.emit(ClientActions.startGame, {}, (resp: EmitResponse) => {
-      if (resp.success) {
-        // TODO load make story screen
-      } else {
+  startGame() { this.emitAction(ClientActions.startGame); }
+  showPartialResults() { this.emitAction(ClientActions.partialResults); }
+  startRound() { this.emitAction(ClientActions.startRound); }
+
+  private emitAction(action: ClientActions) {
+    this.roomSocket.emit(action, {}, (resp: EmitResponse) => {
+      if (!resp.success) {
         alert(resp.message);
       }
     });
@@ -146,6 +150,8 @@ export class RoomComponent implements OnInit {
       case GameStep.extendStory: return ExtendStoryComponent;
       case GameStep.voteStory: return VoteStoryComponent;
       case GameStep.voteStoryResults: return VoteStoryResultsComponent;
+      case GameStep.partialResults: return PartialResultsComponent;
+      case GameStep.finalResults: return FinalResultsComponent;
       default: return null;
     }
   }
