@@ -16,5 +16,7 @@
 </div>
 
 <ng-template #waitingBlock>
+    <app-card-picker [cards]="room.localState.voteCardIds" [(selectedCard)]="voteCard" [isEnabled]="false">
+    </app-card-picker>
     <p>Waiting for others to vote...</p>
 </ng-template>

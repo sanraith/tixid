@@ -1,7 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import RoomContentComponent from '../roomContentComponent';
 import RoomModel from 'src/app/models/roomModel';
-import { Card } from 'src/shared/model/card';
 import { Socket } from 'ngx-socket-io';
 import { ClientActions, VoteStoryData, EmitResponse } from 'src/shared/socket';
 

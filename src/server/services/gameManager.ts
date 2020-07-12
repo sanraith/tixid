@@ -123,6 +123,7 @@ export default class GameManager {
         player.isReady = true;
 
         if (this.areAllPlayersReady()) {
+            shuffle(this.state.storyCardPile);
             this.state.step = GameStep.voteStory;
             this.resetPlayerReadiness();
             this.state.storyTeller!.isReady = true;
@@ -203,6 +204,8 @@ export default class GameManager {
                 reason: RoundPointReason.deceivedSomebody,
                 userInfo: state.storyCardPile.find(sc => sc.card === vote.card)!.userInfo
             }));
+        
+        points.sort((a, b) => a.userInfo.name.localeCompare(b.userInfo.name));
     }
 
     private areAllPlayersReady(): boolean {
