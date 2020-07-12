@@ -22,6 +22,7 @@ export class UserService {
   }
 
   save() {
+    Object.keys(this._user).map(k => this.cookieService.delete(this.getCookieName(k)));
     Object.keys(this._user).map(k => this.cookieService.set(this.getCookieName(k), this._user[k], 365 * 10));
     this.loadOrGenerateUserData();
   }
