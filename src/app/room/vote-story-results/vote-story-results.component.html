@@ -9,7 +9,7 @@
     <br />
     Votes ({{room.localState.votesByCardId[pickedCard.cardId]?.length || "0"}}):
     <span
-        *ngFor="let user of room.localState.votesByCardId[pickedCard.cardId]; let i = index">{{user.name}}{{i > 0 ? ', ' : ''}}</span>
+        *ngFor="let user of room.localState.votesByCardId[pickedCard.cardId]; let i = index">{{i > 0 ? ', ' : ''}}{{user.name}}</span>
 </div>
 
 <ul>

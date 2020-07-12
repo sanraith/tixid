@@ -129,7 +129,7 @@ export default class GameManager {
             this.state.storyTeller!.isReady = true;
         }
         socketManager.emitPlayerStateChanged(this.room, [player]);
-        socketManager.emitGameStateChanged(this.room); // TODO remove? Maybe required to re-render common pile...
+        socketManager.emitGameStateChanged(this.room);
 
         return this.successResult();
     }
@@ -154,8 +154,26 @@ export default class GameManager {
             this.resetPlayerReadiness();
         }
         socketManager.emitPlayerStateChanged(this.room, [player]);
-        socketManager.emitGameStateChanged(this.room); // TODO remove? Maybe required to re-render common pile...
+        socketManager.emitGameStateChanged(this.room);
 
+        return this.successResult();
+    }
+
+    partialResults(): TransitionResult {
+        const state = this.state;
+        if (!state.rules.invalidStateChanges && state.step !== GameStep.voteStoryResults) {
+            return this.errorResult("Can only show partial results after the vote story step!");
+        }
+        
+        for (const pointData of state.roundPoints) {
+            const player = state.players.find(x => x.userInfo === pointData.userInfo)!;
+            player.points += pointData.points;
+        }
+        
+        this.state.step = GameStep.partialResults;
+        socketManager.emitPlayerStateChanged(this.room, state.players);
+        socketManager.emitGameStateChanged(this.room);
+        
         return this.successResult();
     }
 
