@@ -196,15 +196,25 @@ export default class GameManager {
                 }));
         }
 
-        // Add points to players who deceived somebody
+        // Add points to players who deceived somebody.
+        const maxDeceivePoints = state.rules.pointsMaxDeceivedSomebody;
+        const normalDeceivePoints = state.rules.pointsDeceivedSomebody;
+        const userDeceivePoints = state.players.reduce((dict, p) => { dict[p.userInfo.id] = 0; return dict; }, <Record<string, number>>{});
         state.votes
             .filter(vote => vote.card !== state.storyCard)
-            .forEach(vote => points.push({
-                points: state.rules.pointsDeceivedSomebody,
-                reason: RoundPointReason.deceivedSomebody,
-                userInfo: state.storyCardPile.find(sc => sc.card === vote.card)!.userInfo
-            }));
-        
+            .forEach(vote => {
+                const receivingUser = state.storyCardPile.find(sc => sc.card === vote.card)!.userInfo;
+                const currentPoints = userDeceivePoints[receivingUser.id];
+                const alreadyAtMaximum = normalDeceivePoints + currentPoints > maxDeceivePoints;
+                const receivedPoints = alreadyAtMaximum ? 0 : normalDeceivePoints;
+                points.push({
+                    points: receivedPoints,
+                    reason: alreadyAtMaximum ? RoundPointReason.deceivedSomebodyOverMaximum : RoundPointReason.deceivedSomebody,
+                    userInfo: receivingUser
+                });
+                userDeceivePoints[receivingUser.id] += receivedPoints;
+            });
+
         points.sort((a, b) => a.userInfo.name.localeCompare(b.userInfo.name));
     }
 

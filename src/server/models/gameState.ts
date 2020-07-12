@@ -34,7 +34,8 @@ export enum RoundPointReason {
     guessedRight = "you_guessed_right",
     somebodyGuessedRight = "somebody_guessed_right",
 
-    deceivedSomebody = "deceived_somebody"
+    deceivedSomebody = "deceived_somebody",
+    deceivedSomebodyOverMaximum = "deceived_somebody_over_maximum_points"
 }
 
 export default class GameState {
