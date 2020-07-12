@@ -1,5 +1,5 @@
 import { PublicUserInfo } from './model/publicUserInfo';
-import { PublicPlayerState, PrivatePlayerState } from './model/playerState';
+import { PublicPlayerState, PrivatePlayerState } from './model/sharedPlayerState';
 import PublicGameState from './model/publicGameState';
 
 export enum ClientActions {

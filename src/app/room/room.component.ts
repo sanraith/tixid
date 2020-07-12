@@ -7,7 +7,7 @@ import { LobbyComponent } from './lobby/lobby.component';
 import RoomContentComponent from './roomContentComponent';
 import RoomModel, { PlayerState } from '../models/roomModel';
 import { UserService } from '../services/user.service';
-import { PrivatePlayerState } from 'src/shared/model/playerState';
+import { PrivatePlayerState } from 'src/shared/model/sharedPlayerState';
 import { MakeStoryComponent } from './make-story/make-story.component';
 import { GameStep } from 'src/shared/model/gameStep';
 import { ExtendStoryComponent } from './extend-story/extend-story.component';

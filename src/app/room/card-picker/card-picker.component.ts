@@ -17,7 +17,6 @@ export class CardPickerComponent implements OnInit {
   }
 
   _selectedCardChange() {
-    console.log(this.selectedCard);
     this.selectedCardChange.emit(this.selectedCard);
   }
 }

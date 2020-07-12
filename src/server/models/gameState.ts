@@ -9,6 +9,7 @@ export class PlayerGameData {
     points: number = 0;
     hand: Card[] = [];
     isReady: boolean = false;
+    isConnected: boolean = true;
 
     constructor(info: UserInfo) {
         this.userInfo = info;

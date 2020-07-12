@@ -6,7 +6,7 @@ import userManager, { UserCookies } from './userManager';
 import UserInfo from '../models/userInfo';
 import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse, PlayerStateChangedData, GameStateChangedData, MakeStoryData, ExtendStoryData, VoteStoryData } from '../../shared/socket';
 import Room from '../models/room';
-import { PublicPlayerState, PrivatePlayerState } from 'src/shared/model/playerState';
+import { PublicPlayerState, PrivatePlayerState } from 'src/shared/model/sharedPlayerState';
 import { PlayerGameData } from '../models/gameState';
 import PlayerSocket from './playerSocket';
 import { GameStep } from '../../shared/model/gameStep';
@@ -91,7 +91,8 @@ class SocketManager {
                 userInfo: p.userInfo.publicInfo,
                 handSize: p.hand.length,
                 points: p.points,
-                isReady: p.isReady
+                isReady: p.isReady,
+                isConnected: p.isConnected
             });
 
         const recipients = recipient ? [recipient] : room.players;

@@ -8,11 +8,14 @@
     <img *ngFor="let card of room.playerState.hand" src="card/{{card.path}}" style="height: 20vh;">
 </div> -->
 
+<!-- Additional icons to consider: '📶🚫' -->
 <div *ngIf="room.playerState?.players">
     <h2>Players</h2>
     <ul>
         <li *ngFor="let playerState of room.playerState.players">
-            Name: {{playerState.userInfo.name}},
+            {{playerState.isReady ? '✔' : '⏳'}}
+            {{playerState.isConnected ? '' : '⚠'}}
+            {{playerState.userInfo.name}},
             Hand size: {{playerState.handSize}},
             Points: {{playerState.points}}
             <span *ngIf="room.gameState.storyTeller.id === playerState.userInfo.id">[STORYTELLER]</span>

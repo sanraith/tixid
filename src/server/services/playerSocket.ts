@@ -32,6 +32,14 @@ export default class PlayerSocket {
             this.socket.join(this.getRoomChannelId(this.room.id));
             roomManager.joinRoom(this.room, this.userInfo);
             socketManager.emitGameStateChanged(this.room, this.userInfo);
+            
+            // Set connection state 
+            const playerState = this.room?.state.players.find(x => x.userInfo === this.userInfo);
+            if (playerState && !playerState.isConnected) {
+                playerState.isConnected = true;
+                socketManager.emitPlayerStateChanged(this.room, [playerState]);
+            }
+
             if ((this.room.state?.players.length ?? 0) > 0) {
                 socketManager.emitPlayerStateChanged(this.room, this.room?.state.players, this.userInfo);
             }
@@ -51,6 +59,12 @@ export default class PlayerSocket {
     }
 
     disconnect() {
+        const playerState = this.room?.state.players.find(x => x.userInfo === this.userInfo);
+        if (this.room && playerState && playerState.isConnected) {
+            playerState.isConnected = false;
+            socketManager.emitPlayerStateChanged(this.room, [playerState]);
+        }
+
         this.socket.disconnect();
         debug(`Client ${this.userInfo.name} disconnected: ${this.socket.client.id}`);
     }

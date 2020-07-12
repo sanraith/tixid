@@ -111,7 +111,7 @@ export default class GameManager {
         storyTeller.isReady = true;
 
         this.state.step = GameStep.extendStory;
-        socketManager.emitPlayerStateChanged(this.room, [storyTeller]);
+        socketManager.emitPlayerStateChanged(this.room, this.state.players);
         socketManager.emitGameStateChanged(this.room);
 
         return this.successResult();
@@ -137,8 +137,10 @@ export default class GameManager {
             this.state.step = GameStep.voteStory;
             this.resetPlayerReadiness();
             this.state.storyTeller!.isReady = true;
+            socketManager.emitPlayerStateChanged(this.room, this.state.players);
+        } else {
+            socketManager.emitPlayerStateChanged(this.room, [player]);
         }
-        socketManager.emitPlayerStateChanged(this.room, [player]);
         socketManager.emitGameStateChanged(this.room);
 
         return this.successResult();
@@ -162,8 +164,10 @@ export default class GameManager {
             this.scoreVotes();
             this.state.step = GameStep.voteStoryResults;
             this.resetPlayerReadiness();
+            socketManager.emitPlayerStateChanged(this.room, this.state.players);
+        } else {
+            socketManager.emitPlayerStateChanged(this.room, [player]);
         }
-        socketManager.emitPlayerStateChanged(this.room, [player]);
         socketManager.emitGameStateChanged(this.room);
 
         return this.successResult();

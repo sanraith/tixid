@@ -1,6 +1,5 @@
 import { PublicUserInfo } from 'src/shared/model/publicUserInfo'
-import { Card } from 'src/shared/model/card';
-import { PublicPlayerState } from 'src/shared/model/playerState';
+import { PublicPlayerState } from 'src/shared/model/sharedPlayerState';
 import PublicGameState from 'src/shared/model/publicGameState';
 import { ClientUser } from '../services/user.service';
 
