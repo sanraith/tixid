@@ -35,7 +35,9 @@ export class RoomComponent implements OnInit {
     private roomSocket: Socket,
     private componentFactoryResolver: ComponentFactoryResolver,
     private userService: UserService,
-  ) { }
+  ) { 
+    this.room.socket = roomSocket;
+  }
 
   ngOnInit(): void {
     this.room.currentUser = this.userService.userData;
@@ -47,6 +49,7 @@ export class RoomComponent implements OnInit {
     this.leave();
   }
 
+  lobby() { this.emitAction(ClientActions.goToLobby); }
   startGame() { this.emitAction(ClientActions.startGame); }
   showPartialResults() { this.emitAction(ClientActions.partialResults); }
   startRound() { this.emitAction(ClientActions.startRound); }

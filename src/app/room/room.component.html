@@ -1,4 +1,5 @@
 <h2>Room {{room.id}}</h2>
+<button *ngIf="isOwner" (click)="lobby()">Lobby</button>
 <button *ngIf="isOwner" (click)="startGame()">Start game</button>
 <button *ngIf="isOwner" (click)="showPartialResults()">Partial results</button>
 <button *ngIf="isOwner" (click)="startRound()">Start round</button>

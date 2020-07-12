@@ -1,10 +1,10 @@
 import SocketIo from 'socket.io';
 import roomManager from './roomManager';
 import UserInfo from '../models/userInfo';
-import { JoinRoomData, EmitResponse, MakeStoryData, ExtendStoryData, VoteStoryData } from '../../shared/socket';
+import { JoinRoomData, EmitResponse, MakeStoryData, ExtendStoryData, VoteStoryData, StartGameData } from '../../shared/socket';
 import Room from '../models/room';
 import GameManager from './gameManager';
-import { defaultRules } from '../models/rules';
+import { getDefaultRules } from '../../shared/model/rules';
 import cardManager from './cardManager';
 import Debug from 'debug';
 import socketManager from './socketManager';
@@ -32,7 +32,7 @@ export default class PlayerSocket {
             this.socket.join(this.getRoomChannelId(this.room.id));
             roomManager.joinRoom(this.room, this.userInfo);
             socketManager.emitGameStateChanged(this.room, this.userInfo);
-            
+
             // Set connection state 
             const playerState = this.room?.state.players.find(x => x.userInfo === this.userInfo);
             if (playerState && !playerState.isConnected) {
@@ -69,14 +69,14 @@ export default class PlayerSocket {
         debug(`Client ${this.userInfo.name} disconnected: ${this.socket.client.id}`);
     }
 
-    startGame(): EmitResponse {
+    startGame(data?: StartGameData): EmitResponse {
         if (!this.room || !this.manager) { return { success: false, message: "Player is not part of any room!" }; }
         if (this.room.state.rules.onlyOwnerCanStart && this.room.owner !== this.userInfo) {
             return { success: false, message: "Only the owner of the room can start the game!" };
         }
 
         debug(`Requested start game by ${this.userInfo.name}`);
-        const result = this.manager.startGame(defaultRules, Object.values(cardManager.sets));
+        const result = this.manager.startGame(data?.rules ?? getDefaultRules(), Object.values(cardManager.sets));
         return result;
     }
 
@@ -122,6 +122,16 @@ export default class PlayerSocket {
 
         debug(`Requested start round by ${this.userInfo.name}`);
         return this.manager.startRound();
+    }
+
+    goToLobby(): EmitResponse {
+        if (!this.room || !this.manager) { return { success: false, message: "Player is not part of any room!" }; }
+        if (this.room.state.rules.onlyOwnerCanStart && this.room.owner !== this.userInfo) {
+            return { success: false, message: "Only the owner move room to lobby!" };
+        }
+
+        debug(`Requested go to lobby by ${this.userInfo.name}`);
+        return this.manager.goToLobby();
     }
 
     getRoomChannelId(roomId: string) {

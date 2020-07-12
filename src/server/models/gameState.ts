@@ -1,7 +1,7 @@
 import { GameStep } from '../../shared/model/gameStep';
 import { Card } from '../../shared/model/card';
 import UserInfo from './userInfo';
-import { Rules, defaultRules } from './rules';
+import { Rules, getDefaultRules,  } from '../../shared/model/rules';
 import shuffle from 'shuffle-array';
 
 export class PlayerGameData {
@@ -40,7 +40,7 @@ export enum RoundPointReason {
 }
 
 export default class GameState {
-    rules: Rules = defaultRules;
+    rules: Rules = getDefaultRules();
     step: GameStep = GameStep.lobby;
     cardPool: Card[] = [];
     discardPile: Card[] = [];

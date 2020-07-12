@@ -3,7 +3,7 @@ import Room from '../models/room';
 import { Card, CardSet } from '../../shared/model/card';
 import GameState, { PlayerGameData, RoundPointReason } from '../models/gameState';
 import shuffle from 'shuffle-array';
-import { Rules } from '../models/rules';
+import { Rules } from '../../shared/model/rules';
 import socketManager from './socketManager';
 import Debug from 'debug';
 import UserInfo from '../models/userInfo';
@@ -48,7 +48,9 @@ export default class GameManager {
     }
 
     startRound(): TransitionResult {
-        if (!this.state.rules.invalidStateChanges && this.state.step !== GameStep.dealCards) {
+        if (!this.state.rules.invalidStateChanges &&
+            this.state.step !== GameStep.dealCards &&
+            this.state.step !== GameStep.partialResults) {
             return this.errorResult("Can only start the round after the deal cards step!");
         }
 
@@ -176,18 +178,30 @@ export default class GameManager {
     partialResults(): TransitionResult {
         const state = this.state;
         if (!state.rules.invalidStateChanges && state.step !== GameStep.voteStoryResults) {
-            return this.errorResult("Can only show partial results after the vote story step!");
+            return this.errorResult("Can only show partial results after the vote story results step!");
         }
-        
+
         for (const pointData of state.roundPoints) {
             const player = state.players.find(x => x.userInfo === pointData.userInfo)!;
             player.points += pointData.points;
         }
-        
+
         this.state.step = GameStep.partialResults;
         socketManager.emitPlayerStateChanged(this.room, state.players);
         socketManager.emitGameStateChanged(this.room);
-        
+
+        return this.successResult();
+    }
+
+    goToLobby(): TransitionResult {
+        const state = this.state;
+        if (!state.rules.invalidStateChanges && state.step !== GameStep.finalResults) {
+            return this.errorResult("Can only go to the lobby after the final results step!");
+        }
+
+        this.state.step = GameStep.lobby;
+        socketManager.emitGameStateChanged(this.room);
+
         return this.successResult();
     }
 
@@ -229,7 +243,7 @@ export default class GameManager {
         }
 
         // Add points to players who deceived somebody.
-        const maxDeceivePoints = state.rules.pointsMaxDeceivedSomebody;
+        const maxDeceivePoints = state.rules.maxPointsDeceivedSomebody;
         const normalDeceivePoints = state.rules.pointsDeceivedSomebody;
         const userDeceivePoints = state.players.reduce((dict, p) => { dict[p.userInfo.id] = 0; return dict; }, <Record<string, number>>{});
         state.votes

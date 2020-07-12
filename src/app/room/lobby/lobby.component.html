@@ -4,3 +4,17 @@ Players:
 <span *ngFor="let player of room.players; let i = index;" [class.owner-name]="player.id === room.owner.id">
     {{player.name}}<span *ngIf="i < room.players.length - 1">,</span>
 </span>
+
+<!-- Show room controls to owner -->
+<div *ngIf="room.currentUser.id === room.owner.id">
+    <h3>Rules:</h3>
+    <label *ngFor="let key of Object.keys(rules)">
+        {{key}}:
+        <input *ngIf="getInputType(key) === 'checkbox'" type="checkbox" [(ngModel)]="rules[key]">
+        <input *ngIf="getInputType(key) !== 'checkbox'" [type]="getInputType(key)" [(ngModel)]="rules[key]">
+        <br />
+    </label>
+    <button (click)="resetRules()">Reset default rules</button>
+    <button (click)="startGame()">Start game</button>
+</div>
+

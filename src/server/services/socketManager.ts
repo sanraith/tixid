@@ -4,7 +4,7 @@ import cookie from 'cookie';
 import Debug from 'debug';
 import userManager, { UserCookies } from './userManager';
 import UserInfo from '../models/userInfo';
-import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse, PlayerStateChangedData, GameStateChangedData, MakeStoryData, ExtendStoryData, VoteStoryData } from '../../shared/socket';
+import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse, PlayerStateChangedData, GameStateChangedData, MakeStoryData, ExtendStoryData, VoteStoryData, StartGameData } from '../../shared/socket';
 import Room from '../models/room';
 import { PublicPlayerState, PrivatePlayerState } from 'src/shared/model/sharedPlayerState';
 import { PlayerGameData } from '../models/gameState';
@@ -48,8 +48,8 @@ class SocketManager {
             socket.on(ClientActions.leaveRooms, (data: JoinRoomData, callback: (resp: EmitResponse) => void) => {
                 callback(playerSocket.leaveRooms());
             });
-            socket.on(ClientActions.startGame, (data: any, callback: (resp: EmitResponse) => void) => {
-                callback(playerSocket.startGame());
+            socket.on(ClientActions.startGame, (data: StartGameData | undefined, callback: (resp: EmitResponse) => void) => {
+                callback(playerSocket.startGame(data));
             });
             socket.on(ClientActions.makeStory, (data: MakeStoryData, callback: (resp: EmitResponse) => void) => {
                 callback(playerSocket.makeStory(data));
@@ -65,6 +65,9 @@ class SocketManager {
             });
             socket.on(ClientActions.startRound, (data: any, callback: (resp: EmitResponse) => void) => {
                 callback(playerSocket.startRound());
+            });
+            socket.on(ClientActions.goToLobby, (data: any, callback: (resp: EmitResponse) => void) => {
+                callback(playerSocket.goToLobby());
             });
         });
 
@@ -117,6 +120,7 @@ class SocketManager {
         debug(`Emitted game state changed: ${room.id} - ${room.state.step}`);
         const state = room.state;
         const gameStateData: GameStateChangedData = {
+            rules: state.rules,
             cardPoolCount: state.cardPool.length,
             discardPileCount: state.cardPool.length,
             // storyCardPile => differs by player

@@ -1,10 +1,12 @@
 import { PublicUserInfo } from './model/publicUserInfo';
 import { PublicPlayerState, PrivatePlayerState } from './model/sharedPlayerState';
 import PublicGameState from './model/publicGameState';
+import { Rules } from 'src/shared/model/rules';
 
 export enum ClientActions {
     joinRoom = "join_room",
     leaveRooms = "leave_rooms",
+    goToLobby = "go_to_lobby",
     startGame = "start_game",
     makeStory = "make_story",
     extendStory = "extend_story",
@@ -36,6 +38,10 @@ export interface PlayerStateChangedData {
 export interface PlayersChangedData {
     owner: PublicUserInfo,
     players: PublicUserInfo[],
+}
+
+export interface StartGameData {
+    rules: Rules
 }
 
 export interface JoinRoomData {
