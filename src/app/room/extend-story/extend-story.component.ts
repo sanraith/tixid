@@ -13,7 +13,7 @@ import { ClientActions, ExtendStoryData, EmitResponse } from 'src/shared/socket'
 export class ExtendStoryComponent implements RoomContentComponent, OnInit {
   @Input()
   room: RoomModel;
-  extendCard: Card;
+  extendCard: string;
   alreadySubmittedCard: boolean = false;
 
   constructor(private socket: Socket) { }
@@ -23,7 +23,7 @@ export class ExtendStoryComponent implements RoomContentComponent, OnInit {
 
   extendStory(): void {
     this.alreadySubmittedCard = true;
-    this.socket.emit(ClientActions.extendStory, <ExtendStoryData>{ cardId: this.extendCard.id }, (resp: EmitResponse) => {
+    this.socket.emit(ClientActions.extendStory, <ExtendStoryData>{ cardId: this.extendCard }, (resp: EmitResponse) => {
       if (!resp.success) {
         this.alreadySubmittedCard = false;
         alert(`Error: ${resp.message}`);

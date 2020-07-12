@@ -8,12 +8,12 @@ import RoomContentComponent from './roomContentComponent';
 import RoomModel, { PlayerState } from '../models/roomModel';
 import { UserService } from '../services/user.service';
 import { PrivatePlayerState } from 'src/shared/model/playerState';
-import { Card } from 'src/shared/model/card';
 import { MakeStoryComponent } from './make-story/make-story.component';
 import { GameStep } from 'src/shared/model/gameStep';
 import { ExtendStoryComponent } from './extend-story/extend-story.component';
 import { VoteStoryComponent } from './vote-story/vote-story.component';
 import { VoteStoryResultsComponent } from './vote-story-results/vote-story-results.component';
+import { PublicUserInfo } from 'src/shared/model/publicUserInfo';
 
 @Component({
   selector: 'app-room',
@@ -70,7 +70,7 @@ export class RoomComponent implements OnInit {
       const pState = this.room.playerState;
       const myData = <PrivatePlayerState>args.playerStates.find(x => x.userInfo.id === this.room.currentUser.id);
       if (myData) {
-        pState.hand = myData.hand.map(id => new Card(id, id));
+        pState.hand = myData.hand;
       }
       for (const playerState of args.playerStates) {
         const localPlayerStateIndex = pState.players.findIndex(x => x.userInfo.id === playerState.userInfo.id);
@@ -105,13 +105,18 @@ export class RoomComponent implements OnInit {
     const localState = this.room.localState;
     if (gameState.storyCardPile) {
       const mySubmittedCardId = gameState.storyCardPile.find(x => x.userInfo?.id === this.room.currentUser.id)?.cardId;
-      localState.mySubmittedCard = mySubmittedCardId ? new Card(mySubmittedCardId) : undefined;
-      localState.voteCards = gameState.storyCardPile.map(x => new Card(x.cardId));
+      localState.mySubmittedCardId = mySubmittedCardId;
+      localState.voteCardIds = gameState.storyCardPile.map(x => x.cardId);
     }
 
     if (gameState.votes) {
       const myVotedCardId = gameState.votes.find(x => x.userInfo?.id === this.room.currentUser.id)?.cardId;
-      localState.myVotedCard = myVotedCardId ? new Card(myVotedCardId) : undefined;
+      localState.myVotedCardId = myVotedCardId;
+      localState.votesByCardId = gameState.votes.reduce((votes, v) => {
+        if (!votes[v.cardId]) { votes[v.cardId] = []; }
+        votes[v.cardId].push(v.userInfo);
+        return votes;
+      }, <Record<string, PublicUserInfo[]>>{})
     }
   }
 

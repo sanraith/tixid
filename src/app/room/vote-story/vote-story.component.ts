@@ -13,7 +13,7 @@ import { ClientActions, VoteStoryData, EmitResponse } from 'src/shared/socket';
 export class VoteStoryComponent implements RoomContentComponent, OnInit {
   @Input()
   room: RoomModel;
-  voteCard: Card;
+  voteCard: string;
   alreadyVoted: boolean = false;
 
   constructor(private socket: Socket) { }
@@ -23,7 +23,7 @@ export class VoteStoryComponent implements RoomContentComponent, OnInit {
 
   voteForCard(): void {
     this.alreadyVoted = true;
-    this.socket.emit(ClientActions.voteStory, <VoteStoryData>{ cardId: this.voteCard.id }, (resp: EmitResponse) => {
+    this.socket.emit(ClientActions.voteStory, <VoteStoryData>{ cardId: this.voteCard }, (resp: EmitResponse) => {
       if (!resp.success) {
         alert(`Error: ${resp.message}`);
       }

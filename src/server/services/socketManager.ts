@@ -10,7 +10,7 @@ import { PublicPlayerState, PrivatePlayerState } from 'src/shared/model/playerSt
 import { PlayerGameData } from '../models/gameState';
 import PlayerSocket from './playerSocket';
 import { GameStep } from '../../shared/model/gameStep';
-import StoryCard from 'src/shared/model/storyCard';
+import PickedCard from 'src/shared/model/pickedCard';
 export const debug = Debug('tixid:services:socketManager');
 
 enum SocketEvents {
@@ -117,11 +117,13 @@ class SocketManager {
             story: state.story,
             storyTeller: state.storyTeller?.userInfo.publicInfo,
             // storyCardId => differs by player
-            // TODO add votes
+            // votes => differs by player
+            votePoints: state.roundPoints?.map(vp => ({ userInfo: vp.userInfo.publicInfo, points: vp.points, reason: vp.reason }))
         };
 
         const canRevealAllCards = state.step >= GameStep.voteStory;
         const canRevealAllCardOwners = state.step >= GameStep.voteStoryResults;
+        const canRevealAllVotes = state.step >= GameStep.voteStoryResults;
 
         const recipients = recipient ? [recipient] : room.players;
         for (const targetPlayer of recipients) {
@@ -129,17 +131,22 @@ class SocketManager {
             if (!targetSocket) { debug(`Cannot reach player ${targetPlayer.name}`); continue; }
 
             // Only show card origin to card owner, or after the voting
-            const storyCardPile = state.storyCardPile.map(sc => <StoryCard>{
+            const storyCardPile = state.storyCardPile.map(sc => <PickedCard>{
                 cardId: (canRevealAllCards || sc.userInfo === targetPlayer) ? sc.card.id : undefined,
                 userInfo: (canRevealAllCardOwners || sc.userInfo === targetPlayer) ? sc.userInfo.publicInfo : undefined
             });
-
             gameStateData.storyCardPile = storyCardPile;
 
             // Only show story card to story teller
             if (targetPlayer === state.storyTeller?.userInfo) {
                 gameStateData.storyCardId = state.storyCard?.id;
             }
+
+            const votes = state.votes.map(vote => ({
+                cardId: (canRevealAllVotes || vote.userInfo === targetPlayer) ? vote.card.id : undefined,
+                userInfo: vote.userInfo.publicInfo
+            }));
+            gameStateData.votes = votes;
 
             targetSocket.socket.emit(ClientEvents.gameStateChanged, gameStateData);
         }

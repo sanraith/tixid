@@ -1,6 +1,7 @@
 import { GameStep } from './gameStep';
 import { PublicUserInfo } from './publicUserInfo';
-import StoryCard from './storyCard';
+import PickedCard from './pickedCard';
+import { RoundPointReason } from 'src/server/models/gameState';
 
 export default interface PublicGameState {
     step: GameStep;
@@ -10,7 +11,8 @@ export default interface PublicGameState {
     storyTeller?: PublicUserInfo;
     story?: string;
     storyCardId?: string;
-    storyCardPile?: StoryCard[];
+    storyCardPile?: PickedCard[];
 
-    votes?: { userInfo: PublicUserInfo, cardId: string }[];
+    votes?: { userInfo: PublicUserInfo, cardId?: string }[];
+    votePoints?: { userInfo: PublicUserInfo, points: number, reason: RoundPointReason }[];
 }

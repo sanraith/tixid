@@ -1,7 +1,7 @@
 import { GameStep } from '../../shared/model/gameStep';
 import Room from '../models/room';
 import { Card, CardSet } from '../../shared/model/card';
-import GameState, { PlayerGameData } from '../models/gameState';
+import GameState, { PlayerGameData, RoundPointReason } from '../models/gameState';
 import shuffle from 'shuffle-array';
 import { Rules } from '../models/rules';
 import socketManager from './socketManager';
@@ -56,6 +56,7 @@ export default class GameManager {
         this.state.storyCardPile.forEach(sc => this.state.discardPile.push(sc.card));
         this.state.storyCardPile = [];
         this.state.votes = [];
+        this.state.roundPoints = [];
 
         // Draw until everyone has the right amount of cards
         const handSize = this.state.rules.handSize;
@@ -124,6 +125,7 @@ export default class GameManager {
         if (this.areAllPlayersReady()) {
             this.state.step = GameStep.voteStory;
             this.resetPlayerReadiness();
+            this.state.storyTeller!.isReady = true;
         }
         socketManager.emitPlayerStateChanged(this.room, [player]);
         socketManager.emitGameStateChanged(this.room); // TODO remove? Maybe required to re-render common pile...
@@ -146,6 +148,7 @@ export default class GameManager {
         player.isReady = true;
 
         if (this.areAllPlayersReady()) {
+            this.scoreVotes();
             this.state.step = GameStep.voteStoryResults;
             this.resetPlayerReadiness();
         }
@@ -153,6 +156,53 @@ export default class GameManager {
         socketManager.emitGameStateChanged(this.room); // TODO remove? Maybe required to re-render common pile...
 
         return this.successResult();
+    }
+
+    private scoreVotes() {
+        const state = this.state;
+        const points = state.roundPoints;
+        const storyTeller = state.storyTeller!;
+
+        let isEverybodyGuessed = true;
+        let isNobodyGuessed = true;
+        for (let vote of state.votes) {
+            const guessed = vote.card === state.storyCard;
+            isEverybodyGuessed = isEverybodyGuessed && guessed;
+            isNobodyGuessed = isNobodyGuessed && !guessed;
+        }
+
+        if (isEverybodyGuessed || isNobodyGuessed) {
+            // Add points to everyone except storyteller if everyone or no one guessed right
+            const rewardReason = isEverybodyGuessed ? RoundPointReason.everybodyGuessedRight : RoundPointReason.nobodyGuessedRight;
+            const rewardedPoints = state.rules.pointsNobodyOrEverybodyGuessedRight;
+            state.players
+                .filter(x => x.userInfo !== storyTeller.userInfo)
+                .forEach(x => points.push({ points: rewardedPoints, reason: rewardReason, userInfo: x.userInfo }));
+        } else {
+            // Add points to the storyteller and everyone who guessed right
+            const rewardedPoints = state.rules.pointsSomebodyGuessedRight;
+            points.push({
+                userInfo: storyTeller.userInfo,
+                points: rewardedPoints,
+                reason: RoundPointReason.somebodyGuessedRight
+            });
+            this.state.votes
+                .filter(vote => vote.card === state.storyCard)
+                .forEach(vote => points.push({
+                    userInfo: vote.userInfo,
+                    points: rewardedPoints,
+                    reason: RoundPointReason.guessedRight
+                }));
+        }
+
+        // Add points to players who deceived somebody
+        state.votes
+            .filter(vote => vote.card !== state.storyCard)
+            .forEach(vote => points.push({
+                points: state.rules.pointsDeceivedSomebody,
+                reason: RoundPointReason.deceivedSomebody,
+                userInfo: state.storyCardPile.find(sc => sc.card === vote.card)!.userInfo
+            }));
     }
 
     private areAllPlayersReady(): boolean {

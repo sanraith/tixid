@@ -1,14 +1,15 @@
-<!-- If the player IS the story teller -->
 <h2>The story is:</h2>
 <p style="font-style: italic;">"{{room.gameState.story}}"</p>
 
+<!-- If the player IS the story teller -->
 <div *ngIf="room.gameState.storyTeller.id === room.currentUser.id">
     <img src="card/{{room.gameState.storyCardId}}" style="height: 50vh;" />
     <h2>Waiting for everybody else to extend the story...</h2>
 </div>
 
 <!-- If the player is NOT the story teller -->
-<div *ngIf="room.gameState.storyTeller.id !== room.currentUser.id && !room.localState.mySubmittedCard && !alreadySubmittedCard">
+<div
+    *ngIf="room.gameState.storyTeller.id !== room.currentUser.id && !room.localState.mySubmittedCardId && !alreadySubmittedCard; else: waitingBlock">
     <h2>Extend the story!</h2>
     <p>Pick a card which you think is fit for the story.</p>
 
@@ -18,6 +19,6 @@
     <button (click)="extendStory()" [disabled]="!extendCard">Pick card!</button>
 </div>
 
-<div *ngIf="room.localState.mySubmittedCard || alreadySubmittedCard">
+<ng-template #waitingBlock>
     <p>Waiting for others to vote...</p>
-</div>
+</ng-template>

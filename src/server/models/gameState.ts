@@ -3,7 +3,6 @@ import { Card } from '../../shared/model/card';
 import UserInfo from './userInfo';
 import { Rules, defaultRules } from './rules';
 import shuffle from 'shuffle-array';
-import StoryCard from 'src/shared/model/storyCard';
 
 export class PlayerGameData {
     userInfo: UserInfo;
@@ -28,6 +27,16 @@ export class PlayerGameData {
     }
 }
 
+export enum RoundPointReason {
+    everybodyGuessedRight = "everyone_guessed_right",
+    nobodyGuessedRight = "nobody_guessed_right",
+
+    guessedRight = "you_guessed_right",
+    somebodyGuessedRight = "somebody_guessed_right",
+
+    deceivedSomebody = "deceived_somebody"
+}
+
 export default class GameState {
     rules: Rules = defaultRules;
     step: GameStep = GameStep.lobby;
@@ -40,6 +49,12 @@ export default class GameState {
     storyCard?: Card;
     storyCardPile: { userInfo: UserInfo, card: Card }[] = [];
     votes: { userInfo: UserInfo, card: Card }[] = [];
+
+    roundPoints: {
+        userInfo: UserInfo,
+        points: number,
+        reason: RoundPointReason
+    }[] = [];
 
     drawCards(count: number): Card[] {
         if (this.cardPool.length < count) {

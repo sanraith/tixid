@@ -15,7 +15,7 @@ export class MakeStoryComponent implements RoomContentComponent, OnInit {
   room: RoomModel;
 
   story?: string;
-  storyCard?: Card;
+  storyCard?: string;
 
   constructor(private roomSocket: Socket) { }
 
@@ -24,7 +24,7 @@ export class MakeStoryComponent implements RoomContentComponent, OnInit {
   sendStory(): void {
     this.roomSocket.emit(ClientActions.makeStory, <MakeStoryData>{
       story: this.story,
-      cardId: this.storyCard.id
+      cardId: this.storyCard
     }, (resp: EmitResponse) => {
       if (!resp.success) {
         alert(`Error: ${resp.message}`);

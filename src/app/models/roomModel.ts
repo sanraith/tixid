@@ -5,14 +5,15 @@ import PublicGameState from 'src/shared/model/publicGameState';
 import { ClientUser } from '../services/user.service';
 
 export class LocalGameState {
-    mySubmittedCard?: Card;
-    myVotedCard?: Card;
-    voteCards?: Card[];
+    mySubmittedCardId?: string;
+    myVotedCardId?: string;
+    voteCardIds?: string[];
+    votesByCardId?: Record<string, PublicUserInfo[]>;
 }
 
 export class PlayerState {
     players: PublicPlayerState[] = [];
-    hand: Card[];
+    hand: string[];
 };
 
 export default class RoomModel {

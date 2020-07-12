@@ -1,5 +1,5 @@
 <label *ngFor="let card of cards">
-    <input [value]="card" [(ngModel)]="selectedCard" class="hidden" type="radio" id="{{card.id}}" name="card"
-        (change)="selectedCardChange.emit(selectedCard)">
-    <img src="card/{{card.path}}" style="height: 20vh;">
+    <input [value]="card" [(ngModel)]="selectedCard" class="hidden" type="radio" id="{{card}}" name="card"
+        (change)="_selectedCardChange()">
+    <img src="card/{{card}}" style="height: 20vh;">
 </label>
