@@ -1,5 +1,5 @@
 const path = require('path');
-const fs = require('fs-extra');
+const fs = require('fs');
 const childProcess = require('child_process');
 
 try {
@@ -7,17 +7,17 @@ try {
     process.chdir(path.join(__dirname, '..'));
 
     // Remove current build
-    fs.removeSync('./dist/');
+    fs.rmdirSync('./dist/', { recursive: true });
+    let child = null;
+    
+    // Build client
+    child = childProcess.exec('npm run ngBuild');
+    child.stdout.on('data', data => console.log(data));
 
-    // Transpile client side typescript files
-    childProcess.exec('tsc -P src/client/tsconfig.json');
+    // Build server
+    child = childProcess.exec('tsc -P tsconfig.server.json');
+    child.stdout.on('data', data => console.log(data));
 
-    // Copy front-end files
-    fs.copySync('./src/server/public', './dist/public');
-    fs.copySync('./src/server/views', './dist/views');
-
-    // Transpile the typescript files
-    childProcess.exec('ttsc -P src/server/tsconfig.json');
 } catch (err) {
     console.log(err);
 } finally {

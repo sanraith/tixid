@@ -15,8 +15,8 @@ export interface Rules {
 export function getDefaultRules(): Rules {
     return {
         handSize: 6,
-        onlyOwnerCanStart: true,
-        invalidStateChanges: false,
+        onlyOwnerCanStart: false,
+        invalidStateChanges: true,
 
         pointsSomebodyGuessedRight: 3,
         pointsNobodyOrEverybodyGuessedRight: 2,

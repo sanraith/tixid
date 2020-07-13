@@ -23,7 +23,7 @@ enum SocketEvents {
  */
 class SocketManager {
     init(httpServer: HttpServer) {
-        const io = SocketIo(httpServer);
+        const io = SocketIo(httpServer, { perMessageDeflate: false });
 
         io.on(SocketEvents.connection, (socket) => {
             debug(`Client connecting: ${socket.client.id}`);
