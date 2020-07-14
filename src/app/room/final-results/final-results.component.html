@@ -5,3 +5,5 @@
         {{player.userInfo.name}}: {{player.totalPoints}}
     </li>
 </ul>
+
+<app-ready-button [isEnabled]="!room.localState.myPlayerState.isReady"></app-ready-button>

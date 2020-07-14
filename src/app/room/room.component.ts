@@ -111,6 +111,9 @@ export class RoomComponent implements OnInit {
   private updateLocalState(): void {
     const gameState = this.room.gameState;
     const localState = this.room.localState;
+
+    localState.myPlayerState = this.room.playerState.players.find(x => x.userInfo.id === this.room.currentUser.id);
+
     if (gameState.storyCardPile) {
       const mySubmittedCardId = gameState.storyCardPile.find(x => x.userInfo?.id === this.room.currentUser.id)?.cardId;
       localState.mySubmittedCardId = mySubmittedCardId;

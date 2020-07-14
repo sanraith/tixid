@@ -13,5 +13,5 @@
 <!-- If the player is NOT the story teller -->
 <div *ngIf="room.gameState.storyTeller.id !== room.currentUser.id">
     <h2>Waiting for {{room.gameState.storyTeller.name}}, the story teller...</h2>
-    <p>Please wait while the {{room.gameState.storyTeller.name}} makes up a story.</p>
+    <p>Please wait while {{room.gameState.storyTeller.name}} makes up a story.</p>
 </div>

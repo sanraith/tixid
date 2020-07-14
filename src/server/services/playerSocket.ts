@@ -112,7 +112,7 @@ export default class PlayerSocket {
         }
 
         debug(`Requested partial results by ${this.userInfo.name}`);
-        return this.manager.partialResults();
+        return this.manager.applyPointsAndShowPartialResults();
     }
 
     startRound(): EmitResponse {
@@ -133,6 +133,13 @@ export default class PlayerSocket {
 
         debug(`Requested go to lobby by ${this.userInfo.name}`);
         return this.manager.goToLobby();
+    }
+
+    indicateReady(): EmitResponse {
+        if (!this.room || !this.manager) { return { success: false, message: "Player is not part of any room!" }; }
+
+        debug(`Requested indicate ready by ${this.userInfo.name}`);
+        return this.manager.indicatePlayerReady(this.userInfo);
     }
 
     getRoomChannelId(roomId: string) {

@@ -42,32 +42,35 @@ class SocketManager {
                 playerSocket.disconnect();
                 delete this.playerSockets[userInfo.id];
             });
-            socket.on(ClientActions.joinRoom, (data: JoinRoomData, callback: (resp: EmitResponse) => void) => {
-                callback(playerSocket.joinRoom(data));
+            socket.on(ClientActions.joinRoom, (data: JoinRoomData, callback?: (resp: EmitResponse) => void) => {
+                this.callbackMaybe(playerSocket.joinRoom(data), callback);
             });
-            socket.on(ClientActions.leaveRooms, (data: JoinRoomData, callback: (resp: EmitResponse) => void) => {
-                callback(playerSocket.leaveRooms());
+            socket.on(ClientActions.leaveRooms, (data: JoinRoomData, callback?: (resp: EmitResponse) => void) => {
+                this.callbackMaybe(playerSocket.leaveRooms(), callback);
             });
-            socket.on(ClientActions.startGame, (data: StartGameData | undefined, callback: (resp: EmitResponse) => void) => {
-                callback(playerSocket.startGame(data));
+            socket.on(ClientActions.startGame, (data: StartGameData | undefined, callback?: (resp: EmitResponse) => void) => {
+                this.callbackMaybe(playerSocket.startGame(data), callback);
             });
-            socket.on(ClientActions.makeStory, (data: MakeStoryData, callback: (resp: EmitResponse) => void) => {
-                callback(playerSocket.makeStory(data));
+            socket.on(ClientActions.makeStory, (data: MakeStoryData, callback?: (resp: EmitResponse) => void) => {
+                this.callbackMaybe(playerSocket.makeStory(data), callback);
             });
-            socket.on(ClientActions.extendStory, (data: ExtendStoryData, callback: (resp: EmitResponse) => void) => {
-                callback(playerSocket.extendStory(data));
+            socket.on(ClientActions.extendStory, (data: ExtendStoryData, callback?: (resp: EmitResponse) => void) => {
+                this.callbackMaybe(playerSocket.extendStory(data), callback);
             });
-            socket.on(ClientActions.voteStory, (data: VoteStoryData, callback: (resp: EmitResponse) => void) => {
-                callback(playerSocket.voteStory(data));
+            socket.on(ClientActions.voteStory, (data: VoteStoryData, callback?: (resp: EmitResponse) => void) => {
+                this.callbackMaybe(playerSocket.voteStory(data), callback);
             });
-            socket.on(ClientActions.partialResults, (data: any, callback: (resp: EmitResponse) => void) => {
-                callback(playerSocket.partialResults());
+            socket.on(ClientActions.partialResults, (data: any, callback?: (resp: EmitResponse) => void) => {
+                this.callbackMaybe(playerSocket.partialResults(), callback);
             });
-            socket.on(ClientActions.startRound, (data: any, callback: (resp: EmitResponse) => void) => {
-                callback(playerSocket.startRound());
+            socket.on(ClientActions.startRound, (data: any, callback?: (resp: EmitResponse) => void) => {
+                this.callbackMaybe(playerSocket.startRound(), callback);
             });
-            socket.on(ClientActions.goToLobby, (data: any, callback: (resp: EmitResponse) => void) => {
-                callback(playerSocket.goToLobby());
+            socket.on(ClientActions.goToLobby, (data: any, callback?: (resp: EmitResponse) => void) => {
+                this.callbackMaybe(playerSocket.goToLobby(), callback);
+            });
+            socket.on(ClientActions.indicateReady, (data: any, callback?: (resp: EmitResponse) => void) => {
+                this.callbackMaybe(playerSocket.indicateReady(), callback);
             });
         });
 
@@ -172,6 +175,12 @@ class SocketManager {
         if (!userManager.isCookiesContainUserInfo(userCookies)) { return undefined; }
 
         return userManager.getUserFromCookies(userCookies);
+    }
+
+    private callbackMaybe(value: EmitResponse, callback: ((resp: EmitResponse) => void) | undefined) {
+        if (callback) {
+            callback(value);
+        }
     }
 
     private io!: Server;

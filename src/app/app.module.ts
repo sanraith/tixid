@@ -19,6 +19,7 @@ import { VoteStoryComponent } from './room/vote-story/vote-story.component';
 import { VoteStoryResultsComponent } from './room/vote-story-results/vote-story-results.component';
 import { PartialResultsComponent } from './room/partial-results/partial-results.component';
 import { FinalResultsComponent } from './room/final-results/final-results.component';
+import { ReadyButtonComponent } from './room/ready-button/ready-button.component';
 
 const config: SocketIoConfig = { url: '', options: { autoConnect: false } };
 
@@ -36,7 +37,8 @@ const config: SocketIoConfig = { url: '', options: { autoConnect: false } };
     VoteStoryComponent,
     VoteStoryResultsComponent,
     PartialResultsComponent,
-    FinalResultsComponent
+    FinalResultsComponent,
+    ReadyButtonComponent
   ],
   imports: [
     BrowserModule,

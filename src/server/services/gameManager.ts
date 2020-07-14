@@ -7,6 +7,7 @@ import { Rules } from '../../shared/model/rules';
 import socketManager from './socketManager';
 import Debug from 'debug';
 import UserInfo from '../models/userInfo';
+import { assertNever } from "assert-never";
 const debug = Debug('tixid:services:gameManager');
 
 interface TransitionResult {
@@ -57,6 +58,8 @@ export default class GameManager {
         // If somebody has enough points, show the final results instead.
         if (this.state.players.some(x => x.points >= this.state.rules.pointsToWin)) {
             this.state.step = GameStep.finalResults;
+            this.resetPlayerReadiness();
+            socketManager.emitPlayerStateChanged(this.room, this.room.state.players);
             socketManager.emitGameStateChanged(this.room);
 
             return this.successResult();
@@ -175,7 +178,7 @@ export default class GameManager {
         return this.successResult();
     }
 
-    partialResults(): TransitionResult {
+    applyPointsAndShowPartialResults(): TransitionResult {
         const state = this.state;
         if (!state.rules.invalidStateChanges && state.step !== GameStep.voteStoryResults) {
             return this.errorResult("Can only show partial results after the vote story results step!");
@@ -187,6 +190,7 @@ export default class GameManager {
         }
 
         this.state.step = GameStep.partialResults;
+        this.resetPlayerReadiness();
         socketManager.emitPlayerStateChanged(this.room, state.players);
         socketManager.emitGameStateChanged(this.room);
 
@@ -200,7 +204,46 @@ export default class GameManager {
         }
 
         this.state.step = GameStep.lobby;
+        this.resetPlayerReadiness();
         socketManager.emitGameStateChanged(this.room);
+
+        return this.successResult();
+    }
+
+    indicatePlayerReady(userInfo: UserInfo): TransitionResult {
+        const state = this.state;
+        const player = state.players.find(x => x.userInfo === userInfo);
+        if (!player) { return this.errorResult("User is not participating in the current game!"); }
+        if (player.isReady) { return this.errorResult("Player already indicated readiness!"); }
+        switch (state.step) {
+            case GameStep.lobby:
+            case GameStep.voteStoryResults:
+            case GameStep.partialResults:
+            case GameStep.finalResults:
+                break;
+            default:
+                return this.errorResult("You cannot indicate readiness because you have pending actions!");
+        }
+
+        player.isReady = true;
+        socketManager.emitPlayerStateChanged(this.room, [player]);
+
+        // Advance game if all players are ready
+        if (this.areAllPlayersReady()) {
+            switch (state.step) {
+                case GameStep.lobby:
+                    // Do nothing, as the owner explicitly have to start the game
+                    break;
+                case GameStep.voteStoryResults:
+                    return this.applyPointsAndShowPartialResults();
+                case GameStep.partialResults:
+                    return this.startRound();
+                case GameStep.finalResults:
+                    return this.goToLobby();
+                default:
+                    assertNever(state.step);
+            }
+        }
 
         return this.successResult();
     }

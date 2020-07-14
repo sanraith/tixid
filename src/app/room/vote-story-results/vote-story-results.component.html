@@ -17,3 +17,5 @@
         {{vote.userInfo.name}}: +{{vote.points}} for {{vote.reason}}
     </li>
 </ul>
+
+<app-ready-button [isEnabled]="!room.localState.myPlayerState.isReady"></app-ready-button>

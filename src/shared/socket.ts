@@ -12,7 +12,8 @@ export enum ClientActions {
     extendStory = "extend_story",
     voteStory = "vote_story",
     partialResults = "partial_results",
-    startRound = "start_round"
+    startRound = "start_round",
+    indicateReady = "indicate_ready"
 }
 
 export enum ClientEvents {
