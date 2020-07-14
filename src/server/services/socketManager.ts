@@ -11,7 +11,7 @@ import { PlayerGameData } from '../models/gameState';
 import PlayerSocket from './playerSocket';
 import { GameStep } from '../../shared/model/gameStep';
 import PickedCard from 'src/shared/model/pickedCard';
-export const debug = Debug('tixid:services:socketManager');
+const debug = Debug('tixid:services:socketManager');
 
 enum SocketEvents {
     connection = "connection",
@@ -72,7 +72,6 @@ class SocketManager {
         });
 
         this.io = io;
-        this.notifyOnInitListeners();
     }
 
     emitPlayersChanged(room: Room) {
@@ -167,10 +166,6 @@ class SocketManager {
         return this.io.to(`room_${roomId}`);
     }
 
-    onInit(onInitFn: () => void) {
-        this.onInitListeners.push(onInitFn);
-    }
-
     private getUserFromSocketCookies(cookies: any): UserInfo | undefined {
         if (!cookies) { return undefined; }
         const userCookies = <{ [P in keyof UserCookies]: UserCookies[P] }>cookie.parse(cookies);
@@ -179,16 +174,8 @@ class SocketManager {
         return userManager.getUserFromCookies(userCookies);
     }
 
-    private notifyOnInitListeners() {
-        for (const onInitFn of this.onInitListeners) {
-            onInitFn();
-        }
-        this.onInitListeners = [];
-    }
-
     private io!: Server;
     private playerSockets: Record<string, PlayerSocket> = {};
-    private onInitListeners: (() => void)[] = [];
 }
 
 export default new SocketManager();

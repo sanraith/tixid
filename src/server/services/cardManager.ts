@@ -15,6 +15,23 @@ class CardSetManager {
     cards: Record<string, Card> = {};
 
     async init() {
+        const savedDb = await this.loadSavedCardDatabaseAsync();
+        if (savedDb) {
+            debug("Reading existing card database...");
+
+            this.sets = savedDb.sets.reduce((sets, set) => {
+                sets[set.id] = set;
+                debug(`Loaded ${set.cards.length} cards from the '${set.name}' set.`);
+                return sets;
+            }, <Record<string, CardSet>>{});
+
+            this.cards = savedDb.sets
+                .reduce((cards, set) => { cards.push(...set.cards); return cards; }, <Card[]>[])
+                .reduce((cards, card) => { cards[card.id] = card; return cards }, <Record<string, Card>>{});
+
+            return;
+        }
+
         this.sets = {};
         this.cards = {};
 
@@ -47,7 +64,19 @@ class CardSetManager {
             debug(err);
         }
 
-        debug(`Updated card DB with ${Object.keys(this.cards).length} cards.`);
+        debug(`Updated card database with ${Object.keys(this.cards).length} cards.`);
+    }
+
+    async loadSavedCardDatabaseAsync(): Promise<{ sets: CardSet[] } | undefined> {
+        let content: string = "";
+        try {
+            content = await fs.readFile(_cardDbPath, 'utf-8');
+        } catch (err) {
+            debug("No saved card database can be found.");
+            return undefined;
+        }
+        const savedDb = <{ sets: CardSet[] }>JSON.parse(content);
+        return savedDb;
     }
 }
 

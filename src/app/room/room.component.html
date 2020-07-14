@@ -4,13 +4,7 @@
 <button *ngIf="isOwner" (click)="showPartialResults()">Partial results</button>
 <button *ngIf="isOwner" (click)="startRound()">Start round</button>
 
-<!-- <div *ngIf="room.playerState?.hand">
-    <h2>Hand:</h2>
-    <img *ngFor="let card of room.playerState.hand" src="card/{{card.path}}" style="height: 20vh;">
-</div> -->
-
-<!-- Additional icons to consider: '📶🚫' -->
-<div *ngIf="room.playerState?.players">
+<div *ngIf="(room.playerState?.players.length || 0) > 0">
     <h2>Players</h2>
     <ul>
         <li *ngFor="let playerState of room.playerState.players">
@@ -23,4 +17,5 @@
         </li>
     </ul>
 </div>
+
 <ng-template room-content></ng-template>

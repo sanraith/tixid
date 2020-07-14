@@ -76,7 +76,8 @@ export default class PlayerSocket {
         }
 
         debug(`Requested start game by ${this.userInfo.name}`);
-        const result = this.manager.startGame(data?.rules ?? getDefaultRules(), Object.values(cardManager.sets));
+        const rules = data?.rules ?? this.room.state.rules ?? getDefaultRules();
+        const result = this.manager.startGame(rules, Object.values(cardManager.sets));
         return result;
     }
 
