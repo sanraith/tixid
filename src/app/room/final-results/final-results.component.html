@@ -1,1 +1,7 @@
-<p>final-results works!</p>
+<h2>Final results</h2>
+
+<ul>
+    <li *ngFor="let player of room.localState.orderedPlayerResults">
+        {{player.userInfo.name}}: {{player.totalPoints}}
+    </li>
+</ul>

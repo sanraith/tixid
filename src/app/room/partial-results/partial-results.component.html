@@ -1,1 +1,8 @@
-<p>partial-results works!</p>
+<h2>Partial results</h2>
+
+<ul>
+    <li *ngFor="let player of room.localState.orderedPlayerResults">
+        {{player.userInfo.name}}: {{player.totalPoints}}
+        <span *ngIf="player.newPoints > 0">(+{{player.newPoints}})</span>
+    </li>
+</ul>

@@ -35,7 +35,7 @@ export class RoomComponent implements OnInit {
     private roomSocket: Socket,
     private componentFactoryResolver: ComponentFactoryResolver,
     private userService: UserService,
-  ) { 
+  ) {
     this.room.socket = roomSocket;
   }
 
@@ -87,6 +87,7 @@ export class RoomComponent implements OnInit {
           pState.players.push(playerState);
         }
       }
+      this.updateLocalState();
     });
 
     this.roomSocket.on(ClientEvents.gameStateChanged, (newState: GameStateChangedData) => {
@@ -124,6 +125,18 @@ export class RoomComponent implements OnInit {
         votes[v.cardId].push(v.userInfo);
         return votes;
       }, <Record<string, PublicUserInfo[]>>{})
+    }
+
+    if (gameState.votePoints) {
+      localState.orderedPlayerResults = this.room.playerState.players
+        .map(p => ({
+          userInfo: p.userInfo,
+          totalPoints: p.points,
+          newPoints: gameState.votePoints
+            .filter(x => x.userInfo.id === p.userInfo.id)
+            .reduce((points, vote) => points + vote.points, 0)
+        }))
+        .sort((a, b) => b.totalPoints - a.totalPoints);
     }
   }
 

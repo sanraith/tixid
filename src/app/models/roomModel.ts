@@ -9,6 +9,7 @@ export class LocalGameState {
     myVotedCardId?: string;
     voteCardIds?: string[];
     votesByCardId?: Record<string, PublicUserInfo[]>;
+    orderedPlayerResults?: { userInfo: PublicUserInfo, newPoints: number, totalPoints: number }[];
 }
 
 export class PlayerState {
