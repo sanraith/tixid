@@ -1,21 +1,32 @@
 <h2>Room {{room.id}}</h2>
-<button *ngIf="isOwner" (click)="lobby()">Lobby</button>
-<button *ngIf="isOwner" (click)="startGame()">Start game</button>
-<button *ngIf="isOwner" (click)="showPartialResults()">Partial results</button>
-<button *ngIf="isOwner" (click)="startRound()">Start round</button>
-
-<div *ngIf="(room.playerState?.players.length || 0) > 0">
-    <h2>Players</h2>
-    <ul>
-        <li *ngFor="let playerState of room.playerState.players">
-            {{playerState.isReady ? '✔' : '⏳'}}
-            {{playerState.isConnected ? '' : '⚠'}}
-            {{playerState.userInfo.name}},
-            Hand size: {{playerState.handSize}},
-            Points: {{playerState.points}}
-            <span *ngIf="room.gameState.storyTeller.id === playerState.userInfo.id">[STORYTELLER]</span>
-        </li>
-    </ul>
+<div *ngIf="isOwner">
+    <button (click)="lobby()">Lobby</button>
+    <button (click)="startGame()">Start game</button>
+    <button (click)="showPartialResults()">Partial results</button>
+    <button (click)="startRound()">Start round</button>
+    <br /><br />
 </div>
 
-<ng-template room-content></ng-template>
+<div class="playerList">
+    <div *ngIf="room.playerStates.length > 0">
+        <h2 class="title">Players</h2>
+        <ul>
+            <li *ngFor="let playerState of room.playerStates">
+                <div class="pName">
+                    {{playerState.isReady ? '✔' : '⏳'}}
+                    {{playerState.isConnected ? '' : '⚠'}}
+                    {{room.gameState.storyTeller.id=== playerState.userInfo.id ? '📖' : ''}}
+                    {{playerState.userInfo.name}}:&nbsp;
+                </div>
+                <div class="pPoints">
+                    {{playerState.points}} p
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="main">
+    <ng-template room-content></ng-template>
+</div>

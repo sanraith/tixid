@@ -1,3 +1,38 @@
 /* You can add global styles to this file, and also import other style files */
+
+$globalWidth: 800px
+
+*
+    box-sizing: border-box
+
+body
+    margin: 5px
+
 .hidden
     display: none
+
+// Responsive containers
+
+.playerList
+    float: left
+    width: 20%
+    background-color: #F2A20C
+    border-radius: 10px
+
+.main
+    float: left
+    width: 80%
+    padding: 10px 20px
+    background-color: #F2D6A2
+    border-radius: 10px
+
+.page
+    margin: 0 auto
+    width: $globalWidth
+    border: 1px solid
+    overflow: auto
+
+// For mobile phones:
+@media only screen and (max-width: ($globalWidth))
+    .page, .playerList, .main
+        width: 100%

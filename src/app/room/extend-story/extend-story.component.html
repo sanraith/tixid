@@ -13,7 +13,7 @@
     <h2>Extend the story!</h2>
     <p>Pick a card which you think is fit for the story.</p>
 
-    <app-card-picker [cards]="room.playerState.hand" [(selectedCard)]="extendCard"></app-card-picker>
+    <app-card-picker [cards]="room.myState.hand" [(selectedCard)]="extendCard"></app-card-picker>
     <br />
 
     <button (click)="extendStory()" [disabled]="!extendCard">Pick card!</button>

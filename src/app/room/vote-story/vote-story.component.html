@@ -6,6 +6,9 @@
         Try to pick the card of the story teller!<br />
         <small>(You can not pick your own cards.)</small>
     </p>
+
+
+    <h3 style="font-style: italic;">"{{room.gameState.story}}"</h3>
     <app-card-picker [cards]="room.localState.voteCardIds" [(selectedCard)]="voteCard"></app-card-picker>
     <br />
 

@@ -5,7 +5,7 @@ import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResp
 import { RoomContentDirective } from './roomContentDirective';
 import { LobbyComponent } from './lobby/lobby.component';
 import RoomContentComponent from './roomContentComponent';
-import RoomModel, { PlayerState } from '../models/roomModel';
+import RoomModel from '../models/roomModel';
 import { UserService } from '../services/user.service';
 import { PrivatePlayerState } from 'src/shared/model/sharedPlayerState';
 import { MakeStoryComponent } from './make-story/make-story.component';
@@ -64,27 +64,26 @@ export class RoomComponent implements OnInit {
 
   private async join(): Promise<void> {
     this.roomSocket.on(ClientEvents.gameStarted, () => {
-      this.room.playerState = new PlayerState();
+      this.room.playerStates = [];
     });
 
     this.roomSocket.on(ClientEvents.playersChanged, (args: PlayersChangedData) => {
       this.room.owner = args.owner;
       this.room.players = args.players;
-      this.isOwner = true || this.room.currentUser.id === this.room.owner.id;
+      this.isOwner = this.room.currentUser.id === this.room.owner.id;
     });
 
     this.roomSocket.on(ClientEvents.playerStateChanged, (args: PlayerStateChangedData) => {
-      const pState = this.room.playerState;
-      const myData = <PrivatePlayerState>args.playerStates.find(x => x.userInfo.id === this.room.currentUser.id);
-      if (myData) {
-        pState.hand = myData.hand;
-      }
+      const pStates = this.room.playerStates;
+      const myNewState = <PrivatePlayerState>args.playerStates.find(x => x.userInfo.id === this.room.currentUser.id);
+
+      this.room.myState = myNewState ? myNewState : this.room.myState;
       for (const playerState of args.playerStates) {
-        const localPlayerStateIndex = pState.players.findIndex(x => x.userInfo.id === playerState.userInfo.id);
+        const localPlayerStateIndex = pStates.findIndex(x => x.userInfo.id === playerState.userInfo.id);
         if (localPlayerStateIndex >= 0) {
-          pState.players[localPlayerStateIndex] = playerState;
+          pStates[localPlayerStateIndex] = playerState;
         } else {
-          pState.players.push(playerState);
+          pStates.push(playerState);
         }
       }
       this.updateLocalState();
@@ -112,8 +111,6 @@ export class RoomComponent implements OnInit {
     const gameState = this.room.gameState;
     const localState = this.room.localState;
 
-    localState.myPlayerState = this.room.playerState.players.find(x => x.userInfo.id === this.room.currentUser.id);
-
     if (gameState.storyCardPile) {
       const mySubmittedCardId = gameState.storyCardPile.find(x => x.userInfo?.id === this.room.currentUser.id)?.cardId;
       localState.mySubmittedCardId = mySubmittedCardId;
@@ -131,7 +128,7 @@ export class RoomComponent implements OnInit {
     }
 
     if (gameState.votePoints) {
-      localState.orderedPlayerResults = this.room.playerState.players
+      localState.orderedPlayerResults = this.room.playerStates
         .map(p => ({
           userInfo: p.userInfo,
           totalPoints: p.points,

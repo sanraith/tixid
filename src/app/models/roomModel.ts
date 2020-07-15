@@ -1,22 +1,16 @@
 import { PublicUserInfo } from 'src/shared/model/publicUserInfo'
-import { PublicPlayerState } from 'src/shared/model/sharedPlayerState';
+import { PublicPlayerState, PrivatePlayerState } from 'src/shared/model/sharedPlayerState';
 import PublicGameState from 'src/shared/model/publicGameState';
 import { ClientUser } from '../services/user.service';
 import { Socket } from 'ngx-socket-io';
 
 export class LocalGameState {
-    myPlayerState: PublicPlayerState;
     mySubmittedCardId?: string;
     myVotedCardId?: string;
     voteCardIds?: string[];
     votesByCardId?: Record<string, PublicUserInfo[]>;
     orderedPlayerResults?: { userInfo: PublicUserInfo, newPoints: number, totalPoints: number }[];
 }
-
-export class PlayerState {
-    players: PublicPlayerState[] = [];
-    hand: string[];
-};
 
 export default class RoomModel {
     id: string;
@@ -26,7 +20,9 @@ export default class RoomModel {
     owner: PublicUserInfo;
     players: PublicUserInfo[];
 
-    playerState: PlayerState = new PlayerState();
+    playerStates: PublicPlayerState[] = [];
+    myState?: PrivatePlayerState;
+
     gameState: PublicGameState;
     localState: LocalGameState = new LocalGameState();
 }
