@@ -24,6 +24,7 @@ export default class PlayerSocket {
         this.socket = socket;
     }
 
+    // TODO handle room player info (before game started) or refactor the 2 kinds of player infos into one.
     joinRoom(data: JoinRoomData): EmitResponse {
         debug(`Client ${this.userInfo.name} joins room`, data);
         this.room = roomManager.getRoom(data.roomId);
@@ -34,14 +35,14 @@ export default class PlayerSocket {
             socketManager.emitGameStateChanged(this.room, this.userInfo);
 
             // Set connection state 
-            const playerState = this.room?.state.players.find(x => x.userInfo === this.userInfo);
+            const playerState = this.room.state.players.find(x => x.userInfo === this.userInfo);
             if (playerState && !playerState.isConnected) {
                 playerState.isConnected = true;
                 socketManager.emitPlayerStateChanged(this.room, [playerState]);
             }
 
-            if ((this.room.state?.players.length ?? 0) > 0) {
-                socketManager.emitPlayerStateChanged(this.room, this.room?.state.players, this.userInfo);
+            if ((this.room.state.players.length ?? 0) > 0) {
+                socketManager.emitPlayerStateChanged(this.room, this.room.state.players, this.userInfo);
             }
             return { success: true };
         }
@@ -50,12 +51,15 @@ export default class PlayerSocket {
         }
     }
 
-    leaveRooms() {
-        roomManager.getRooms()
-            .filter(x => x.players.some(p => this.userInfo.id === p.id))
-            .forEach(x => roomManager.leaveRoom(x, this.userInfo));
-        debug(`Client ${this.userInfo.name} left all rooms.`);
-        return { success: true };
+    leaveRoom(): EmitResponse {
+        if (this.room) {
+            debug(`Client ${this.userInfo.name} left room ${this.room.id}.`);
+            roomManager.leaveRoom(this.room, this.userInfo);
+            return { success: true };
+        } else {
+            debug(`Client ${this.userInfo.name} tried to leave room, but is not part of any room!`);
+            return { success: false };
+        }
     }
 
     disconnect() {
@@ -66,7 +70,6 @@ export default class PlayerSocket {
         }
 
         this.socket.disconnect();
-        debug(`Client ${this.userInfo.name} disconnected: ${this.socket.client.id}`);
     }
 
     startGame(data?: StartGameData): EmitResponse {

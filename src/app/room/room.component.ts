@@ -101,9 +101,7 @@ export class RoomComponent implements OnInit {
 
     this.roomSocket.connect();
     this.roomSocket.emit(ClientActions.joinRoom, <JoinRoomData>{ roomId: this.room.id }, (resp: EmitResponse) => {
-      if (!resp.success) {
-        this.router.navigate(['home']);
-      }
+      if (!resp.success) { this.router.navigate(['home']); }
     });
   }
 

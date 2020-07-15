@@ -59,6 +59,7 @@ class CardSetManager {
             sets: Object.keys(this.sets).map(k => this.sets[k])
         };
         try {
+            await fs.mkdir(_contextFolder);
             await fs.writeFile(_cardDbPath, JSON.stringify(cardsDb));
         } catch (err) {
             debug(err);

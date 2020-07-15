@@ -11,6 +11,7 @@ import { PlayerGameData } from '../models/gameState';
 import PlayerSocket from './playerSocket';
 import { GameStep } from '../../shared/model/gameStep';
 import PickedCard from 'src/shared/model/pickedCard';
+import roomManager from './roomManager';
 const debug = Debug('tixid:services:socketManager');
 
 enum SocketEvents {
@@ -26,27 +27,57 @@ class SocketManager {
         const io = SocketIo(httpServer, { perMessageDeflate: false });
 
         io.on(SocketEvents.connection, (socket) => {
-            debug(`Client connecting: ${socket.client.id}`);
-
             const userInfo = this.getUserFromSocketCookies(socket.handshake.headers.cookie);
             if (userInfo === undefined) {
                 debug(`Disconnected client, no user data: ${socket.client.id}`)
                 socket.disconnect();
                 return;
             }
+
+            // Save player socket
+            if (!this.playerSockets[userInfo.id]) { this.playerSockets[userInfo.id] = []; }
+            const playerSockets = this.playerSockets[userInfo.id];
             const playerSocket = new PlayerSocket(userInfo, socket);
-            this.playerSockets[userInfo.id] = playerSocket;
-            debug(`Client ${userInfo.name} connected: ${socket.client.id}`);
+
+            playerSockets.push(playerSocket);
+            debug(`Client ${userInfo.name} #${playerSockets.length - 1} connected: ${socket.client.id}`);
+
+            // Reconnect to the last connected room if player was already connected.
+            // TODO make sure player only reconnect if they have to (not connecting into a new room)
+            // a. store room id in the session cookie
+            // b. store room id in the socket.io url
+            const lastConnectedRoom = this.playerLastConnectedRooms[userInfo.id];
+            if (lastConnectedRoom) {
+                debug(`Reconnecting ${userInfo.name} to room ${lastConnectedRoom.id}...`);
+                playerSocket.joinRoom({ roomId: lastConnectedRoom.id });
+            }
 
             socket.on(SocketEvents.disconnect, () => {
                 playerSocket.disconnect();
-                delete this.playerSockets[userInfo.id];
+                if (!this.playerSockets[userInfo.id]) {
+                    debug(`Disconnecting ${socket.id}, but cannot find any saved sockets for player ${userInfo.name}!`);
+                }
+
+                const playerSockets = this.playerSockets[userInfo.id];
+                const index = playerSockets.indexOf(playerSocket);
+                if (index < 0) {
+                    debug(`Disconnecting ${socket.id}, but cannot find saved socket for player ${userInfo.name}!`);
+                }
+
+                playerSockets.splice(index, 1);
+                debug(`Disconnecting player ${userInfo.name} socket ${socket.client.id}. ${playerSockets.length} connections remain.`);
+                if (playerSockets.length === 0) {
+                    delete this.playerSockets[userInfo.id];
+                }
+
             });
             socket.on(ClientActions.joinRoom, (data: JoinRoomData, callback?: (resp: EmitResponse) => void) => {
-                this.callbackMaybe(playerSocket.joinRoom(data), callback);
+                const result = playerSocket.joinRoom(data);
+                if (result.success) { this.playerLastConnectedRooms[userInfo.id] = roomManager.getRoom(data.roomId); }
+                this.callbackMaybe(result, callback);
             });
             socket.on(ClientActions.leaveRooms, (data: JoinRoomData, callback?: (resp: EmitResponse) => void) => {
-                this.callbackMaybe(playerSocket.leaveRooms(), callback);
+                this.callbackMaybe(playerSocket.leaveRoom(), callback);
             });
             socket.on(ClientActions.startGame, (data: StartGameData | undefined, callback?: (resp: EmitResponse) => void) => {
                 this.callbackMaybe(playerSocket.startGame(data), callback);
@@ -90,7 +121,7 @@ class SocketManager {
 
     emitPlayerStateChanged(room: Room, changedPlayers: PlayerGameData[], recipient?: UserInfo) {
         const publicPlayerStates: Record<string, PublicPlayerState> = {};
-        debug(`Emit players changed: ${changedPlayers.map(p => p.userInfo.name).join(', ')}`);
+        debug(`Emit players changed: ${changedPlayers.map(p => `${p.userInfo.name} (${this.playerSockets[p.userInfo.id]?.length ?? 0})`).join(', ')}`);
         changedPlayers
             .forEach(p => publicPlayerStates[p.userInfo.id] = <PublicPlayerState>{
                 userInfo: p.userInfo.publicInfo,
@@ -102,19 +133,21 @@ class SocketManager {
 
         const recipients = recipient ? [recipient] : room.players;
         for (const targetPlayer of recipients) {
-            const targetSocket = this.playerSockets[targetPlayer.id];
-            if (!targetSocket) { debug(`Cannot reach player ${targetPlayer.name}`); continue; }
+            const targetSockets = this.playerSockets[targetPlayer.id];
+            if (!targetSockets?.length) { debug(`Cannot reach player ${targetPlayer.name}`); continue; }
 
-            const emittedData = <PlayerStateChangedData>{
-                playerStates: changedPlayers.map(p => {
-                    const publicState = publicPlayerStates[p.userInfo.id]
-                    if (p.userInfo === targetPlayer) {
-                        return <PrivatePlayerState>{ ...publicState, hand: p.hand.map(c => c.id) };
-                    }
-                    return publicState;
-                })
-            };
-            targetSocket.socket.emit(ClientEvents.playerStateChanged, emittedData);
+            for (const targetSocket of targetSockets) {
+                const emittedData = <PlayerStateChangedData>{
+                    playerStates: changedPlayers.map(p => {
+                        const publicState = publicPlayerStates[p.userInfo.id]
+                        if (p.userInfo === targetPlayer) {
+                            return <PrivatePlayerState>{ ...publicState, hand: p.hand.map(c => c.id) };
+                        }
+                        return publicState;
+                    })
+                };
+                targetSocket.socket.emit(ClientEvents.playerStateChanged, emittedData);
+            }
         }
     }
 
@@ -140,28 +173,31 @@ class SocketManager {
 
         const recipients = recipient ? [recipient] : room.players;
         for (const targetPlayer of recipients) {
-            const targetSocket = this.playerSockets[targetPlayer.id];
-            if (!targetSocket) { debug(`Cannot reach player ${targetPlayer.name}`); continue; }
+            const targetSockets = this.playerSockets[targetPlayer.id];
+            if (!targetSockets?.length) { debug(`Cannot reach player ${targetPlayer.name}`); continue; }
 
-            // Only show card origin to card owner, or after the voting
-            const storyCardPile = state.storyCardPile.map(sc => <PickedCard>{
-                cardId: (canRevealAllCards || sc.userInfo === targetPlayer) ? sc.card.id : undefined,
-                userInfo: (canRevealAllCardOwners || sc.userInfo === targetPlayer) ? sc.userInfo.publicInfo : undefined
-            });
-            gameStateData.storyCardPile = storyCardPile;
+            for (const targetSocket of targetSockets) {
 
-            // Only show story card to story teller
-            if (targetPlayer === state.storyTeller?.userInfo) {
-                gameStateData.storyCardId = state.storyCard?.id;
+                // Only show card origin to card owner, or after the voting
+                const storyCardPile = state.storyCardPile.map(sc => <PickedCard>{
+                    cardId: (canRevealAllCards || sc.userInfo === targetPlayer) ? sc.card.id : undefined,
+                    userInfo: (canRevealAllCardOwners || sc.userInfo === targetPlayer) ? sc.userInfo.publicInfo : undefined
+                });
+                gameStateData.storyCardPile = storyCardPile;
+
+                // Only show story card to story teller
+                if (targetPlayer === state.storyTeller?.userInfo) {
+                    gameStateData.storyCardId = state.storyCard?.id;
+                }
+
+                const votes = state.votes.map(vote => ({
+                    cardId: (canRevealAllVotes || vote.userInfo === targetPlayer) ? vote.card.id : undefined,
+                    userInfo: vote.userInfo.publicInfo
+                }));
+                gameStateData.votes = votes;
+
+                targetSocket.socket.emit(ClientEvents.gameStateChanged, gameStateData);
             }
-
-            const votes = state.votes.map(vote => ({
-                cardId: (canRevealAllVotes || vote.userInfo === targetPlayer) ? vote.card.id : undefined,
-                userInfo: vote.userInfo.publicInfo
-            }));
-            gameStateData.votes = votes;
-
-            targetSocket.socket.emit(ClientEvents.gameStateChanged, gameStateData);
         }
     }
 
@@ -184,7 +220,8 @@ class SocketManager {
     }
 
     private io!: Server;
-    private playerSockets: Record<string, PlayerSocket> = {};
+    private playerSockets: Record<string, PlayerSocket[]> = {};
+    private playerLastConnectedRooms: Record<string, Room | undefined> = {};
 }
 
 export default new SocketManager();
