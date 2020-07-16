@@ -65,6 +65,7 @@ export default class PlayerSocket {
     disconnect() {
         const playerState = this.room?.state.players.find(x => x.userInfo === this.userInfo);
         if (this.room && playerState && playerState.isConnected) {
+            debug(`Setting disconnect state for player ${this.userInfo.name} on room ${this.room.id}.`);
             playerState.isConnected = false;
             socketManager.emitPlayerStateChanged(this.room, [playerState]);
         }

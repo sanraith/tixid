@@ -42,18 +42,7 @@ class SocketManager {
             playerSockets.push(playerSocket);
             debug(`Client ${userInfo.name} #${playerSockets.length - 1} connected: ${socket.client.id}`);
 
-            // Reconnect to the last connected room if player was already connected.
-            // TODO make sure player only reconnect if they have to (not connecting into a new room)
-            // a. store room id in the session cookie
-            // b. store room id in the socket.io url
-            const lastConnectedRoom = this.playerLastConnectedRooms[userInfo.id];
-            if (lastConnectedRoom) {
-                debug(`Reconnecting ${userInfo.name} to room ${lastConnectedRoom.id}...`);
-                playerSocket.joinRoom({ roomId: lastConnectedRoom.id });
-            }
-
             socket.on(SocketEvents.disconnect, () => {
-                playerSocket.disconnect();
                 if (!this.playerSockets[userInfo.id]) {
                     debug(`Disconnecting ${socket.id}, but cannot find any saved sockets for player ${userInfo.name}!`);
                 }
@@ -67,14 +56,12 @@ class SocketManager {
                 playerSockets.splice(index, 1);
                 debug(`Disconnecting player ${userInfo.name} socket ${socket.client.id}. ${playerSockets.length} connections remain.`);
                 if (playerSockets.length === 0) {
+                    playerSocket.disconnect();
                     delete this.playerSockets[userInfo.id];
                 }
-
             });
             socket.on(ClientActions.joinRoom, (data: JoinRoomData, callback?: (resp: EmitResponse) => void) => {
-                const result = playerSocket.joinRoom(data);
-                if (result.success) { this.playerLastConnectedRooms[userInfo.id] = roomManager.getRoom(data.roomId); }
-                this.callbackMaybe(result, callback);
+                this.callbackMaybe(playerSocket.joinRoom(data), callback);
             });
             socket.on(ClientActions.leaveRooms, (data: JoinRoomData, callback?: (resp: EmitResponse) => void) => {
                 this.callbackMaybe(playerSocket.leaveRoom(), callback);
@@ -121,7 +108,7 @@ class SocketManager {
 
     emitPlayerStateChanged(room: Room, changedPlayers: PlayerGameData[], recipient?: UserInfo) {
         const publicPlayerStates: Record<string, PublicPlayerState> = {};
-        debug(`Emit players changed: ${changedPlayers.map(p => `${p.userInfo.name} (${this.playerSockets[p.userInfo.id]?.length ?? 0})`).join(', ')}`);
+        debug(`Emit players changed: ${changedPlayers.map(p => `${p.userInfo.name} (${this.playerSockets[p.userInfo.id]?.length ?? 0})`).join(', ')} to ${recipient?.name ?? 'all'}`);
         changedPlayers
             .forEach(p => publicPlayerStates[p.userInfo.id] = <PublicPlayerState>{
                 userInfo: p.userInfo.publicInfo,
@@ -221,7 +208,6 @@ class SocketManager {
 
     private io!: Server;
     private playerSockets: Record<string, PlayerSocket[]> = {};
-    private playerLastConnectedRooms: Record<string, Room | undefined> = {};
 }
 
 export default new SocketManager();

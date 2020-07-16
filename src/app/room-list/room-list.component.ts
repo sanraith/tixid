@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { RoomService } from '../services/room.service';
 import { PublicUserInfo } from 'src/shared/model/publicUserInfo';
 
@@ -13,7 +13,8 @@ export class RoomListComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private roomService: RoomService) { }
+    private roomService: RoomService
+  ) { }
 
   ngOnInit(): void {
     this.fetchRooms();

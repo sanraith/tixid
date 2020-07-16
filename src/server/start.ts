@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import app from './app';
+import expressServer from './server';
 import http from 'http';
 import _debug from 'debug';
 import socketManager from './services/socketManager';
@@ -10,20 +10,20 @@ const debug = _debug('tixid:start');
  * Get port from environment and store in Express.
  */
 const port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+expressServer.set('port', port);
 
 /**
  * Create HTTP server.
  */
-const server = http.createServer(app);
+const httpServer = http.createServer(expressServer);
 
 /**
  * Listen on provided port, on all network interfaces.
  */
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
-socketManager.init(server);
+httpServer.listen(port);
+httpServer.on('error', onError);
+httpServer.on('listening', onListening);
+socketManager.init(httpServer);
 
 /**
  * Normalize a port into a number, string, or false.
@@ -75,7 +75,7 @@ function onError(error: any) {
  * Event listener for HTTP server "listening" event.
  */
 function onListening() {
-  const addr = server.address();
+  const addr = httpServer.address();
   const bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr?.port;
