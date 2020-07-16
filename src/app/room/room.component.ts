@@ -99,10 +99,21 @@ export class RoomComponent implements OnInit {
       }
     });
 
-    this.roomSocket.connect();
-    this.roomSocket.emit(ClientActions.joinRoom, <JoinRoomData>{ roomId: this.room.id }, (resp: EmitResponse) => {
-      if (!resp.success) { this.router.navigate(['home']); }
+    this.roomSocket.on(ClientEvents.connect, () => {
+      console.log("Socket connected.");
+      this.roomSocket.emit(ClientActions.joinRoom, <JoinRoomData>{ roomId: this.room.id }, (resp: EmitResponse) => {
+        if (!resp.success) {
+          console.log("Failed to join room, redirecting to home.");
+          this.router.navigate(['home']);
+        }
+      });
     });
+
+    this.roomSocket.on(ClientEvents.disconnect, () => {
+      console.log("Socket disconnected.");
+    });
+
+    this.roomSocket.connect();
   }
 
   private updateLocalState(): void {

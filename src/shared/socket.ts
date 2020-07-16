@@ -17,6 +17,9 @@ export enum ClientActions {
 }
 
 export enum ClientEvents {
+    connect = "connect",
+    disconnect = "disconnect",
+
     playersChanged = "players_changed",
 
     playerStateChanged = "player_state_changed",

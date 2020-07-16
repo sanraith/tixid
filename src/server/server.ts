@@ -14,7 +14,7 @@ const _app_context_folder = 'dist/context';
 var app = express();
 
 cardSetManager.init().then(() => {
-  testDataGenerator();
+  // testDataGenerator();
 
   // Middleware setup
   app.use(logger('dev'));
