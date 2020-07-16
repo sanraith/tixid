@@ -41,6 +41,7 @@ export class RoomComponent implements OnInit {
 
   ngOnInit(): void {
     this.room.currentUser = this.userService.userData;
+    console.log(this.room.currentUser);
     this.room.id = this.route.snapshot.paramMap.get('id')!;
     this.join();
   }
@@ -64,16 +65,19 @@ export class RoomComponent implements OnInit {
 
   private async join(): Promise<void> {
     this.roomSocket.on(ClientEvents.gameStarted, () => {
+      console.log(`Event: ${ClientEvents.gameStarted}`);
       this.room.playerStates = [];
     });
 
     this.roomSocket.on(ClientEvents.playersChanged, (args: PlayersChangedData) => {
+      console.log(`Event: ${ClientEvents.playersChanged} ${JSON.stringify(args)}`);
       this.room.owner = args.owner;
       this.room.players = args.players;
       this.isOwner = this.room.currentUser.id === this.room.owner.id;
     });
 
     this.roomSocket.on(ClientEvents.playerStateChanged, (args: PlayerStateChangedData) => {
+      console.log(`Event: ${ClientEvents.playerStateChanged} ${JSON.stringify(args)}`);
       const pStates = this.room.playerStates;
       const myNewState = <PrivatePlayerState>args.playerStates.find(x => x.userInfo.id === this.room.currentUser.id);
 
@@ -90,6 +94,7 @@ export class RoomComponent implements OnInit {
     });
 
     this.roomSocket.on(ClientEvents.gameStateChanged, (newState: GameStateChangedData) => {
+      console.log(`Event: ${ClientEvents.gameStateChanged} ${JSON.stringify(newState)}`);
       const currentGameState = this.room.gameState;
       const newContent = this.pickRoomContent(currentGameState?.step, newState.step);
       this.room.gameState = newState;
