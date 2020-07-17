@@ -1,5 +1,10 @@
 <label *ngFor="let card of cards">
     <input class="hidden" type="radio" id="{{card}}" name="card" [value]="card" [(ngModel)]="selectedCard"
         [disabled]="!isEnabled" (change)="_selectedCardChange()">
-    <img src="card/{{card}}" style="height: 20vh;" [class.selectable]="isEnabled">
+    <img src="card/{{card}}" style="height: 20vh;" [class.selectable]="isEnabled" (dblclick)="displayCard(card)">
 </label>
+
+<!-- The Modal -->
+<div *ngIf="displayedCard" class="modal" (click)="displayCard()">
+    <img class="modal-content" src="card/{{displayedCard}}">
+</div>

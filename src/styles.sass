@@ -29,7 +29,8 @@ body
 
 .page
     margin: 0 auto
-    width: $globalWidth
+    min-width: $globalWidth
+    max-width: 1200px
     border: 1px solid
     overflow: auto
 
@@ -37,3 +38,4 @@ body
 @media only screen and (max-width: ($globalWidth))
     .page, .playerList, .main
         width: 100%
+        min-width: 0px

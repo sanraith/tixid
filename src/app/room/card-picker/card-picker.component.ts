@@ -11,6 +11,8 @@ export class CardPickerComponent implements OnInit {
   @Input() isEnabled: boolean = true;
   @Output() selectedCardChange = new EventEmitter();
 
+  displayedCard: string;
+
   constructor() { }
 
   ngOnInit(): void {
@@ -18,5 +20,9 @@ export class CardPickerComponent implements OnInit {
 
   _selectedCardChange() {
     this.selectedCardChange.emit(this.selectedCard);
+  }
+
+  displayCard(card?: string): void {
+    this.displayedCard = card;
   }
 }
