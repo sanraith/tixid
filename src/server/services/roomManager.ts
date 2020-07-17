@@ -46,17 +46,17 @@ class RoomManager {
         if (existingUserIndex < 0) { return; }
 
         const leftPlayer = room.players.splice(existingUserIndex, 1)[0];
-        if (leftPlayer === room.owner) {
-            if (room.players.length > 0) {
-                room.owner = room.players[0];
-            } else {
-                // TODO delete room eventually
-            }
+        if (room.players.length === 0) {
+            this.deleteRoom(room);
         }
 
         socketManager.emitPlayersChanged(room);
 
         debug(`Client ${leftPlayer.name} left room ${room.id}`);
+    }
+
+    deleteRoom(room: Room) {
+        delete this._rooms[room.id];
     }
 
     _roomIdGenerator: { generate(): string } = shortid;

@@ -146,6 +146,20 @@ export default class PlayerSocket {
         return this.manager.indicatePlayerReady(this.userInfo);
     }
 
+    takeOwnership(): EmitResponse {
+        if (!this.room || !this.manager) { return { success: false, message: "Player is not part of any room!" }; }
+
+        const currentOwner = this.room!.owner;
+        const currentOwnerState = this.room.state.players.find(x => x.userInfo === currentOwner);
+        if (currentOwnerState && currentOwnerState.isConnected) { return { success: false, message: "Can only take ownership from disconnected players!" }; }
+
+        debug(`Requested take ownership ready by ${this.userInfo.name}`);
+        this.room.owner = this.userInfo;
+        socketManager.emitPlayersChanged(this.room);
+
+        return { success: true };
+    }
+
     getRoomChannelId(roomId: string) {
         return `room_${roomId}`;
     }

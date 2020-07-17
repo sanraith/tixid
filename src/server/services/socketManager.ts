@@ -57,6 +57,7 @@ class SocketManager {
                 debug(`Disconnecting player ${userInfo.name} socket ${socket.client.id}. ${playerSockets.length} connections remain.`);
                 if (playerSockets.length === 0) {
                     playerSocket.disconnect();
+                    playerSocket.leaveRoom();
                     delete this.playerSockets[userInfo.id];
                 }
             });
@@ -89,6 +90,9 @@ class SocketManager {
             });
             socket.on(ClientActions.indicateReady, (data: any, callback?: (resp: EmitResponse) => void) => {
                 this.callbackMaybe(playerSocket.indicateReady(), callback);
+            });
+            socket.on(ClientActions.takeOwnership, (data: any, callback?: (resp: EmitResponse) => void) => {
+                this.callbackMaybe(playerSocket.takeOwnership(), callback);
             });
         });
 

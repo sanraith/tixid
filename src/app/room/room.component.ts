@@ -16,6 +16,7 @@ import { VoteStoryResultsComponent } from './vote-story-results/vote-story-resul
 import { PublicUserInfo } from 'src/shared/model/publicUserInfo';
 import { PartialResultsComponent } from './partial-results/partial-results.component';
 import { FinalResultsComponent } from './final-results/final-results.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-room',
@@ -34,7 +35,7 @@ export class RoomComponent implements OnInit {
     private route: ActivatedRoute,
     private roomSocket: Socket,
     private componentFactoryResolver: ComponentFactoryResolver,
-    private userService: UserService,
+    private userService: UserService
   ) {
     this.room.socket = roomSocket;
   }
@@ -48,6 +49,12 @@ export class RoomComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.leave();
+  }
+
+  takeOwnership() {
+    if (confirm("Are you sure you want to take ownership of the room?")) {
+      this.emitAction(ClientActions.takeOwnership);
+    }
   }
 
   lobby() { this.emitAction(ClientActions.goToLobby); }
@@ -155,6 +162,7 @@ export class RoomComponent implements OnInit {
   }
 
   private leave(): void {
+    console.log("Leaving...");
     this.roomSocket.emit(ClientActions.leaveRooms, null, (resp: EmitResponse) => { });
     this.roomSocket.removeAllListeners();
     this.roomSocket.disconnect();

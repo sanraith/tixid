@@ -14,8 +14,14 @@
             <li *ngFor="let playerState of room.playerStates">
                 <div class="pName">
                     {{playerState.isReady ? '✔' : '⏳'}}
-                    {{playerState.isConnected ? '' : '⚠'}}
-                    {{room.gameState.storyTeller.id=== playerState.userInfo.id ? '📖' : ''}}
+
+                    <a nohref
+                        *ngIf="!playerState.isConnected && room.owner.id === playerState.userInfo.id; else notOwner"
+                        style="cursor: pointer" (click)="takeOwnership()">⚠</a>
+                    <ng-template #notOwner>{{playerState.isConnected ? '' : '⚠'}}</ng-template>
+
+                    {{room.gameState.storyTeller.id === playerState.userInfo.id ? '📖' : ''}}
+
                     {{playerState.userInfo.name}}:&nbsp;
                 </div>
                 <div class="pPoints">
