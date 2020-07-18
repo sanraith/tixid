@@ -2,9 +2,12 @@
 <h3>Story: "{{room.gameState.story}}"</h3>
 
 <div *ngFor="let pickedCard of room.gameState.storyCardPile" class="voteColumn">
-    <img src="card/{{pickedCard.cardId}}">
+    <app-card-picker [cards]="[pickedCard.cardId]" [isEnabled]="false"
+        [class.selectedCard]="pickedCard.userInfo.id === room.gameState.storyTeller.id"
+        [selectedCard]="room.localState.mySubmittedCardId === pickedCard.cardId && pickedCard.userInfo.id !== room.gameState.storyTeller.id ? pickedCard.cardId : null">
+    </app-card-picker>
     <br />
-    <span *ngIf="pickedCard.userInfo.id === room.gameState.storyTeller.id">[STORY TELLER]<br/></span>
+    <span *ngIf="pickedCard.userInfo.id === room.gameState.storyTeller.id">[STORY TELLER]<br /></span>
     <span class="cardOwner">By: {{pickedCard.userInfo.name}}</span>
     <br />
     Votes ({{room.localState.votesByCardId[pickedCard.cardId]?.length || "0"}}):

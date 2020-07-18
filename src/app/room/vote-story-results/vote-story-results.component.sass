@@ -5,5 +5,14 @@
 .cardOwner
     font-weight: bold
 
-img
-    height: 25vh
+.selectedCard
+    line-height: 0
+    display: inline-block
+    animation: correctGlow 1s infinite alternate
+
+$glowSize: 3px
+@keyframes correctGlow
+  from
+    box-shadow: 0 0 $glowSize -$glowSize #04B2D9
+  to
+    box-shadow: 0 0 $glowSize $glowSize #04B2D9

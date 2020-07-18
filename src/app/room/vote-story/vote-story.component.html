@@ -9,7 +9,9 @@
 
 
     <h3 style="font-style: italic;">"{{room.gameState.story}}"</h3>
-    <app-card-picker [cards]="room.localState.voteCardIds" [(selectedCard)]="voteCard"></app-card-picker>
+    <app-card-picker [cards]="room.localState.voteCardIds" [(selectedCard)]="voteCard"
+        [blockedCards]="[room.localState.mySubmittedCardId]">
+    </app-card-picker>
     <br />
 
     <button (click)="voteForCard()"

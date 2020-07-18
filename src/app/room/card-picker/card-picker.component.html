@@ -1,7 +1,10 @@
 <label *ngFor="let card of cards">
-    <input class="hidden" type="radio" id="{{card}}" name="card" [value]="card" [(ngModel)]="selectedCard"
-        [disabled]="!isEnabled" (change)="_selectedCardChange()">
-    <img src="card/{{card}}" style="height: 20vh;" [class.selectable]="isEnabled" (dblclick)="displayCard(card)">
+    <ng-container *ngIf="{ isBlocked: blockedCards.includes(card) } as c">
+        <input class="hidden" type="radio" id="{{card}}" name="card" [value]="card" [(ngModel)]="selectedCard"
+            [disabled]="!isEnabled || c.isBlocked" (change)="_selectedCardChange()" />
+        <img src="card/{{card}}" style="height: 20vh;" [class.selectable]="isEnabled && !c.isBlocked"
+            [class.blocked]="c.isBlocked" (dblclick)="displayCard(card)">
+    </ng-container>
 </label>
 
 <!-- The Modal -->

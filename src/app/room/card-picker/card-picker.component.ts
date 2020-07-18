@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-card-picker',
@@ -9,6 +9,7 @@ export class CardPickerComponent implements OnInit {
   @Input() cards: string[];
   @Input() selectedCard: string;
   @Input() isEnabled: boolean = true;
+  @Input() blockedCards: string[] = [];
   @Output() selectedCardChange = new EventEmitter();
 
   displayedCard: string;
