@@ -20,6 +20,8 @@ import { VoteStoryResultsComponent } from './room/vote-story-results/vote-story-
 import { PartialResultsComponent } from './room/partial-results/partial-results.component';
 import { FinalResultsComponent } from './room/final-results/final-results.component';
 import { ReadyButtonComponent } from './room/ready-button/ready-button.component';
+import { CardFacedownPipe } from './pipes/card-facedown.pipe';
+import { EmptyCardToCardbackPipe } from './pipes/empty-card-to-cardback.pipe';
 
 const config: SocketIoConfig = { url: '', options: { autoConnect: false } };
 
@@ -38,7 +40,9 @@ const config: SocketIoConfig = { url: '', options: { autoConnect: false } };
     VoteStoryResultsComponent,
     PartialResultsComponent,
     FinalResultsComponent,
-    ReadyButtonComponent
+    ReadyButtonComponent,
+    CardFacedownPipe,
+    EmptyCardToCardbackPipe
   ],
   imports: [
     BrowserModule,

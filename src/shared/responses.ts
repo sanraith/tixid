@@ -11,3 +11,14 @@ export interface GetRoomListResponse {
         players: PublicUserInfo[]
     }[]
 }
+
+export interface CardSetInfo {
+    id: string,
+    name: string,
+    cardCount: number,
+    cards: string[]
+}
+
+export interface GetCardSetsResponse {
+    cardSets: CardSetInfo[]
+}

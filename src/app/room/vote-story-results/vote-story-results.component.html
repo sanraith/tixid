@@ -4,7 +4,7 @@
 <div *ngFor="let pickedCard of room.gameState.storyCardPile" class="voteColumn">
     <app-card-picker [cards]="[pickedCard.cardId]" [isEnabled]="false"
         [class.selectedCard]="pickedCard.userInfo.id === room.gameState.storyTeller.id"
-        [selectedCard]="room.localState.mySubmittedCardId === pickedCard.cardId && pickedCard.userInfo.id !== room.gameState.storyTeller.id ? pickedCard.cardId : null">
+        [selectedCard]="room.localState.myVotedCardId === pickedCard.cardId && pickedCard.userInfo.id !== room.gameState.storyTeller.id ? pickedCard.cardId : null">
     </app-card-picker>
     <br />
     <span *ngIf="pickedCard.userInfo.id === room.gameState.storyTeller.id">[STORY TELLER]<br /></span>

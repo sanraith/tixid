@@ -2,20 +2,43 @@ import express from 'express';
 import Debug from 'debug';
 import cardManager from '../services/cardManager';
 import path from 'path';
+import { CardSetInfo, GetCardSetsResponse } from 'src/shared/responses';
 
 const debug = Debug('tixid:routes:card');
-const router = express.Router();
+const cardRouter = express.Router();
+const cardSetRouter = express.Router();
 
 const _app_client_folder = 'dist/client';
-const _app_cardSets_folder = 'assets/cardSets';
+const _app_assets_folder = 'assets';
+const _app_cardSets_folder = path.join(_app_assets_folder, 'cardSets');
+const _cardback_path = path.join(_app_assets_folder, 'cardback.jpg');
 
-router.get("/:cardId", (req, res) => {
+cardSetRouter.get("/", (req, res) => {
+    res.json(<GetCardSetsResponse>{
+        cardSets: Object.values(cardManager.sets).map(set => (<CardSetInfo>{
+            id: set.id,
+            name: set.name,
+            cardCount: set.cards.length,
+            cards: set.cards.filter((_, i) => i < 5).map(c => c.id)
+        }))
+    });
+});
+
+cardRouter.get("/:cardId", (req, res) => {
     const cardId = req.params["cardId"];
-    const card = cardManager.cards[cardId];
-    const cardPath = path.join(_app_cardSets_folder, card.path);
+    if (cardId === "cardback") {
+        res.sendFile(_cardback_path, { root: _app_client_folder });
+        return;
+    }
 
-    // TODO serve 304 for subsequent requests
-    res.status(200).sendFile(cardPath, { root: _app_client_folder });
+    const card = cardManager.cards[cardId];
+    if (card) {
+        const cardPath = path.join(_app_cardSets_folder, card.path);
+        // TODO serve 304 based on file changes
+        res.sendFile(cardPath, { root: _app_client_folder });
+    } else {
+        res.status(404);
+    }
 })
 
-export default router;
+export { cardRouter, cardSetRouter };

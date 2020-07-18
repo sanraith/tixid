@@ -3,7 +3,7 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import roomsRouter from './routes/roomsRouter';
 import cardSetManager from './services/cardManager';
-import cardRouter from './routes/cardRouter';
+import { cardRouter, cardSetRouter } from './routes/cardRouter';
 import testDataGenerator from './services/testDataGenerator';
 import process from 'process';
 import Debug from 'debug';
@@ -26,6 +26,7 @@ cardSetManager.init().then(() => {
   app.use(express["static"](_app_client_folder));
   app.use(express["static"](_app_context_folder))
   app.use('/api/rooms', roomsRouter);
+  app.use('/api/sets', cardSetRouter);
   app.use('/card', cardRouter);
 
   // Serve application paths

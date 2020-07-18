@@ -81,7 +81,15 @@ export default class PlayerSocket {
 
         debug(`Requested start game by ${this.userInfo.name}`);
         const rules = data?.rules ?? this.room.state.rules ?? getDefaultRules();
-        const result = this.manager.startGame(rules, Object.values(cardManager.sets));
+        let sets = Object.values(cardManager.sets);
+        if (rules.cardSets && rules.cardSets.length > 0) {
+            sets = rules.cardSets.map(x => cardManager.sets[x]);
+            if (sets.some(x => !x)) {
+                return { success: false, message: "Some of the requested sets do not exists!" }
+            }
+        }
+
+        const result = this.manager.startGame(rules, sets);
         return result;
     }
 

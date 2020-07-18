@@ -3,7 +3,6 @@
 
 <!-- Player IS the story teller -->
 <div *ngIf="room.gameState.storyTeller.id === room.currentUser.id">
-    <app-card-picker [cards]="[room.gameState.storyCardId]" [isEnabled]="false"></app-card-picker>
     <h2>Waiting for everybody else to extend the story...</h2>
 </div>
 
@@ -20,5 +19,6 @@
 </div>
 
 <ng-template #waitingBlock>
-    <p>Waiting for others to vote...</p>
+    <app-card-picker [cards]="room.localState.voteCardIds | cardFacedown" [isEnabled]="false"></app-card-picker>
+    <p>Waiting for others to extend the story...</p>
 </ng-template>

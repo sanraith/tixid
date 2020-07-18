@@ -16,7 +16,6 @@ import { VoteStoryResultsComponent } from './vote-story-results/vote-story-resul
 import { PublicUserInfo } from 'src/shared/model/publicUserInfo';
 import { PartialResultsComponent } from './partial-results/partial-results.component';
 import { FinalResultsComponent } from './final-results/final-results.component';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-room',

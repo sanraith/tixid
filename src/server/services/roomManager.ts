@@ -47,7 +47,11 @@ class RoomManager {
 
         const leftPlayer = room.players.splice(existingUserIndex, 1)[0];
         if (room.players.length === 0) {
-            this.deleteRoom(room);
+            // Delete room after some time if no players rejoin
+            // TODO refine this to cancel timeout after someone rejoins
+            setTimeout(() => {
+                if (room.players.length === 0) { this.deleteRoom(room); }
+            }, 60000);
         }
 
         socketManager.emitPlayersChanged(room);
@@ -57,6 +61,7 @@ class RoomManager {
 
     deleteRoom(room: Room) {
         delete this._rooms[room.id];
+        debug(`Room ${room.id} deleted.`);
     }
 
     _roomIdGenerator: { generate(): string } = shortid;

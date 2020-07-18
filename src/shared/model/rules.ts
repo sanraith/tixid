@@ -9,11 +9,15 @@ export interface Rules {
     pointsDeceivedSomebody: number,
     maxPointsDeceivedSomebody: number,
 
-    pointsToWin: number
+    pointsToWin: number,
+    
+    cardSets: string[]
 }
 
 export function getDefaultRules(): Rules {
     return {
+        cardSets: [], // Empty == all
+
         handSize: 6,
         onlyOwnerCanStart: false,
         invalidStateChanges: true,

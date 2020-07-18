@@ -7,14 +7,51 @@ Players:
 
 <!-- Show room controls to owner -->
 <div *ngIf="room.currentUser.id === room.owner.id">
+    <button (click)="startGame()">Start game</button>
+
+    <h3>Card sets:</h3>
+    <table *ngIf="sets; else setsNotLoaded">
+        <tr *ngFor="let set of sets" [class.highlighted]="set.isSelected">
+            <td>
+                <input type="checkbox" id="{{set.info.id}}" [(ngModel)]="set.isSelected">
+            </td>
+            <td>
+                <label style="font-size: larger;" for="{{set.info.id}}">
+                    <span style="font-weight: bold;">{{set.info.name}}</span>
+                    <br />
+                    {{set.info.cardCount}} cards
+                </label>
+            </td>
+            <td>
+                <app-card-picker [cards]="set.info.cards" [isEnabled]="false" [imageHeightVh]="10">
+                </app-card-picker>
+            </td>
+        </tr>
+    </table>
+    <ng-template #setsNotLoaded>
+        Loading available sets...
+    </ng-template>
+
     <h3>Rules:</h3>
-    <label *ngFor="let key of Object.keys(rules)">
-        {{key}}:
-        <input *ngIf="getInputType(key) === 'checkbox'" type="checkbox" [(ngModel)]="rules[key]">
-        <input *ngIf="getInputType(key) !== 'checkbox'" [type]="getInputType(key)" [(ngModel)]="rules[key]">
-        <br />
-    </label>
+    <table>
+        <tr *ngFor="let key of Object.keys(rules)">
+            <td><label for="{{key}}">{{key}}</label></td>
+            <td>
+                <div [ngSwitch]="getInputType(key)">
+                    <div *ngSwitchCase="'object'">
+                        <div *ngFor="let set of sets" style="display: inline-block;">
+                            <div *ngIf="set.isSelected" style="margin-right: 5px;">
+                                <app-card-picker [cards]="set.info.cards" [isEnabled]="false" [imageHeightVh]="3">
+                                </app-card-picker>
+                            </div>
+                        </div>
+                    </div>
+                    <input id="{{key}}" *ngSwitchCase="'checkbox'" type="checkbox" [(ngModel)]="rules[key]">
+                    <input id="{{key}}" *ngSwitchDefault [type]="getInputType(key)" [(ngModel)]="rules[key]">
+                </div>
+            </td>
+        </tr>
+    </table>
     <button (click)="resetRules()">Reset default rules</button>
     <button (click)="startGame()">Start game</button>
 </div>
-

@@ -3,23 +3,22 @@ import { Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import url from 'url';
 import { CreateRoomResponse, GetRoomListResponse } from 'src/shared/responses';
+import { GET_ROOMS_PATH } from 'src/shared/apiPaths';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RoomService {
-  private roomUrl = 'api/rooms/';
-
   constructor(private http: HttpClient) {
   }
 
   createRoom(): Observable<CreateRoomResponse> {
-    const targetUrl = url.resolve(this.roomUrl, 'create');
+    const targetUrl = url.resolve(GET_ROOMS_PATH, 'create');
     return this.http.post<CreateRoomResponse>(targetUrl, null);
   }
 
   getRooms(): Observable<GetRoomListResponse> {
-    const targetUrl = this.roomUrl;
+    const targetUrl = GET_ROOMS_PATH;
     return this.http.get<GetRoomListResponse>(targetUrl);
   }
 }
