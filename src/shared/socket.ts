@@ -15,12 +15,14 @@ export enum ClientActions {
     startRound = "start_round",
     indicateReady = "indicate_ready",
     forceReady = "force_ready",
-    takeOwnership = "take_ownership"
+    takeOwnership = "take_ownership",
+    kickPlayer = "kick_player"
 }
 
 export enum ClientEvents {
     connect = "connect",
     disconnect = "disconnect",
+    kickedFromRoom = "kicked_from_room",
 
     playersChanged = "players_changed",
 
@@ -38,7 +40,8 @@ export interface EmitResponse {
 export interface GameStateChangedData extends PublicGameState { }
 
 export interface PlayerStateChangedData {
-    playerStates: (PublicPlayerState | PrivatePlayerState)[]
+    playerStates: (PublicPlayerState | PrivatePlayerState)[],
+    isCompleteList: boolean
 }
 
 export interface PlayersChangedData {
@@ -64,3 +67,11 @@ export interface ExtendStoryData {
 }
 
 export interface VoteStoryData extends ExtendStoryData { }
+
+export interface KickPlayerData {
+    publicId: string
+}
+
+export interface KickedFromRoomData{
+    roomId: string
+}

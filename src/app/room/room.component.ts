@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ComponentFactoryResolver, Type } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Socket } from 'ngx-socket-io';
-import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse, PlayerStateChangedData, GameStateChangedData } from 'src/shared/socket';
+import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse, PlayerStateChangedData, GameStateChangedData, KickPlayerData, KickedFromRoomData } from 'src/shared/socket';
 import { RoomContentDirective } from './roomContentDirective';
 import { LobbyComponent } from './lobby/lobby.component';
 import RoomContentComponent from './roomContentComponent';
@@ -61,13 +61,19 @@ export class RoomComponent implements OnInit {
     }
   }
 
+  kick(player: PublicUserInfo) {
+    if (confirm(`Are you sure you want to kick ${player.name} from the room?`)) {
+      this.emitAction(ClientActions.kickPlayer, <KickPlayerData>{ publicId: player.id });
+    }
+  }
+
   lobby() { this.emitAction(ClientActions.goToLobby); }
   startGame() { this.emitAction(ClientActions.startGame); }
   showPartialResults() { this.emitAction(ClientActions.partialResults); }
   startRound() { this.emitAction(ClientActions.startRound); }
 
-  private emitAction(action: ClientActions) {
-    this.roomSocket.emit(action, {}, (resp: EmitResponse) => {
+  private emitAction(action: ClientActions, data?: any) {
+    this.roomSocket.emit(action, data, (resp: EmitResponse) => {
       if (!resp.success) {
         alert(resp.message);
       }
@@ -89,10 +95,12 @@ export class RoomComponent implements OnInit {
 
     this.roomSocket.on(ClientEvents.playerStateChanged, (args: PlayerStateChangedData) => {
       console.log(`Event: ${ClientEvents.playerStateChanged} ${JSON.stringify(args)}`);
-      const pStates = this.room.playerStates;
-      const myNewState = <PrivatePlayerState>args.playerStates.find(x => x.userInfo.id === this.room.currentUser.id);
 
+      const myNewState = <PrivatePlayerState>args.playerStates.find(x => x.userInfo.id === this.room.currentUser.id);
       this.room.myState = myNewState ? myNewState : this.room.myState;
+
+      if (args.isCompleteList) { this.room.playerStates = []; }
+      const pStates = this.room.playerStates;
       for (const playerState of args.playerStates) {
         const localPlayerStateIndex = pStates.findIndex(x => x.userInfo.id === playerState.userInfo.id);
         if (localPlayerStateIndex >= 0) {
@@ -127,6 +135,14 @@ export class RoomComponent implements OnInit {
 
     this.roomSocket.on(ClientEvents.disconnect, () => {
       console.log("Socket disconnected.");
+    });
+
+    this.roomSocket.on(ClientEvents.kickedFromRoom, (args: KickedFromRoomData) => {
+      console.log(`Kicked from room. ${args.roomId}`);
+      if (this.room.id === args.roomId) {
+        alert("You have been kicked from the room!");
+        this.router.navigate(['home']);
+      }
     });
 
     this.roomSocket.connect();

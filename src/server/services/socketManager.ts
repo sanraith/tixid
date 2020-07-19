@@ -4,7 +4,7 @@ import cookie from 'cookie';
 import Debug from 'debug';
 import userManager, { UserCookies } from './userManager';
 import UserInfo from '../models/userInfo';
-import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse, PlayerStateChangedData, GameStateChangedData, MakeStoryData, ExtendStoryData, VoteStoryData, StartGameData } from '../../shared/socket';
+import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse, PlayerStateChangedData, GameStateChangedData, MakeStoryData, ExtendStoryData, VoteStoryData, StartGameData, KickPlayerData, KickedFromRoomData } from '../../shared/socket';
 import Room from '../models/room';
 import { PublicPlayerState, PrivatePlayerState } from 'src/shared/model/sharedPlayerState';
 import { PlayerGameData } from '../models/gameState';
@@ -96,6 +96,9 @@ class SocketManager {
             socket.on(ClientActions.takeOwnership, (data: any, callback?: (resp: EmitResponse) => void) => {
                 this.callbackMaybe(playerSocket.takeOwnership(), callback);
             });
+            socket.on(ClientActions.kickPlayer, (data: KickPlayerData, callback?: (resp: EmitResponse) => void) => {
+                this.callbackMaybe(playerSocket.kickPlayer(data), callback);
+            });
         });
 
         this.io = io;
@@ -112,7 +115,7 @@ class SocketManager {
         this.getRoomChannel(room.id).emit(ClientEvents.gameStarted);
     }
 
-    emitPlayerStateChanged(room: Room, changedPlayers: PlayerGameData[], recipient?: UserInfo) {
+    emitPlayerStateChanged(room: Room, changedPlayers: PlayerGameData[], recipient?: UserInfo, isCompleteList: boolean = false) {
         const publicPlayerStates: Record<string, PublicPlayerState> = {};
         debug(`Emit players changed: ${changedPlayers.map(p => `${p.userInfo.name} (${this.playerSockets[p.userInfo.id]?.length ?? 0})`).join(', ')} to ${recipient?.name ?? 'all'}`);
         changedPlayers
@@ -137,7 +140,8 @@ class SocketManager {
                             return <PrivatePlayerState>{ ...publicState, hand: p.hand.map(c => c.id) };
                         }
                         return publicState;
-                    })
+                    }),
+                    isCompleteList: isCompleteList
                 };
                 targetSocket.socket.emit(ClientEvents.playerStateChanged, emittedData);
             }
@@ -191,6 +195,17 @@ class SocketManager {
 
                 targetSocket.socket.emit(ClientEvents.gameStateChanged, gameStateData);
             }
+        }
+    }
+
+    emitKickedFromRoom(room: Room, targetPlayer: UserInfo) {
+        const targetSockets = this.playerSockets[targetPlayer.id];
+        if (!targetSockets?.length) { debug(`Cannot reach player ${targetPlayer.name}`); return; }
+
+        for (let targetSocket of targetSockets) {
+            targetSocket.socket.emit(ClientEvents.kickedFromRoom, <KickedFromRoomData>{
+                roomId: room.id
+            });
         }
     }
 

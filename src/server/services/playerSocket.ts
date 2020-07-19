@@ -1,7 +1,7 @@
 import SocketIo from 'socket.io';
 import roomManager from './roomManager';
 import UserInfo from '../models/userInfo';
-import { JoinRoomData, EmitResponse, MakeStoryData, ExtendStoryData, VoteStoryData, StartGameData } from '../../shared/socket';
+import { JoinRoomData, EmitResponse, MakeStoryData, ExtendStoryData, VoteStoryData, StartGameData, KickPlayerData } from '../../shared/socket';
 import Room from '../models/room';
 import GameManager from './gameManager';
 import { getDefaultRules } from '../../shared/model/rules';
@@ -42,7 +42,7 @@ export default class PlayerSocket {
             }
 
             if ((this.room.state.players.length ?? 0) > 0) {
-                socketManager.emitPlayerStateChanged(this.room, this.room.state.players, this.userInfo);
+                socketManager.emitPlayerStateChanged(this.room, this.room.state.players, this.userInfo, true);
             }
             return { success: true };
         }
@@ -185,6 +185,24 @@ export default class PlayerSocket {
         socketManager.emitPlayersChanged(this.room);
 
         return { success: true };
+    }
+
+    kickPlayer(data: KickPlayerData): EmitResponse {
+        if (!this.room || !this.manager) { return { success: false, message: "Player is not part of any room!" }; }
+        if (this.room.state.rules.onlyOwnerCanStart && this.room.owner !== this.userInfo) {
+            return { success: false, message: "Only the owner can kick other players from the room!" };
+        }
+
+        const player = this.room.players.find(x => x.publicId === data.publicId);
+        if (!player) {
+            return { success: false, message: "Kicked player is not part of the room!" };
+        }
+
+        const result = this.manager.kickPlayer(player);
+        if (result) {
+            roomManager.leaveRoom(this.room, player);
+        }
+        return result;
     }
 
     getRoomChannelId(roomId: string) {
