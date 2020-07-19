@@ -5,7 +5,8 @@ import { uuid } from 'uuidv4';
 export interface ClientUser {
   name: string,
   id: string,
-  secret: string
+  secret: string,
+  isNamePersonalized: boolean
 }
 
 @Injectable({
@@ -32,13 +33,20 @@ export class UserService {
       this._user = {
         name: 'Player',
         id: uuid(),
-        secret: uuid()
+        secret: uuid(),
+        isNamePersonalized: false
       };
     }
 
     const userDataExists = Object.keys(this._user).every(k => this.cookieService.check(this.getCookieName(k)));
     if (userDataExists) {
-      Object.keys(this._user).map(k => this._user[k] = this.cookieService.get(this.getCookieName(k)));
+      Object.keys(this._user).map(k => {
+        let value: any = this.cookieService.get(this.getCookieName(k));
+        switch (typeof this._user[k]) {
+          case 'boolean': this._user[k] = value === 'true'; break;
+          default: this._user[k] = value; break;
+        }
+      });
     } else {
       this.save();
     }

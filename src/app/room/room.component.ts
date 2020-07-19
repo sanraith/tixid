@@ -16,6 +16,7 @@ import { VoteStoryResultsComponent } from './vote-story-results/vote-story-resul
 import { PublicUserInfo } from 'src/shared/model/publicUserInfo';
 import { PartialResultsComponent } from './partial-results/partial-results.component';
 import { FinalResultsComponent } from './final-results/final-results.component';
+import { PreJoinComponent } from './pre-join/pre-join.component';
 
 @Component({
   selector: 'app-room',
@@ -46,9 +47,13 @@ export class RoomComponent implements OnInit {
 
   ngOnInit(): void {
     this.room.currentUser = this.userService.userData;
-    console.log(this.room.currentUser);
     this.room.id = this.route.snapshot.paramMap.get('id')!;
-    this.join();
+
+    if (!this.room.currentUser.isNamePersonalized) {
+      this.loadContent(PreJoinComponent);
+    } else {
+      this.join();
+    }
   }
 
   ngOnDestroy(): void {

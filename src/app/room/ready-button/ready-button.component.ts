@@ -5,8 +5,8 @@ import { ClientActions, EmitResponse } from 'src/shared/socket';
 @Component({
   selector: 'app-ready-button',
   template: `
-    <button [disabled]="!isEnabled || readyCompleted" (click)="indicateReady()">Ready</button>
-    <button [class.hidden]="!allowForce || isEnabled || pendingAction || waitingForTimeout" (click)="forceReady()">
+    <button class="bigButton" [disabled]="!isEnabled || readyCompleted" (click)="indicateReady()">Ready</button>
+    <button class="bigButton" [class.hidden]="!allowForce || isEnabled || pendingAction || waitingForTimeout" (click)="forceReady()">
       Force everyone to ready
     </button>
   `,

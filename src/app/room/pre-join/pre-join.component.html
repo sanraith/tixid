@@ -1,0 +1,5 @@
+<h2>Please select a nickname before you join the room!</h2>
+
+<input [(ngModel)]="userName" placeholder="Player" (input)="onUserNameInput()"
+    (keyup)="onEnter($event, continue)" /><br />
+<button [disabled]="!userName || userName.length == 0 || !isEdited" (click)="continue()" class="bigButton">Continue</button>

@@ -22,6 +22,8 @@ export class MakeStoryComponent implements RoomContentComponent, OnInit {
   ngOnInit(): void { }
 
   sendStory(): void {
+    if (!this.storyCard || !this.story) { return; }
+    
     this.roomSocket.emit(ClientActions.makeStory, <MakeStoryData>{
       story: this.story,
       cardId: this.storyCard
@@ -30,5 +32,11 @@ export class MakeStoryComponent implements RoomContentComponent, OnInit {
         alert(`Error: ${resp.message}`);
       }
     });
+  }
+
+  onEnter(event: any, onEnterFunc: () => void) {
+    if (event.keyCode === 13) {
+      onEnterFunc.apply(this);
+    }
   }
 }

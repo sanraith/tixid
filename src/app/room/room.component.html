@@ -7,7 +7,7 @@
     <br /><br />
 </div>
 
-<div class="playerList">
+<div class="playerList" *ngIf="this.room.players.length > 0">
     <h2 class="title">Players</h2>
     <ul
         *ngIf="this.room.gameState && this.room.gameState.step !== types.GameStep.lobby && room.playerStates.length > 0; else statelessPlayers">

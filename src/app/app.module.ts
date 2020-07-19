@@ -23,6 +23,7 @@ import { FinalResultsComponent } from './room/final-results/final-results.compon
 import { ReadyButtonComponent } from './room/ready-button/ready-button.component';
 import { CardFacedownPipe } from './pipes/card-facedown.pipe';
 import { EmptyCardToCardbackPipe } from './pipes/empty-card-to-cardback.pipe';
+import { PreJoinComponent } from './room/pre-join/pre-join.component';
 
 const config: SocketIoConfig = { url: '', options: { autoConnect: false } };
 
@@ -43,7 +44,8 @@ const config: SocketIoConfig = { url: '', options: { autoConnect: false } };
     FinalResultsComponent,
     ReadyButtonComponent,
     CardFacedownPipe,
-    EmptyCardToCardbackPipe
+    EmptyCardToCardbackPipe,
+    PreJoinComponent
   ],
   imports: [
     BrowserModule,

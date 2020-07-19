@@ -18,7 +18,7 @@ export default class RoomModel {
     socket: Socket;
 
     owner: PublicUserInfo;
-    players: PublicUserInfo[];
+    players: PublicUserInfo[] = [];
 
     playerStates: PublicPlayerState[] = [];
     myState?: PrivatePlayerState;

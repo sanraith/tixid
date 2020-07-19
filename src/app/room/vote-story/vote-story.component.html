@@ -14,7 +14,7 @@
     </app-card-picker>
     <br />
 
-    <button (click)="voteForCard()"
+    <button (click)="voteForCard()" class="bigButton"
         [disabled]="alreadyVoted || !voteCard || voteCard === room.localState.mySubmittedCardId">
         Vote for card!
     </button>
