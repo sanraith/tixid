@@ -1,6 +1,7 @@
 .voteColumn
     display: inline-block
     margin: 10px
+    vertical-align: top
 
 .cardOwner
     font-weight: bold
@@ -8,11 +9,11 @@
 .selectedCard
     line-height: 0
     display: inline-block
-    animation: correctGlow 1s infinite alternate
+    animation: correctGlow 0.75s infinite alternate
 
-$glowSize: 3px
+$glowSize: 5px
 @keyframes correctGlow
   from
-    box-shadow: 0 0 $glowSize -$glowSize #04B2D9
+    box-shadow: 0 0 $glowSize -$glowSize #04d980
   to
-    box-shadow: 0 0 $glowSize $glowSize #04B2D9
+    box-shadow: 0 0 $glowSize $glowSize #04d980

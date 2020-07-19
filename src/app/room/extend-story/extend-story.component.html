@@ -1,5 +1,6 @@
-<h2>The story is:</h2>
-<p style="font-style: italic;">"{{room.gameState.story}}"</p>
+<h2>Extend the story</h2>
+<app-story-title [room]="room"></app-story-title>
+<app-card-picker [cards]="room.localState.voteCardIds | cardFacedown" [isEnabled]="false"></app-card-picker>
 
 <!-- Player IS the story teller -->
 <div *ngIf="room.gameState.storyTeller.id === room.currentUser.id">
@@ -9,8 +10,7 @@
 <!-- Player is NOT the story teller -->
 <div
     *ngIf="room.gameState.storyTeller.id !== room.currentUser.id && !room.localState.mySubmittedCardId && !alreadySubmittedCard; else: waitingBlock">
-    <h2>Extend the story!</h2>
-    <p>Pick a card which you think is fit for the story.</p>
+    <p>Pick a card from your hand which you think is fit for the story.</p>
 
     <app-card-picker [cards]="room.myState.hand" [(selectedCard)]="extendCard"></app-card-picker>
     <br />
@@ -19,6 +19,5 @@
 </div>
 
 <ng-template #waitingBlock>
-    <app-card-picker [cards]="room.localState.voteCardIds | cardFacedown" [isEnabled]="false"></app-card-picker>
     <p>Waiting for others to extend the story...</p>
 </ng-template>

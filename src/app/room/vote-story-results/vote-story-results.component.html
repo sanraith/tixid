@@ -1,20 +1,30 @@
 <h2>Vote results</h2>
-<h3>Story: "{{room.gameState.story}}"</h3>
-
-<div *ngFor="let pickedCard of room.gameState.storyCardPile" class="voteColumn">
-    <app-card-picker [cards]="[pickedCard.cardId]" [isEnabled]="false"
-        [class.selectedCard]="pickedCard.userInfo.id === room.gameState.storyTeller.id"
-        [selectedCard]="room.localState.myVotedCardId === pickedCard.cardId && pickedCard.userInfo.id !== room.gameState.storyTeller.id ? pickedCard.cardId : null">
-    </app-card-picker>
-    <br />
-    <span *ngIf="pickedCard.userInfo.id === room.gameState.storyTeller.id">[STORY TELLER]<br /></span>
-    <span class="cardOwner">By: {{pickedCard.userInfo.name}}</span>
-    <br />
-    Votes ({{room.localState.votesByCardId[pickedCard.cardId]?.length || "0"}}):
-    <span
-        *ngFor="let user of room.localState.votesByCardId[pickedCard.cardId]; let i = index">{{i > 0 ? ', ' : ''}}{{user.name}}</span>
+<app-story-title [room]="room"></app-story-title>
+<div>
+    <div *ngFor="let storyCard of room.gameState.storyCardPile" class="voteColumn">
+        <app-card-picker [cards]="[storyCard.cardId]" [isEnabled]="false"
+            [class.selectedCard]="storyCard.userInfo.id === room.gameState.storyTeller.id"
+            [selectedCard]="room.localState.myVotedCardId === storyCard.cardId && storyCard.userInfo.id !== room.gameState.storyTeller.id ? storyCard.cardId : null">
+        </app-card-picker>
+        <br />
+        <span class="cardOwner">
+            By: {{storyCard.userInfo.name}}
+            {{storyCard.cardId === room.gameState.storyCardId ? '✔' : ''}}
+        </span>
+        <br />
+        <span *ngIf="room.localState.votesByCardId[storyCard.cardId]?.length || '0' as voteCount"
+            [ngPlural]="voteCount">
+            {{voteCount}}
+            <ng-template ngPluralCase="=0">votes</ng-template>
+            <ng-template ngPluralCase="=1">vote:</ng-template>
+            <ng-template ngPluralCase="other">votes:</ng-template>
+        </span>
+        <span *ngFor="let user of room.localState.votesByCardId[storyCard.cardId]; let i = index">
+            <br />
+            - {{user.name}}
+        </span>
+    </div>
 </div>
-
 <ul>
     <li *ngFor="let vote of room.gameState.votePoints">
         {{vote.userInfo.name}}: +{{vote.points}} for {{vote.reason}}

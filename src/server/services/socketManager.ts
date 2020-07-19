@@ -183,7 +183,7 @@ class SocketManager {
                 gameStateData.storyCardPile = storyCardPile;
 
                 // Only show story card to story teller
-                if (targetPlayer === state.storyTeller?.userInfo) {
+                if (targetPlayer === state.storyTeller?.userInfo || canRevealAllVotes) {
                     gameStateData.storyCardId = state.storyCard?.id;
                 }
 
