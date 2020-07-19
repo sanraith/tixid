@@ -1,15 +1,26 @@
-<h2>Lobby</h2>
+<div style="display: inline-block; width: 100%;">
+    <div style="width: fit-content; float: right; margin-top: 10px; text-align: center;">
+        <qrcode [qrdata]="roomAddress" [scale]="8" [margin]="2"></qrcode>
+    </div>
 
-Players:
-<span *ngFor="let player of room.players; let i = index;" [class.owner-name]="player.id === room.owner.id">
-    {{player.name}}<span *ngIf="i < room.players.length - 1">,</span>
-</span>
+    <h2>Lobby</h2>
+
+    <p>
+        Send this url to your friends, <br />
+        or show them the QR code to join the game!
+    </p>
+    <p>
+        <input value="{{roomAddress}}" readonly [size]="roomAddress.length" #roomAddressInput>
+        <button #copyRoomAddressButton (click)="copyRoomAddressToClipboard(roomAddressInput, copyRoomAddressButton)">Copy</button>
+        <span [hidden]="true">Copied!</span>
+    </p>
+</div>
 
 <!-- Show room controls to owner -->
 <div *ngIf="room.currentUser.id === room.owner.id">
-    <button (click)="startGame()">Start game</button>
+    <button (click)="startGame()" style="width: 200px; height: 50px;">Start game</button>
 
-    <h3>Card sets:</h3>
+    <h3>Change the active card sets:</h3>
     <table *ngIf="sets; else setsNotLoaded">
         <tr *ngFor="let set of sets" [class.highlighted]="set.isSelected">
             <td>
@@ -32,7 +43,7 @@ Players:
         Loading available sets...
     </ng-template>
 
-    <h3>Rules:</h3>
+    <h3>Change the rules:</h3>
     <table>
         <tr *ngFor="let key of Object.keys(rules)">
             <td><label for="{{key}}">{{key}}</label></td>
@@ -53,5 +64,4 @@ Players:
         </tr>
     </table>
     <button (click)="resetRules()">Reset default rules</button>
-    <button (click)="startGame()">Start game</button>
 </div>

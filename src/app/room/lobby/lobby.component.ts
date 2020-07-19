@@ -15,8 +15,8 @@ import { GET_CARDSETS_PATH } from 'src/shared/apiPaths';
 export class LobbyComponent implements RoomContentComponent, OnInit {
   @Input()
   room: RoomModel;
+  roomAddress: string;
   rules: Rules;
-
   sets: {
     info: CardSetInfo,
     isSelected: boolean;
@@ -27,6 +27,7 @@ export class LobbyComponent implements RoomContentComponent, OnInit {
 
   constructor(private http: HttpClient) {
     this.defaultRules = getDefaultRules();
+    this.roomAddress = window.location.href;
   }
 
   ngOnInit(): void {
@@ -60,6 +61,17 @@ export class LobbyComponent implements RoomContentComponent, OnInit {
           this.rules.cardSets.forEach(s1 => this.sets.find(s2 => s2.info.id === s1)!.isSelected = true);
         }
       });
+  }
+
+  async copyRoomAddressToClipboard(input: HTMLInputElement, button: HTMLButtonElement) {
+    input.select();
+    document.execCommand('copy');
+
+    const previousButtonText = button.innerHTML;
+    button.innerHTML = "Copied!";
+    setTimeout(() => {
+      button.innerHTML = previousButtonText;
+    }, 2000);
   }
 
   getInputType(key: string) {

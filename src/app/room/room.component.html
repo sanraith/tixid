@@ -8,30 +8,33 @@
 </div>
 
 <div class="playerList">
-    <div *ngIf="room.playerStates.length > 0">
-        <h2 class="title">Players</h2>
+    <h2 class="title">Players</h2>
+    <ul *ngIf="this.room.gameState && this.room.gameState.step !== types.GameStep.lobby && room.playerStates.length > 0; else statelessPlayers">
+        <li *ngFor="let playerState of room.playerStates">
+            <div class="pName">
+                {{playerState.isReady ? '✔' : '⏳'}}
+
+                <a nohref *ngIf="!playerState.isConnected && room.owner.id === playerState.userInfo.id; else notOwner"
+                    style="cursor: pointer" (click)="takeOwnership()">⚠</a>
+                <ng-template #notOwner>{{playerState.isConnected ? '' : '⚠'}}</ng-template>
+
+                {{room.gameState.storyTeller.id === playerState.userInfo.id ? '📖' : ''}}
+
+                {{playerState.userInfo.name}}:&nbsp;
+            </div>
+            <div class="pPoints">
+                {{playerState.points}} p
+            </div>
+        </li>
+    </ul>
+    <ng-template #statelessPlayers>
         <ul>
-            <li *ngFor="let playerState of room.playerStates">
-                <div class="pName">
-                    {{playerState.isReady ? '✔' : '⏳'}}
-
-                    <a nohref
-                        *ngIf="!playerState.isConnected && room.owner.id === playerState.userInfo.id; else notOwner"
-                        style="cursor: pointer" (click)="takeOwnership()">⚠</a>
-                    <ng-template #notOwner>{{playerState.isConnected ? '' : '⚠'}}</ng-template>
-
-                    {{room.gameState.storyTeller.id === playerState.userInfo.id ? '📖' : ''}}
-
-                    {{playerState.userInfo.name}}:&nbsp;
-                </div>
-                <div class="pPoints">
-                    {{playerState.points}} p
-                </div>
+            <li *ngFor="let playerState of room.players">
+                <div class="pName">{{playerState.name}}</div>
             </li>
         </ul>
-    </div>
+    </ng-template>
 </div>
-
 
 <div class="main">
     <ng-template room-content></ng-template>

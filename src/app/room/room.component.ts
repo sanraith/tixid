@@ -29,6 +29,11 @@ export class RoomComponent implements OnInit {
   @ViewChild(RoomContentDirective, { static: true })
   contentHost: RoomContentDirective;
 
+  // Capture types to use in template
+  types = {
+    GameStep: GameStep
+  };
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
