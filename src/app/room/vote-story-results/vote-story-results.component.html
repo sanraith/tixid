@@ -21,4 +21,5 @@
     </li>
 </ul>
 
-<app-ready-button [isEnabled]="!room.myState.isReady"></app-ready-button>
+<app-ready-button [isEnabled]="!room.myState.isReady" [allowForce]="this.room.owner.id === this.room.currentUser.id">
+</app-ready-button>

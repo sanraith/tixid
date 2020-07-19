@@ -154,6 +154,25 @@ export default class PlayerSocket {
         return this.manager.indicatePlayerReady(this.userInfo);
     }
 
+    forceReady(): EmitResponse {
+        if (!this.room || !this.manager) { return { success: false, message: "Player is not part of any room!" }; }
+        if (this.room.state.rules.onlyOwnerCanStart && this.room.owner !== this.userInfo) {
+            return { success: false, message: "Only the owner can force ready states!" };
+        }
+
+        debug(`Requested force ready by ${this.userInfo.name}`);
+        let result = { success: true };
+        for (let playerInfo of this.room.state.players.filter(x => !x.isReady)) {
+            result = this.manager.indicatePlayerReady(playerInfo.userInfo);
+            if (!result.success) {
+                debug("Force ready not successful.");
+                return result;
+            }
+        }
+
+        return result;
+    }
+
     takeOwnership(): EmitResponse {
         if (!this.room || !this.manager) { return { success: false, message: "Player is not part of any room!" }; }
 

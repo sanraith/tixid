@@ -14,6 +14,7 @@ export enum ClientActions {
     partialResults = "partial_results",
     startRound = "start_round",
     indicateReady = "indicate_ready",
+    forceReady = "force_ready",
     takeOwnership = "take_ownership"
 }
 

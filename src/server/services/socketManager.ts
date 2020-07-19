@@ -11,7 +11,6 @@ import { PlayerGameData } from '../models/gameState';
 import PlayerSocket from './playerSocket';
 import { GameStep } from '../../shared/model/gameStep';
 import PickedCard from 'src/shared/model/pickedCard';
-import roomManager from './roomManager';
 const debug = Debug('tixid:services:socketManager');
 
 enum SocketEvents {
@@ -90,6 +89,9 @@ class SocketManager {
             });
             socket.on(ClientActions.indicateReady, (data: any, callback?: (resp: EmitResponse) => void) => {
                 this.callbackMaybe(playerSocket.indicateReady(), callback);
+            });
+            socket.on(ClientActions.forceReady, (data: any, callback?: (resp: EmitResponse) => void) => {
+                this.callbackMaybe(playerSocket.forceReady(), callback);
             });
             socket.on(ClientActions.takeOwnership, (data: any, callback?: (resp: EmitResponse) => void) => {
                 this.callbackMaybe(playerSocket.takeOwnership(), callback);
