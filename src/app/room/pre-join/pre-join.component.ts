@@ -16,7 +16,7 @@ export class PreJoinComponent implements RoomContentComponent, OnInit {
   constructor(private userService: UserService) { }
 
   ngOnInit(): void {
-    this.userName = this.userService.userData.name;
+    this.userName = this.userService.userData.isNamePersonalized ? this.userService.userData.name : '';
   }
 
   onUserNameInput() {

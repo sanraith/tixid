@@ -1,5 +1,7 @@
-<h2>Please select a nickname before you join the room!</h2>
+<h2>Joining room {{room.id}}...</h2>
 
-<input [(ngModel)]="userName" placeholder="Player" (input)="onUserNameInput()"
+<h3>Please select a nickname before you join the room!</h3>
+
+<input [(ngModel)]="userName" placeholder="Type your nickname here..." (input)="onUserNameInput()"
     (keyup)="onEnter($event, continue)" /><br />
 <button [disabled]="!userName || userName.length == 0 || !isEdited" (click)="continue()" class="bigButton">Continue</button>

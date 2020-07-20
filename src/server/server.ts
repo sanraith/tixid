@@ -17,7 +17,9 @@ cardSetManager.init().then(() => {
   // testDataGenerator();
 
   // Middleware setup
-  app.use(logger('dev'));
+  if (process.env.NODE_ENV === "development") {
+    app.use(logger('dev'));
+  }
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(cookieParser());

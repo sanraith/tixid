@@ -11,7 +11,12 @@ import { PlayerGameData } from '../models/gameState';
 import PlayerSocket from './playerSocket';
 import { GameStep } from '../../shared/model/gameStep';
 import PickedCard from 'src/shared/model/pickedCard';
+import roomManager from './roomManager';
+import shortid from 'shortid';
 const debug = Debug('tixid:services:socketManager');
+const errorDebug = Debug('tixid:services:socketManager:ERROR');
+
+type ErrorHandler = (action: () => void) => void;
 
 enum SocketEvents {
     connection = "connection",
@@ -37,67 +42,71 @@ class SocketManager {
             if (!this.playerSockets[userInfo.id]) { this.playerSockets[userInfo.id] = []; }
             const playerSockets = this.playerSockets[userInfo.id];
             const playerSocket = new PlayerSocket(userInfo, socket);
-
             playerSockets.push(playerSocket);
             debug(`Client ${userInfo.name} #${playerSockets.length - 1} connected: ${socket.client.id}`);
 
+            const errorHandler: ErrorHandler = action => this.handlePlayerSocketError(playerSocket, action);
+
             socket.on(SocketEvents.disconnect, () => {
-                if (!this.playerSockets[userInfo.id]) {
-                    debug(`Disconnecting ${socket.id}, but cannot find any saved sockets for player ${userInfo.name}!`);
-                }
+                errorHandler(() => {
+                    if (!this.playerSockets[userInfo.id]) {
+                        debug(`Disconnecting ${socket.id}, but cannot find any saved sockets for player ${userInfo.name}!`);
+                    }
 
-                const playerSockets = this.playerSockets[userInfo.id];
-                const index = playerSockets.indexOf(playerSocket);
-                if (index < 0) {
-                    debug(`Disconnecting ${socket.id}, but cannot find saved socket for player ${userInfo.name}!`);
-                }
+                    const playerSockets = this.playerSockets[userInfo.id];
+                    const index = playerSockets.indexOf(playerSocket);
+                    if (index < 0) {
+                        debug(`Disconnecting ${socket.id}, but cannot find saved socket for player ${userInfo.name}!`);
+                    }
 
-                playerSockets.splice(index, 1);
-                debug(`Disconnecting player ${userInfo.name} socket ${socket.client.id}. ${playerSockets.length} connections remain.`);
-                if (playerSockets.length === 0) {
-                    playerSocket.disconnect();
-                    playerSocket.leaveRoom();
-                    delete this.playerSockets[userInfo.id];
-                }
+                    debug(`Disconnecting player ${userInfo.name} socket ${socket.client.id}. ${playerSockets.length} connections remain.`);
+                    playerSocket.socket.removeAllListeners();
+                    playerSockets.splice(index, 1);
+                    if (playerSockets.length === 0) {
+                        playerSocket.markPlayerAsDisconnected();
+                        playerSocket.leaveRoom();
+                        delete this.playerSockets[userInfo.id];
+                    }
+                })
             });
             socket.on(ClientActions.joinRoom, (data: JoinRoomData, callback?: (resp: EmitResponse) => void) => {
-                this.callbackMaybe(playerSocket.joinRoom(data), callback);
+                errorHandler(() => this.callbackMaybe(playerSocket.joinRoom(data), callback));
             });
             socket.on(ClientActions.leaveRooms, (data: JoinRoomData, callback?: (resp: EmitResponse) => void) => {
-                this.callbackMaybe(playerSocket.leaveRoom(), callback);
+                errorHandler(() => this.callbackMaybe(playerSocket.leaveRoom(), callback));
             });
             socket.on(ClientActions.startGame, (data: StartGameData | undefined, callback?: (resp: EmitResponse) => void) => {
-                this.callbackMaybe(playerSocket.startGame(data), callback);
+                errorHandler(() => this.callbackMaybe(playerSocket.startGame(data), callback));
             });
             socket.on(ClientActions.makeStory, (data: MakeStoryData, callback?: (resp: EmitResponse) => void) => {
-                this.callbackMaybe(playerSocket.makeStory(data), callback);
+                errorHandler(() => this.callbackMaybe(playerSocket.makeStory(data), callback));
             });
             socket.on(ClientActions.extendStory, (data: ExtendStoryData, callback?: (resp: EmitResponse) => void) => {
-                this.callbackMaybe(playerSocket.extendStory(data), callback);
+                errorHandler(() => this.callbackMaybe(playerSocket.extendStory(data), callback));
             });
             socket.on(ClientActions.voteStory, (data: VoteStoryData, callback?: (resp: EmitResponse) => void) => {
-                this.callbackMaybe(playerSocket.voteStory(data), callback);
+                errorHandler(() => this.callbackMaybe(playerSocket.voteStory(data), callback));
             });
             socket.on(ClientActions.partialResults, (data: any, callback?: (resp: EmitResponse) => void) => {
-                this.callbackMaybe(playerSocket.partialResults(), callback);
+                errorHandler(() => this.callbackMaybe(playerSocket.partialResults(), callback));
             });
             socket.on(ClientActions.startRound, (data: any, callback?: (resp: EmitResponse) => void) => {
-                this.callbackMaybe(playerSocket.startRound(), callback);
+                errorHandler(() => this.callbackMaybe(playerSocket.startRound(), callback));
             });
             socket.on(ClientActions.goToLobby, (data: any, callback?: (resp: EmitResponse) => void) => {
-                this.callbackMaybe(playerSocket.goToLobby(), callback);
+                errorHandler(() => this.callbackMaybe(playerSocket.goToLobby(), callback));
             });
             socket.on(ClientActions.indicateReady, (data: any, callback?: (resp: EmitResponse) => void) => {
-                this.callbackMaybe(playerSocket.indicateReady(), callback);
+                errorHandler(() => this.callbackMaybe(playerSocket.indicateReady(), callback));
             });
             socket.on(ClientActions.forceReady, (data: any, callback?: (resp: EmitResponse) => void) => {
-                this.callbackMaybe(playerSocket.forceReady(), callback);
+                errorHandler(() => this.callbackMaybe(playerSocket.forceReady(), callback));
             });
             socket.on(ClientActions.takeOwnership, (data: any, callback?: (resp: EmitResponse) => void) => {
-                this.callbackMaybe(playerSocket.takeOwnership(), callback);
+                errorHandler(() => this.callbackMaybe(playerSocket.takeOwnership(), callback));
             });
             socket.on(ClientActions.kickPlayer, (data: KickPlayerData, callback?: (resp: EmitResponse) => void) => {
-                this.callbackMaybe(playerSocket.kickPlayer(data), callback);
+                errorHandler(() => this.callbackMaybe(playerSocket.kickPlayer(data), callback));
             });
         });
 
@@ -198,19 +207,56 @@ class SocketManager {
         }
     }
 
-    emitKickedFromRoom(room: Room, targetPlayer: UserInfo) {
+    emitKickedFromRoom(room: Room, targetPlayer: UserInfo, reason: string) {
         const targetSockets = this.playerSockets[targetPlayer.id];
         if (!targetSockets?.length) { debug(`Cannot reach player ${targetPlayer.name}`); return; }
 
         for (let targetSocket of targetSockets) {
             targetSocket.socket.emit(ClientEvents.kickedFromRoom, <KickedFromRoomData>{
-                roomId: room.id
+                roomId: room.id,
+                reason: reason
             });
         }
     }
 
     getRoomChannel(roomId: string): SocketIo.Namespace {
         return this.io.to(`room_${roomId}`);
+    }
+
+    private handlePlayerSocketError(playerSocket: PlayerSocket, action: () => void) {
+        try {
+            action();
+        } catch (error) {
+            const errorId = `err_${shortid()}`;
+            errorDebug(`${errorId}:`, error);
+
+            if (playerSocket.room) {
+                const players = playerSocket.room.players;
+                for (let player of players) {
+                    this.emitKickedFromRoom(playerSocket.room, player, `Game server error. Id: ${errorId}`);
+                }
+                roomManager.deleteRoom(playerSocket.room);
+
+                // TODO this have to be changed as if players can be part of multiple rooms
+                for (let player of players) {
+                    this.disconnectAllSocketsFor(player);
+                }
+            } else {
+                this.disconnectAllSocketsFor(playerSocket.userInfo);
+            }
+
+            errorDebug(`${errorId} cleanup finished.`);
+        }
+    }
+
+    private disconnectAllSocketsFor(player: UserInfo) {
+        const sockets = this.playerSockets[player.id];
+        for (let socket of sockets ?? []) {
+            socket.markPlayerAsDisconnected();
+            socket.socket.disconnect();
+            socket.socket.removeAllListeners();
+        }
+        delete this.playerSockets[player.id];
     }
 
     private getUserFromSocketCookies(cookies: any): UserInfo | undefined {

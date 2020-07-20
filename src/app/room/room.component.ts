@@ -145,7 +145,7 @@ export class RoomComponent implements OnInit {
     this.roomSocket.on(ClientEvents.kickedFromRoom, (args: KickedFromRoomData) => {
       console.log(`Kicked from room. ${args.roomId}`);
       if (this.room.id === args.roomId) {
-        alert("You have been kicked from the room!");
+        alert(`You have been kicked from the room. Reason: ${args.reason}`);
         this.router.navigate(['home']);
       }
     });
