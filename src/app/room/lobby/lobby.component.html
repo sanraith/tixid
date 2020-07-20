@@ -14,6 +14,10 @@
         <button #copyRoomAddressButton (click)="copyRoomAddressToClipboard(roomAddressInput, copyRoomAddressButton)">Copy</button>
         <span [hidden]="true">Copied!</span>
     </p>
+    <h2 *ngIf="room.players.length < 3; else enoughPlayersJoined">Waiting for more players to join...</h2>
+    <ng-template #enoughPlayersJoined>
+        <h2>Waiting for {{room.owner.name}} to start the game...</h2>
+    </ng-template>
 </div>
 
 <!-- Show room controls to owner -->
