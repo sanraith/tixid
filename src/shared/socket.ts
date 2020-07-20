@@ -73,5 +73,6 @@ export interface KickPlayerData {
 }
 
 export interface KickedFromRoomData{
-    roomId: string
+    roomId: string,
+    reason: string
 }

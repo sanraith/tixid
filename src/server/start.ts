@@ -2,9 +2,10 @@
 
 import expressServer from './server';
 import http from 'http';
-import _debug from 'debug';
+import Debug from 'debug';
 import socketManager from './services/socketManager';
-const debug = _debug('tixid:start');
+Debug.enable('*:ERROR'); // always print errors
+const debug = Debug('tixid:start');
 
 /**
  * Get port from environment and store in Express.

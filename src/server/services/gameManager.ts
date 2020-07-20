@@ -263,7 +263,7 @@ export default class GameManager {
 
         // Remove the kicked player from the list of players.
         state.players.splice(kickedPlayerIndex, 1);
-        socketManager.emitKickedFromRoom(this.room, kickedUserInfo);
+        socketManager.emitKickedFromRoom(this.room, kickedUserInfo, "Game owner kicked player from the room.");
         socketManager.emitPlayerStateChanged(this.room, state.players, undefined, true);
 
         // Start a new round with the remaining players.
