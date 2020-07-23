@@ -45,7 +45,7 @@
     "debug": "^4.1.1",
     "express": "^4.17.1",
     "morgan": "^1.10.0",
-    "ngx-cookie-service": "^3.0.4",
+    "ngx-cookie-service": "^3.1.1",
     "ngx-socket-io": "^3.0.1",
     "rxjs": "~6.6.0",
     "shortid": "^2.2.15",
@@ -57,7 +57,7 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.901.12",
-    "@angular/cli": "^10.0.3",
+    "@angular/cli": "^10.0.4",
     "@angular/compiler-cli": "^9.1.12",
     "@types/cookie": "^0.4.0",
     "@types/cookie-parser": "^1.4.2",
