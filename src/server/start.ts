@@ -4,7 +4,9 @@ import expressServer from './server';
 import http from 'http';
 import Debug from 'debug';
 import socketManager from './services/socketManager';
-Debug.enable('*:ERROR'); // always print errors
+if (!Debug.enabled) {
+  Debug.enable('*:ERROR'); // always print errors
+}
 const debug = Debug('tixid:start');
 
 /**
