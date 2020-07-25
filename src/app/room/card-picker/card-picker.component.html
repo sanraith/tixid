@@ -1,4 +1,4 @@
-<div *ngFor="let card of cards | emptyCardToCardback" style="position: relative;" class="selectDisable">
+<div *ngFor="let card of cards | emptyCardToCardback" class="cardPreview selectDisable">
     <label *ngIf="{ isBlocked: blockedCards.includes(card) } as c">
         <input class="hidden" type="radio" id="{{card}}" name="card" [value]="card" [(ngModel)]="selectedCard"
             [disabled]="!isEnabled || c.isBlocked" (change)="_selectedCardChange()" />

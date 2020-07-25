@@ -58,12 +58,8 @@ class CardSetManager {
         const cardsDb = {
             sets: Object.keys(this.sets).map(k => this.sets[k])
         };
-        try {
-            await fs.mkdir(_contextFolder);
-            await fs.writeFile(_cardDbPath, JSON.stringify(cardsDb));
-        } catch (err) {
-            debug(err);
-        }
+        try { await fs.mkdir(_contextFolder); } catch (err) { debug(err); }
+        try { await fs.writeFile(_cardDbPath, JSON.stringify(cardsDb)); } catch (err) { debug(err); }
 
         debug(`Updated card database with ${Object.keys(this.cards).length} cards.`);
     }

@@ -3,11 +3,24 @@
     <h2>You are the story teller!</h2>
     <p>Pick a card, and make up a short sentence as the story.</p>
 
-    <app-card-picker [cards]="room.myState?.hand" [(selectedCard)]="storyCard" ></app-card-picker>
+    <app-card-picker [cards]="room.myState?.hand" [(selectedCard)]="storyCard"></app-card-picker>
     <br />
 
-    <input [(ngModel)]="story" type="text" placeholder="Write your story here..." (keyup)="onEnter($event, sendStory)"/><br/>
-    <button (click)="sendStory()" [disabled]="!storyCard || !story" class="bigButton">Send story!</button>
+    <input [(ngModel)]="story" type="text" placeholder="Write your story here..." style="width: 60%;"
+        (keyup)="onEnter($event, sendStory)" />
+    <button (click)="sendStory()" [disabled]="!storyCard || !story" class="bigButton">
+        <ng-container *ngIf="!storyCard; else checkWriteStory">
+            Pick a card...
+        </ng-container>
+        <ng-template #checkWriteStory>
+            <ng-container *ngIf="!story; else sendStoryText">
+                Write the story...
+            </ng-container>
+        </ng-template>
+        <ng-template #sendStoryText>
+            Send story!
+        </ng-template>
+    </button>
 </div>
 
 <!-- If the player is NOT the story teller -->

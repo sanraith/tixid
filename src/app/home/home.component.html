@@ -1,10 +1,10 @@
 <h2>Welcome. Create a room!</h2>
 
 <label>User nickname:</label>
-<input [(ngModel)]="userName" placeholder="Player" (input)="onUserNameInput()" />
+<input [(ngModel)]="userName" type="text" placeholder="Player" (input)="onUserNameInput()" />
 <br />
 
-<button (click)="onCreateRoomClick()" [disabled]="isCreatingRoom">Create room</button>
+<button class="bigButton" (click)="onCreateRoomClick()" [disabled]="isCreatingRoom">Create room</button>
 <span *ngIf="isCreatingRoom">Working on it...</span>
 
 <app-room-list></app-room-list>

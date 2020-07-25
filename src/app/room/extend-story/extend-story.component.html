@@ -1,6 +1,7 @@
 <h2>Extend the story</h2>
 <app-story-title [room]="room"></app-story-title>
-<app-card-picker [cards]="room.localState.voteCardIds | cardFacedown" [isEnabled]="false"></app-card-picker>
+<app-card-picker [cards]="room.localState.voteCardIds | cardFacedown" [isEnabled]="false"
+    [isOverlayIconEnabled]="false"></app-card-picker>
 
 <!-- Player IS the story teller -->
 <div *ngIf="room.gameState.storyTeller.id === room.currentUser.id">

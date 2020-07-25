@@ -10,8 +10,8 @@
         or show them the QR code to join the game!
     </p>
     <p>
-        <input value="{{roomAddress}}" readonly [size]="roomAddress.length" #roomAddressInput>
-        <button #copyRoomAddressButton
+        <input type="text" value="{{roomAddress}}" readonly [size]="roomAddress.length" #roomAddressInput>
+        <button #copyRoomAddressButton class="bigButton"
             (click)="copyRoomAddressToClipboard(roomAddressInput, copyRoomAddressButton)">Copy</button>
         <span [hidden]="true">Copied!</span>
     </p>
@@ -23,7 +23,7 @@
 
 <!-- Show room controls to owner -->
 <div *ngIf="room.currentUser.id === room.owner.id">
-    <button (click)="startGame()" style="width: 200px; height: 50px;">Start game</button>
+    <button class="bigButton" (click)="startGame()">Start game</button>
 
     <h3>Change the active card sets:</h3>
     <table *ngIf="sets; else setsNotLoaded">
