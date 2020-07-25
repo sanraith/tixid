@@ -9,6 +9,7 @@ export class CardPickerComponent implements OnInit {
   @Input() cards: string[];
   @Input() selectedCard: string;
   @Input() isEnabled: boolean = true;
+  @Input() isOverlayIconEnabled: boolean = true;
   @Input() blockedCards: string[] = [];
   @Input() imageHeightVh: number = 20;
   @Output() selectedCardChange = new EventEmitter();

@@ -1,4 +1,7 @@
-label + label
+div
+    display: inline-block
+    
+div + div
     margin-left: 5px
     
 [type=radio] + img.selectable
@@ -36,3 +39,21 @@ label + label
     padding: 2%
     max-width: 100%
     max-height: 100%
+
+.overlay-icon
+    position: absolute
+    bottom: 5%
+    right: 5%
+    cursor: pointer
+    opacity: 0.6
+    transition: 0.3s
+
+.overlay-icon:hover
+    opacity: 1
+
+.selectDisable 
+    -webkit-user-select: none
+    -khtml-user-select: none
+    -moz-user-select: none
+    -o-user-select: none
+    user-select: none
