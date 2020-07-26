@@ -1,0 +1,6 @@
+<div *ngIf="(room.myState?.hand?.length || 0) > 0" style="width: 100%;">
+    <h3 style="margin-bottom: 0">Your hand</h3>
+    <hr style="width: 100%;">
+    <app-card-picker [cards]="room.myState.hand" [isEnabled]="false" [imageHeightVh]="15">
+    </app-card-picker>
+</div>

@@ -21,11 +21,30 @@ export class CardPickerComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  _selectedCardChange() {
+  _selectedCardChange(): void {
     this.selectedCardChange.emit(this.selectedCard);
+  }
+
+  selectCard(card: string): void {
+    if (this.isEnabled && !this.blockedCards.includes(card)) {
+      this.selectedCard = card;
+      this._selectedCardChange();
+    }
   }
 
   displayCard(card?: string): void {
     this.displayedCard = card;
+  }
+
+  changeDisplayedCard(direction: number): void {
+    const index = this.cards.indexOf(this.displayedCard);
+    if (index === -1) { return; }
+
+    const newIndex = Math.max(0, Math.min(this.cards.length - 1, index + direction));
+    this.displayedCard = this.cards[newIndex];
+  }
+
+  onWheelEvent(scrollEventArgs: { deltaY: number }) {
+    this.changeDisplayedCard(scrollEventArgs.deltaY > 0 ? 1 : -1);
   }
 }

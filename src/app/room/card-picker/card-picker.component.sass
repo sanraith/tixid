@@ -7,8 +7,13 @@ div.cardPreview + div.cardPreview
 [type=radio] + img.selectable
     cursor: pointer
 
+$selectedBorder: 4px solid #f00
+
 [type=radio]:checked + img 
-    outline: 4px solid #f00
+    outline: $selectedBorder
+
+.selected
+    outline: $selectedBorder
 
 .blocked
     cursor: not-allowed
@@ -28,7 +33,6 @@ div.cardPreview + div.cardPreview
     overflow: auto // Enable scroll if needed
     background-color: rgb(0,0,0) // Fallback color
     background-color: rgba(0,0,0,0.9) // Black w/ opacity
-    cursor: pointer
 
 // Modal Content (image)
 .modal-content
@@ -39,9 +43,23 @@ div.cardPreview + div.cardPreview
     left: 0
     right: 0
     display: block
-    padding: 2%
+    // padding: 2% 2% 80px 2%
+    margin-top: 2%
     max-width: 100%
-    max-height: 100%
+    max-height: 85%
+    cursor: pointer
+
+.modal-background
+    margin: 0 0 4% 0
+    position: absolute
+    top: 0
+    bottom: 0
+    left: 0
+    right: 0
+    width: 100%
+    heigth: 100%
+    display: block
+    cursor: pointer
 
 .modal-closeButton
     position: absolute
@@ -52,6 +70,32 @@ div.cardPreview + div.cardPreview
     font-size: 4vh
     font-weight: 800
     line-height: .7
+    cursor: pointer
+
+.modal-controls
+    position: absolute
+    width: 100%
+    text-align: center
+    bottom: 30px
+    left: 0
+    right: 0
+    color: #FFFFFF
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif
+    font-size: 4vh
+    font-weight: 800
+    line-height: .7
+
+.modal-controls span
+    border: 2px solid #FFFFFF
+    padding: 0 10px
+    cursor: pointer
+
+.modal-controls span + span
+    margin-left: 100px
+
+.modal-controls span.hideControl
+    opacity: 0
+    cursor: default
 
 .overlay-icon
     position: absolute

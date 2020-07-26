@@ -25,6 +25,7 @@ import { CardFacedownPipe } from './pipes/card-facedown.pipe';
 import { EmptyCardToCardbackPipe } from './pipes/empty-card-to-cardback.pipe';
 import { PreJoinComponent } from './room/pre-join/pre-join.component';
 import { StoryTitleComponent } from './room/story-title/story-title.component';
+import { YourHandComponent } from './room/your-hand/your-hand.component';
 
 const config: SocketIoConfig = { url: '', options: { autoConnect: false } };
 
@@ -47,7 +48,8 @@ const config: SocketIoConfig = { url: '', options: { autoConnect: false } };
     CardFacedownPipe,
     EmptyCardToCardbackPipe,
     PreJoinComponent,
-    StoryTitleComponent
+    StoryTitleComponent,
+    YourHandComponent
   ],
   imports: [
     BrowserModule,

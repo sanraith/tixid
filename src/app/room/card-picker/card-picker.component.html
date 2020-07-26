@@ -12,7 +12,18 @@
 </div>
 
 <!-- The Modal -->
-<div *ngIf="displayedCard" class="modal selectDisable" (click)="displayCard()">
-    <img class="modal-content" src="card/{{displayedCard}}">
-    <span class="modal-closeButton">x</span>
+<div *ngIf="displayedCard" class="modal selectDisable" (wheel)="onWheelEvent($event)">
+    <div class="modal-background" (click)="displayCard()">&nbsp;</div>
+    <img class="modal-content" src="card/{{displayedCard}}"
+        (click)="isEnabled ? selectCard(displayedCard) : displayCard()" (dblclick)="displayCard()"
+        [class.selected]="isEnabled && selectedCard === displayedCard">
+    <span class="modal-closeButton" (click)="displayCard()">x</span>
+    <div class="modal-controls">
+        <span (click)="changeDisplayedCard(-1)" [class.hideControl]="cards[0] === displayedCard">&lt;</span>
+        <span [style.opacity]="selectedCard === displayedCard ? 1 : 0">
+            ✔
+        </span>
+        <span (click)="changeDisplayedCard(1)"
+            [class.hideControl]="cards[cards.length - 1] === displayedCard">&gt;</span>
+    </div>
 </div>

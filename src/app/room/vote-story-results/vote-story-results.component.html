@@ -33,3 +33,5 @@
 
 <app-ready-button [isEnabled]="!room.myState.isReady" [allowForce]="this.room.owner.id === this.room.currentUser.id">
 </app-ready-button>
+
+<app-your-hand [room]="room"></app-your-hand>
