@@ -1,11 +1,4 @@
 <h2>Room {{room.id}}</h2>
-<div *ngIf="isOwner">
-    <button (click)="lobby()">Lobby</button>
-    <button (click)="startGame()">Start game</button>
-    <button (click)="showPartialResults()">Partial results</button>
-    <button (click)="startRound()">Start round</button>
-    <br /><br />
-</div>
 
 <div class="playerList" *ngIf="this.room.players.length > 0">
     <h2 class="title">Players</h2>
@@ -44,4 +37,14 @@
 
 <div class="main">
     <ng-template room-content></ng-template>
+</div>
+
+<div *ngIf="isOwner" style="margin-top: 20px; opacity: 0.2;">
+    <input type="checkbox"> Show admin controls
+    <div class="adminControls">
+        <button (click)="lobby()">Lobby</button>
+        <button (click)="startGame()">Start game</button>
+        <button (click)="showPartialResults()">Partial results</button>
+        <button (click)="startRound()">Start round</button>
+    </div>
 </div>

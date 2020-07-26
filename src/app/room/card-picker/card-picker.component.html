@@ -1,12 +1,14 @@
 <div *ngFor="let card of cards | emptyCardToCardback" class="cardPreview selectDisable">
-    <label *ngIf="{ isBlocked: blockedCards.includes(card) } as c">
-        <input class="hidden" type="radio" id="{{card}}" name="card" [value]="card" [(ngModel)]="selectedCard"
-            [disabled]="!isEnabled || c.isBlocked" (change)="_selectedCardChange()" />
-        <img src="card/{{card}}" (dblclick)="displayCard(card)" [class.blocked]="c.isBlocked"
-            [style.height.vh]="imageHeightVh" [class.selectable]="isEnabled && !c.isBlocked">
+    <ng-container *ngIf="{ isBlocked: blockedCards.includes(card) } as c">
+        <label>
+            <input class="hidden" type="radio" id="{{card}}" name="card" [value]="card" [(ngModel)]="selectedCard"
+                [disabled]="!isEnabled || c.isBlocked" (change)="_selectedCardChange()" />
+            <img src="card/{{card}}" (dblclick)="displayCard(card)" [class.blocked]="c.isBlocked"
+                [style.height.vh]="imageHeightVh" [class.selectable]="isEnabled && !c.isBlocked">
+        </label>
         <img *ngIf="isOverlayIconEnabled" class="overlay-icon" src="assets/maximize.png" (click)="displayCard(card)"
             [style.height.vh]="imageHeightVh / 6">
-    </label>
+    </ng-container>
 </div>
 
 <!-- The Modal -->
