@@ -10,7 +10,7 @@
     <input [(ngModel)]="roomName" type="text" placeholder="Fun zone" (keyup)="onEnter($event, onCreateRoomClick)" />
     <button class="bigButton" (click)="onCreateRoomClick()" [disabled]="!roomName || isCreatingRoom">Create
         room</button>
-    <span *ngIf="isCreatingRoom">Working on it...</span>
+    <span *ngIf="isCreatingRoom"><br />Working on it...</span>
 </div>
 
 <div class="section">

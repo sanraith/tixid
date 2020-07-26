@@ -22,9 +22,9 @@ class TestIdGenerator {
 export default function () {
     roomManager._roomIdGenerator = new TestIdGenerator();
 
-    const room1 = roomManager.createRoom(user1);
-    const room2 = roomManager.createRoom(user2);
-    const room3 = roomManager.createRoom(user3);
+    const room1 = roomManager.createRoom(user1, "user1's room");
+    const room2 = roomManager.createRoom(user2, "user2's room");
+    const room3 = roomManager.createRoom(user3, "user3's room");
     roomManager.joinRoom(room1, user1);
     roomManager.joinRoom(room1, user2);
     roomManager.joinRoom(room1, user3);
