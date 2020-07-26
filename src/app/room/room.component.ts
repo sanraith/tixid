@@ -17,6 +17,7 @@ import { PublicUserInfo } from 'src/shared/model/publicUserInfo';
 import { PartialResultsComponent } from './partial-results/partial-results.component';
 import { FinalResultsComponent } from './final-results/final-results.component';
 import { PreJoinComponent } from './pre-join/pre-join.component';
+import { AudioService, SoundEffect } from '../services/audio.service';
 
 @Component({
   selector: 'app-room',
@@ -40,7 +41,8 @@ export class RoomComponent implements OnInit {
     private route: ActivatedRoute,
     private roomSocket: Socket,
     private componentFactoryResolver: ComponentFactoryResolver,
-    private userService: UserService
+    private userService: UserService,
+    private audioService: AudioService
   ) {
     this.room.socket = roomSocket;
   }
@@ -93,6 +95,14 @@ export class RoomComponent implements OnInit {
 
     this.roomSocket.on(ClientEvents.playersChanged, (args: PlayersChangedData) => {
       console.log(`Event: ${ClientEvents.playersChanged} ${JSON.stringify(args)}`);
+
+      // If a new player have joined lor left, play a sound
+      if (args.players.length > this.room.players.length) {
+        this.audioService.play(SoundEffect.PlayerJoined);
+      } else if (args.players.length < this.room.players.length) {
+        this.audioService.play(SoundEffect.PlayerLeft);
+      }
+
       this.room.owner = args.owner;
       this.room.players = args.players;
       this.isOwner = this.room.currentUser.id === this.room.owner.id;
@@ -120,9 +130,26 @@ export class RoomComponent implements OnInit {
     this.roomSocket.on(ClientEvents.gameStateChanged, (newState: GameStateChangedData) => {
       console.log(`Event: ${ClientEvents.gameStateChanged} ${JSON.stringify(newState)}`);
       const currentGameState = this.room.gameState;
+
       const newContent = this.pickRoomContent(currentGameState?.step, newState.step);
       this.room.gameState = newState;
       this.updateLocalState();
+
+      // If new cards are added to the story card pile, play a sound
+      const cardPileDifference = (newState.storyCardPile?.length ?? 0) - (currentGameState?.storyCardPile?.length ?? 0);
+      if (cardPileDifference > 0) {
+        this.audioService.play(SoundEffect.PlaceCard);
+      }
+
+      // Play right/wrong sound imn the voteStoryResults step.
+      if (currentGameState?.step !== GameStep.voteStoryResults && newState?.step === GameStep.voteStoryResults) {
+        if (this.room.currentUser.id === newState?.storyTeller.id || newState.storyCardId === this.room.localState.myVotedCardId) {
+          this.audioService.play(SoundEffect.GuessedRight);
+        } else {
+          this.audioService.play(SoundEffect.GuessedWrong);
+        }
+      }
+
       if (newContent) {
         this.loadContent(newContent);
       }
@@ -205,6 +232,13 @@ export class RoomComponent implements OnInit {
   private pickRoomContent(previousStep: GameStep | undefined, newStep: GameStep): Type<RoomContentComponent> | null {
     if (previousStep === newStep) {
       return null;
+    }
+
+    // If the game step have changed, play a sound
+    switch (newStep) {
+      case GameStep.voteStoryResults: break; // play success or fail sound in game state change
+      case GameStep.finalResults: this.audioService.play(SoundEffect.GameEndTone); break;
+      default: this.audioService.play(SoundEffect.StepChange);
     }
 
     switch (newStep) {

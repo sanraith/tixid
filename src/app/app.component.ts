@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { UserService } from './services/user.service';
+import { AudioService } from './services/audio.service';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +10,10 @@ import { UserService } from './services/user.service';
 export class AppComponent {
   title = 'tixid';
 
-  constructor(private userService: UserService) { }
+  constructor(
+    public audioService: AudioService,
+    private userService: UserService
+  ) { }
 
   impersonate(name: string, publicId: string, secret: string) {
     this.userService.userData.name = name;

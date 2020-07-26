@@ -191,7 +191,7 @@ export default class PlayerSocket {
             return { success: false, message: "Only the owner can kick other players from the room!" };
         }
 
-        const player = this.room.players.find(x => x.publicId === data.publicId);
+        const player = this.room.state.players.map(x => x.userInfo).find(x => x.publicId === data.publicId);
         if (!player) {
             return { success: false, message: "Kicked player is not part of the room!" };
         }

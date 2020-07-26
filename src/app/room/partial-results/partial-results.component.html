@@ -1,11 +1,17 @@
 <h2>Partial results</h2>
 
-<ul>
-    <li *ngFor="let player of room.localState.orderedPlayerResults">
-        {{player.userInfo.name}}: {{player.totalPoints}}
-        <span *ngIf="player.newPoints > 0">(+{{player.newPoints}})</span>
-    </li>
-</ul>
+<table>
+    <tr *ngFor="let player of room.localState.orderedPlayerResults; index as index">
+        <td>{{index + 1}}.</td>
+        <td style="padding-left: 20px; padding-right: 20px;">{{player.userInfo.name}}</td>
+        <td>{{player.totalPoints}}p</td>
+        <td>
+            <span *ngIf="player.newPoints > 0">(+{{player.newPoints}})</span>
+        </td>
+    </tr>
+</table>
+
+<br/>
 
 <app-ready-button [isEnabled]="!room.myState.isReady" [allowForce]="this.room.owner.id === this.room.currentUser.id">
 </app-ready-button>
