@@ -10,7 +10,7 @@
         or show them the QR code to join the game!
     </p>
     <p>
-        <input type="text" value="{{roomAddress}}" readonly [size]="roomAddress.length" #roomAddressInput>
+        <input type="text" value="{{roomAddress}}" readonly #roomAddressInput style="width: 50%;">
         <button #copyRoomAddressButton class="bigButton"
             (click)="copyRoomAddressToClipboard(roomAddressInput, copyRoomAddressButton)">Copy</button>
         <span [hidden]="true">Copied!</span>

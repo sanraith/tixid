@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { UserService } from './services/user.service';
 import { AudioService } from './services/audio.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -12,6 +13,7 @@ export class AppComponent {
 
   constructor(
     public audioService: AudioService,
+    private router: Router,
     private userService: UserService
   ) { }
 
@@ -20,5 +22,9 @@ export class AppComponent {
     this.userService.userData.id = publicId;
     this.userService.userData.secret = secret;
     this.userService.save();
+  }
+
+  navigateHome() {
+    this.router.navigate(['home']);
   }
 }

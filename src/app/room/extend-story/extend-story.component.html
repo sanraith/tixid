@@ -16,7 +16,7 @@
     <app-card-picker [cards]="room.myState.hand" [(selectedCard)]="extendCard"></app-card-picker>
     <br />
 
-    <button (click)="extendStory()" [disabled]="!extendCard">Pick card!</button>
+    <button class="bigButton" (click)="extendStory()" [disabled]="!extendCard">Pick card!</button>
 </div>
 
 <ng-template #waitingBlock>
