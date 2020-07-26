@@ -1,10 +1,27 @@
-<h2>Welcome. Create a room!</h2>
+<h2>Welcome! </h2>
+<p>
+    <span style="font-style: italic;">Tixid</span> is an online multiplayer card guessing game, based on Dixit.<br />
+    Create a room, or join one of the available rooms!
+</p>
+<div class="section">
+    <h3>Create a room!</h3>
+    <hr>
+    <label>Room name:</label>
+    <input [(ngModel)]="roomName" type="text" placeholder="Fun zone" (keyup)="onEnter($event, onCreateRoomClick)" />
+    <button class="bigButton" (click)="onCreateRoomClick()" [disabled]="!roomName || isCreatingRoom">Create
+        room</button>
+    <span *ngIf="isCreatingRoom">Working on it...</span>
+</div>
 
-<label>User nickname:</label>
-<input [(ngModel)]="userName" type="text" placeholder="Player" (input)="onUserNameInput()" />
+<div class="section">
+    <h3>Change your nickname!</h3>
+    <hr>
+    <label>User nickname:</label>
+    <input [(ngModel)]="userName" type="text" placeholder="Player" (input)="onUserNameInput()" />
+</div>
+
 <br />
 
-<button class="bigButton" (click)="onCreateRoomClick()" [disabled]="isCreatingRoom">Create room</button>
-<span *ngIf="isCreatingRoom">Working on it...</span>
-
-<app-room-list></app-room-list>
+<div class="section">
+    <app-room-list></app-room-list>
+</div>

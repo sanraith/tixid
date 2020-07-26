@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import url from 'url';
-import { CreateRoomResponse, GetRoomListResponse } from 'src/shared/responses';
+import { CreateRoomResponse, GetRoomListResponse, CreateRoomRequest } from 'src/shared/responses';
 import { GET_ROOMS_PATH } from 'src/shared/apiPaths';
 
 @Injectable({
@@ -12,9 +12,9 @@ export class RoomService {
   constructor(private http: HttpClient) {
   }
 
-  createRoom(): Observable<CreateRoomResponse> {
+  createRoom(roomName: string): Observable<CreateRoomResponse> {
     const targetUrl = url.resolve(GET_ROOMS_PATH, 'create');
-    return this.http.post<CreateRoomResponse>(targetUrl, null);
+    return this.http.post<CreateRoomResponse>(targetUrl, <CreateRoomRequest>{ name: roomName });
   }
 
   getRooms(): Observable<GetRoomListResponse> {

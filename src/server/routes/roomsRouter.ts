@@ -16,6 +16,7 @@ router.get("/", (req, res) => {
         res.json(<GetRoomListResponse>{
             rooms: rooms.map(r => ({
                 id: r.id,
+                name: r.name,
                 owner: r.owner.publicInfo,
                 players: r.players.map(p => p.publicInfo)
             }))
@@ -26,10 +27,14 @@ router.get("/", (req, res) => {
 router.post("/create", (req, res) => {
     errorHandler(res, () => {
         const owner = userManager.getUserFromCookies(req.cookies);
-        const room = roomManager.createRoom(owner);
+        const roomName = req.body?.name ?? `${owner.name}'s room`;
+        const room = roomManager.createRoom(owner, roomName);
         debug(`Room: ${room.id} Owner: ${owner.name} ${owner.publicId}`);
 
-        res.json(<CreateRoomResponse>room);
+        res.json(<CreateRoomResponse>{
+            id: room.id,
+            name: room.name
+        });
     });
 });
 

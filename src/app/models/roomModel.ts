@@ -14,6 +14,7 @@ export class LocalGameState {
 
 export default class RoomModel {
     id: string;
+    name?: string;
     currentUser: ClientUser;
     socket: Socket;
 

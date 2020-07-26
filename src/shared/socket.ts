@@ -37,6 +37,10 @@ export interface EmitResponse {
     message?: string;
 }
 
+export interface JoinRoomResponse extends EmitResponse {
+    name?: string;
+}
+
 export interface GameStateChangedData extends PublicGameState { }
 
 export interface PlayerStateChangedData {
@@ -72,7 +76,7 @@ export interface KickPlayerData {
     publicId: string
 }
 
-export interface KickedFromRoomData{
+export interface KickedFromRoomData {
     roomId: string,
     reason: string
 }

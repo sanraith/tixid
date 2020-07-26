@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ComponentFactoryResolver, Type } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Socket } from 'ngx-socket-io';
-import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse, PlayerStateChangedData, GameStateChangedData, KickPlayerData, KickedFromRoomData } from 'src/shared/socket';
+import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse, PlayerStateChangedData, GameStateChangedData, KickPlayerData, KickedFromRoomData, JoinRoomResponse } from 'src/shared/socket';
 import { RoomContentDirective } from './roomContentDirective';
 import { LobbyComponent } from './lobby/lobby.component';
 import RoomContentComponent from './roomContentComponent';
@@ -157,8 +157,10 @@ export class RoomComponent implements OnInit {
 
     this.roomSocket.on(ClientEvents.connect, () => {
       console.log("Socket connected.");
-      this.roomSocket.emit(ClientActions.joinRoom, <JoinRoomData>{ roomId: this.room.id }, (resp: EmitResponse) => {
-        if (!resp.success) {
+      this.roomSocket.emit(ClientActions.joinRoom, <JoinRoomData>{ roomId: this.room.id }, (resp: JoinRoomResponse) => {
+        if (resp.success) {
+          this.room.name = resp.name;
+        } else {
           console.log("Failed to join room, redirecting to home.");
           this.router.navigate(['home']);
         }

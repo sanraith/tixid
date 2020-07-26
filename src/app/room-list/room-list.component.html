@@ -3,11 +3,11 @@
 <ul *ngIf="rooms">
     <li *ngFor="let room of rooms">
         <button (click)="this.joinRoom(room.id)">Join</button>
-        Id: {{room.id}},
-        Owner: {{room.owner.name}},
-        Players:
+        &nbsp;<span style="font-size: small;">[{{room.id}}]</span>&nbsp;
+        <span style="font-weight: 800;">{{room.name}}</span> - 
         <span *ngFor="let player of room.players; let i=index;">
-            {{player.name}}<span *ngIf="i < room.players.length - 1">,</span>
+            <span [style.font-weight]="player.name===room.owner.name?800:0">{{player.name}}</span>
+            <span *ngIf="i < room.players.length - 1">, </span>
         </span>
     </li>
 </ul>

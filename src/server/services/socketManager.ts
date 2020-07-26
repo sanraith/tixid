@@ -4,7 +4,7 @@ import cookie from 'cookie';
 import Debug from 'debug';
 import userManager, { UserCookies } from './userManager';
 import UserInfo from '../models/userInfo';
-import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse, PlayerStateChangedData, GameStateChangedData, MakeStoryData, ExtendStoryData, VoteStoryData, StartGameData, KickPlayerData, KickedFromRoomData } from '../../shared/socket';
+import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse, PlayerStateChangedData, GameStateChangedData, MakeStoryData, ExtendStoryData, VoteStoryData, StartGameData, KickPlayerData, KickedFromRoomData, JoinRoomResponse } from '../../shared/socket';
 import Room from '../models/room';
 import { PublicPlayerState, PrivatePlayerState } from 'src/shared/model/sharedPlayerState';
 import { PlayerGameData } from '../models/gameState';
@@ -69,7 +69,7 @@ class SocketManager {
                     }
                 })
             });
-            socket.on(ClientActions.joinRoom, (data: JoinRoomData, callback?: (resp: EmitResponse) => void) => {
+            socket.on(ClientActions.joinRoom, (data: JoinRoomData, callback?: (resp: JoinRoomResponse) => void) => {
                 errorHandler(() => this.callbackMaybe(playerSocket.joinRoom(data), callback));
             });
             socket.on(ClientActions.leaveRooms, (data: JoinRoomData, callback?: (resp: EmitResponse) => void) => {

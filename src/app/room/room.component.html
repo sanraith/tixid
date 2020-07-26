@@ -1,4 +1,4 @@
-<h2>Room {{room.id}}</h2>
+<h2>Room: {{room.name || room.id}}</h2>
 
 <div class="playerList" *ngIf="this.room.players.length > 0">
     <h2 class="title">Players</h2>

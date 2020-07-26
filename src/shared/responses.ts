@@ -1,12 +1,18 @@
 import { PublicUserInfo } from './model/publicUserInfo';
 
+export interface CreateRoomRequest{
+    name: string
+}
+
 export interface CreateRoomResponse {
-    id: string
+    id: string,
+    name: string
 }
 
 export interface GetRoomListResponse {
     rooms: {
         id: string,
+        name: string,
         owner: PublicUserInfo,
         players: PublicUserInfo[]
     }[]

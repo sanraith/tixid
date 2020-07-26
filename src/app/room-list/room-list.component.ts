@@ -9,7 +9,7 @@ import { PublicUserInfo } from 'src/shared/model/publicUserInfo';
   styleUrls: ['./room-list.component.sass']
 })
 export class RoomListComponent implements OnInit {
-  rooms: { id: string; owner: PublicUserInfo; players: PublicUserInfo[]; }[];
+  rooms: { id: string; name:string, owner: PublicUserInfo; players: PublicUserInfo[]; }[];
 
   constructor(
     private router: Router,

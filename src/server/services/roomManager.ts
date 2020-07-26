@@ -8,9 +8,10 @@ import GameState from '../models/gameState';
 const debug = Debug("tixid:services:roomManager");
 
 class RoomManager {
-    createRoom(owner: UserInfo): Room {
+    createRoom(owner: UserInfo, name: string): Room {
         const newRoom: Room = {
             id: this._roomIdGenerator.generate(),
+            name: name,
             owner: owner,
             players: [],
             state: new GameState(),

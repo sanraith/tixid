@@ -11,6 +11,7 @@ import { UserService } from '../services/user.service';
 export class HomeComponent implements OnInit {
   isCreatingRoom: boolean = false;
   userName: string;
+  roomName: string;
 
   constructor(
     private roomService: RoomService,
@@ -22,8 +23,12 @@ export class HomeComponent implements OnInit {
   }
 
   onCreateRoomClick(): void {
+    if (this.isCreatingRoom || !this.roomName) {
+      return;
+    }
+    
     this.isCreatingRoom = true;
-    this.roomService.createRoom().subscribe(resp => {
+    this.roomService.createRoom(this.roomName).subscribe(resp => {
       this.isCreatingRoom = false;
       this.router.navigate(['room', resp.id]);
     });
@@ -33,6 +38,12 @@ export class HomeComponent implements OnInit {
     if (this.userName) {
       this.userService.userData.name = this.userName;
       this.userService.save();
+    }
+  }
+
+  onEnter(event: any, onEnterFunc: () => void) {
+    if (event.keyCode === 13) {
+      onEnterFunc.apply(this);
     }
   }
 }

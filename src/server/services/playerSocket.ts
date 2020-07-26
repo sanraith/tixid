@@ -1,7 +1,7 @@
 import SocketIo from 'socket.io';
 import roomManager from './roomManager';
 import UserInfo from '../models/userInfo';
-import { JoinRoomData, EmitResponse, MakeStoryData, ExtendStoryData, VoteStoryData, StartGameData, KickPlayerData } from '../../shared/socket';
+import { JoinRoomData, EmitResponse, MakeStoryData, ExtendStoryData, VoteStoryData, StartGameData, KickPlayerData, JoinRoomResponse } from '../../shared/socket';
 import Room from '../models/room';
 import GameManager from './gameManager';
 import { getDefaultRules } from '../../shared/model/rules';
@@ -25,7 +25,7 @@ export default class PlayerSocket {
     }
 
     // TODO handle room player info (before game started) or refactor the 2 kinds of player infos into one.
-    joinRoom(data: JoinRoomData): EmitResponse {
+    joinRoom(data: JoinRoomData): JoinRoomResponse {
         debug(`Client ${this.userInfo.name} joins room`, data);
         this.room = roomManager.getRoom(data.roomId);
         if (this.room) {
@@ -44,7 +44,7 @@ export default class PlayerSocket {
             if ((this.room.state.players.length ?? 0) > 0) {
                 socketManager.emitPlayerStateChanged(this.room, this.room.state.players, this.userInfo, true);
             }
-            return { success: true };
+            return { name: this.room.name, success: true };
         }
         else {
             return { success: false };
