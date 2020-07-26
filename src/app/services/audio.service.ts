@@ -1,15 +1,28 @@
 import { Injectable } from '@angular/core';
+import { CookieService } from 'ngx-cookie-service';
+
+const AUDIO_ENABLED_COOKIE_KEY = "tixid.audio.isEnabled";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AudioService {
-  isEnabled: boolean = true;
+  get isEnabled(): boolean { return this._isEnabled; }
+  set isEnabled(value: boolean) {
+    this._isEnabled = value;
+    this.cookieService.set(AUDIO_ENABLED_COOKIE_KEY, `${value}`, 365 * 10, '/');
+  }
 
+  private _isEnabled: boolean;
   private currentAudio: HTMLAudioElement | null = null;
   private effects: Record<string, HTMLAudioElement> = {};
 
-  constructor() {
+  constructor(private cookieService: CookieService) {
+    if (!this.cookieService.check(AUDIO_ENABLED_COOKIE_KEY)) {
+      this.isEnabled = true;
+    }
+    this._isEnabled = this.cookieService.get(AUDIO_ENABLED_COOKIE_KEY) === 'true';
+
     for (let effect of Object.values(SoundEffect)) {
       let audio = new Audio();
       audio.src = `assets/sound/${effect}`;
