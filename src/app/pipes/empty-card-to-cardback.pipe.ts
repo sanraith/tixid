@@ -10,7 +10,7 @@ export class EmptyCardToCardbackPipe implements PipeTransform {
       case 'undefined':
       case 'string':
         return value ? value : 'cardback';
-      default: return value.map(x => x ? x : 'cardback');
+      default: return (value ?? []).map(x => x ? x : 'cardback');
     }
   }
 
