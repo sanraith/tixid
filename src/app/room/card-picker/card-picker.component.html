@@ -20,7 +20,7 @@
     <span class="modal-closeButton" (click)="displayCard()">x</span>
     <div class="modal-controls">
         <span (click)="changeDisplayedCard(-1)" [class.hideControl]="cards[0] === displayedCard">&lt;</span>
-        <span [style.opacity]="selectedCard === displayedCard ? 1 : 0">
+        <span [style.opacity]="selectedCard === displayedCard ? 1 : 0" (click)="displayCard()">
             ✔
         </span>
         <span (click)="changeDisplayedCard(1)"
