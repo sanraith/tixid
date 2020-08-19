@@ -52,7 +52,7 @@
     "shuffle-array": "^1.0.1",
     "socket.io": "^2.3.0",
     "tslib": "^2.0.1",
-    "uuidv4": "^6.2.2",
+    "uuidv4": "^6.2.3",
     "zone.js": "~0.10.2"
   },
   "devDependencies": {
