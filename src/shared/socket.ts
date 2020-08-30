@@ -11,7 +11,6 @@ export enum ClientActions {
     makeStory = "make_story",
     extendStory = "extend_story",
     voteStory = "vote_story",
-    partialResults = "partial_results",
     startRound = "start_round",
     indicateReady = "indicate_ready",
     forceReady = "force_ready",

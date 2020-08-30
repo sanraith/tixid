@@ -109,12 +109,8 @@ dist
 *.sass.map
 *.scss.map
 
-# Generated CSS
-src/server/public/stylesheets/**/*.css
-
-# Generated Javascript
-src/server/public/scripts/*.js
-src/server/public/scripts/*.js.map
+# Webstorm
+/.idea
 
 # Card images
 src/assets/cardSets/**/*.jpg

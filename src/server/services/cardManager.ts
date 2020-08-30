@@ -1,7 +1,7 @@
 import Debug from 'debug'; const debug = Debug('tixid:services:cardSetManager');
 import { promises as fs } from 'fs';
 import path from 'path';
-import { uuid } from 'uuidv4';
+import { v4 as uuid } from 'uuid';
 import { Card, CardSet } from '../../shared/model/card';
 
 const _appFolder = 'dist/client';

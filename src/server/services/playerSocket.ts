@@ -34,7 +34,7 @@ export default class PlayerSocket {
             roomManager.joinRoom(this.room, this.userInfo);
             socketManager.emitGameStateChanged(this.room, this.userInfo);
 
-            // Set connection state 
+            // Set connection state
             const playerState = this.room.state.players.find(x => x.userInfo === this.userInfo);
             if (playerState && !playerState.isConnected) {
                 playerState.isConnected = true;
@@ -113,16 +113,6 @@ export default class PlayerSocket {
         debug(`Requested vote story by ${this.userInfo.name}`);
         const card = cardManager.cards[data.cardId];
         return this.manager.voteStory(this.userInfo, card);
-    }
-
-    partialResults(): EmitResponse {
-        if (!this.room || !this.manager) { return { success: false, message: "Player is not part of any room!" }; }
-        if (this.room.state.rules.onlyOwnerCanStart && this.room.owner !== this.userInfo) {
-            return { success: false, message: "Only the owner can show partial results!" };
-        }
-
-        debug(`Requested partial results by ${this.userInfo.name}`);
-        return this.manager.applyPointsAndShowPartialResults();
     }
 
     startRound(): EmitResponse {
