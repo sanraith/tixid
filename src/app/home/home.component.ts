@@ -20,6 +20,7 @@ export class HomeComponent implements OnInit {
 
     ngOnInit(): void {
         this.userName = this.userService.userData.name;
+        this.roomName = `${this.userName}'s room`;
     }
 
     onCreateRoomClick(): void {

@@ -94,11 +94,13 @@ export class RoomComponent implements OnInit {
         this.roomSocket.on(ClientEvents.playersChanged, (args: PlayersChangedData) => {
             console.log(`Event: ${ClientEvents.playersChanged} ${JSON.stringify(args)}`);
 
-            // If a new player have joined lor left, play a sound
-            if (args.players.length > this.room.players.length) {
-                this.audioService.play(SoundEffect.PlayerJoined);
-            } else if (args.players.length < this.room.players.length) {
-                this.audioService.play(SoundEffect.PlayerLeft);
+            // If a new player have joined or left in the lobby, play a sound
+            if (this.room.gameState?.step === GameStep.lobby) {
+                if (args.players.length > this.room.players.length) {
+                    this.audioService.play(SoundEffect.PlayerJoined);
+                } else if (args.players.length < this.room.players.length) {
+                    this.audioService.play(SoundEffect.PlayerLeft);
+                }
             }
 
             this.room.owner = args.owner;
