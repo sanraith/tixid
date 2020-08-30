@@ -87,9 +87,6 @@ class SocketManager {
             socket.on(ClientActions.voteStory, (data: VoteStoryData, callback?: (resp: EmitResponse) => void) => {
                 errorHandler(() => this.callbackMaybe(playerSocket.voteStory(data), callback));
             });
-            socket.on(ClientActions.partialResults, (data: any, callback?: (resp: EmitResponse) => void) => {
-                errorHandler(() => this.callbackMaybe(playerSocket.partialResults(), callback));
-            });
             socket.on(ClientActions.startRound, (data: any, callback?: (resp: EmitResponse) => void) => {
                 errorHandler(() => this.callbackMaybe(playerSocket.startRound(), callback));
             });

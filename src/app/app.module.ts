@@ -18,7 +18,6 @@ import { ExtendStoryComponent } from './room/extend-story/extend-story.component
 import { CardPickerComponent } from './room/card-picker/card-picker.component';
 import { VoteStoryComponent } from './room/vote-story/vote-story.component';
 import { VoteStoryResultsComponent } from './room/vote-story-results/vote-story-results.component';
-import { PartialResultsComponent } from './room/partial-results/partial-results.component';
 import { FinalResultsComponent } from './room/final-results/final-results.component';
 import { ReadyButtonComponent } from './room/ready-button/ready-button.component';
 import { CardFacedownPipe } from './pipes/card-facedown.pipe';
@@ -30,37 +29,36 @@ import { YourHandComponent } from './room/your-hand/your-hand.component';
 const config: SocketIoConfig = { url: '', options: { autoConnect: false } };
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    HomeComponent,
-    RoomComponent,
-    RoomListComponent,
-    LobbyComponent,
-    RoomContentDirective,
-    MakeStoryComponent,
-    ExtendStoryComponent,
-    CardPickerComponent,
-    VoteStoryComponent,
-    VoteStoryResultsComponent,
-    PartialResultsComponent,
-    FinalResultsComponent,
-    ReadyButtonComponent,
-    CardFacedownPipe,
-    EmptyCardToCardbackPipe,
-    PreJoinComponent,
-    StoryTitleComponent,
-    YourHandComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-    FormsModule,
-    SocketIoModule.forRoot(config),
-    QRCodeModule
-  ],
-  entryComponents: [LobbyComponent],
-  providers: [CookieService],
-  bootstrap: [AppComponent]
+    declarations: [
+        AppComponent,
+        HomeComponent,
+        RoomComponent,
+        RoomListComponent,
+        LobbyComponent,
+        RoomContentDirective,
+        MakeStoryComponent,
+        ExtendStoryComponent,
+        CardPickerComponent,
+        VoteStoryComponent,
+        VoteStoryResultsComponent,
+        FinalResultsComponent,
+        ReadyButtonComponent,
+        CardFacedownPipe,
+        EmptyCardToCardbackPipe,
+        PreJoinComponent,
+        StoryTitleComponent,
+        YourHandComponent
+    ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        HttpClientModule,
+        FormsModule,
+        SocketIoModule.forRoot(config),
+        QRCodeModule
+    ],
+    entryComponents: [LobbyComponent],
+    providers: [CookieService],
+    bootstrap: [AppComponent]
 })
 export class AppModule { }

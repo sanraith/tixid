@@ -50,8 +50,7 @@ export default class GameManager {
 
     startRound(): TransitionResult {
         if (!this.state.rules.invalidStateChanges &&
-            this.state.step !== GameStep.dealCards &&
-            this.state.step !== GameStep.partialResults) {
+            this.state.step !== GameStep.dealCards) {
             return this.errorResult("Can only start the round after the deal cards step!");
         }
 
@@ -178,25 +177,6 @@ export default class GameManager {
         return this.successResult();
     }
 
-    applyPointsAndShowPartialResults(): TransitionResult {
-        const state = this.state;
-        if (!state.rules.invalidStateChanges && state.step !== GameStep.voteStoryResults) {
-            return this.errorResult("Can only show partial results after the vote story results step!");
-        }
-
-        for (const pointData of state.roundPoints) {
-            const player = state.players.find(x => x.userInfo === pointData.userInfo)!;
-            player.points += pointData.points;
-        }
-
-        this.state.step = GameStep.partialResults;
-        this.resetPlayerReadiness();
-        socketManager.emitPlayerStateChanged(this.room, state.players);
-        socketManager.emitGameStateChanged(this.room);
-
-        return this.successResult();
-    }
-
     goToLobby(): TransitionResult {
         const state = this.state;
         if (!state.rules.invalidStateChanges && state.step !== GameStep.finalResults) {
@@ -218,7 +198,6 @@ export default class GameManager {
         switch (state.step) {
             case GameStep.lobby:
             case GameStep.voteStoryResults:
-            case GameStep.partialResults:
             case GameStep.finalResults:
                 break;
             default:
@@ -235,8 +214,6 @@ export default class GameManager {
                     // Do nothing, as the owner explicitly have to start the game
                     break;
                 case GameStep.voteStoryResults:
-                    return this.applyPointsAndShowPartialResults();
-                case GameStep.partialResults:
                     return this.startRound();
                 case GameStep.finalResults:
                     return this.goToLobby();
@@ -327,6 +304,12 @@ export default class GameManager {
             });
 
         points.sort((a, b) => a.userInfo.name.localeCompare(b.userInfo.name));
+
+        // Apply points to players
+        for (const pointData of points) {
+            const player = state.players.find(x => x.userInfo === pointData.userInfo)!;
+            player.points += pointData.points;
+        }
     }
 
     private areAllPlayersReady(): boolean {
