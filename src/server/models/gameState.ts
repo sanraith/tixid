@@ -1,7 +1,7 @@
 import { GameStep } from '../../shared/model/gameStep';
 import { Card } from '../../shared/model/card';
 import UserInfo from './userInfo';
-import { Rules, getDefaultRules,  } from '../../shared/model/rules';
+import { Rules, getDefaultRules, } from '../../shared/model/rules';
 import shuffle from 'shuffle-array';
 
 export class PlayerGameData {
@@ -29,14 +29,14 @@ export class PlayerGameData {
 }
 
 export enum RoundPointReason {
-    everybodyGuessedRight = "everyone_guessed_right",
-    nobodyGuessedRight = "nobody_guessed_right",
+    everybodyGuessedRight = "everyone guessing right",
+    nobodyGuessedRight = "nobody guessing right",
 
-    guessedRight = "you_guessed_right",
-    somebodyGuessedRight = "somebody_guessed_right",
+    guessedRight = "guessing right",
+    somebodyGuessedRight = "somebody guessing their card",
 
-    deceivedSomebody = "deceived_somebody",
-    deceivedSomebodyOverMaximum = "deceived_somebody_over_maximum_points"
+    deceivedSomebody = "deceiving somebody",
+    deceivedSomebodyOverMaximum = "deceiving somebody (already earned max points for deceiving)"
 }
 
 export default class GameState {

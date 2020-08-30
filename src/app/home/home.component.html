@@ -7,7 +7,7 @@
     <h3>Create a room!</h3>
     <hr>
     <label>Room name:</label>
-    <input [(ngModel)]="roomName" type="text" placeholder="Fun zone" (keyup)="onEnter($event, onCreateRoomClick)" />
+    <input [(ngModel)]="roomName" type="text" placeholder="Room name" (keyup)="onEnter($event, onCreateRoomClick)" />
     <button class="bigButton" (click)="onCreateRoomClick()" [disabled]="!roomName || isCreatingRoom">Create
         room</button>
     <span *ngIf="isCreatingRoom"><br />Working on it...</span>
