@@ -66,10 +66,12 @@ export interface MakeStoryData {
 }
 
 export interface ExtendStoryData {
-    cardId: string
+    cardIds: string[]
 }
 
-export interface VoteStoryData extends ExtendStoryData { }
+export interface VoteStoryData {
+    cardId: string
+}
 
 export interface KickPlayerData {
     publicId: string

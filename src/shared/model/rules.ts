@@ -1,16 +1,17 @@
 export interface Rules {
     handSize: number;
+    maxExtendCardCount: number;
+    maxVoteCount: number;
+
     onlyOwnerCanStart: boolean;
     invalidStateChanges: boolean;
 
     pointsSomebodyGuessedRight: number;
     pointsNobodyOrEverybodyGuessedRight: number;
-
     pointsDeceivedSomebody: number,
     maxPointsDeceivedSomebody: number,
-
     pointsToWin: number,
-    
+
     cardSets: string[]
 }
 
@@ -19,6 +20,9 @@ export function getDefaultRules(): Rules {
         cardSets: [], // Empty == all
 
         handSize: 6,
+        maxExtendCardCount: 1,
+        maxVoteCount: 1,
+
         onlyOwnerCanStart: false,
         invalidStateChanges: true,
 

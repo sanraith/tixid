@@ -187,8 +187,8 @@ export class RoomComponent implements OnInit {
         const localState = this.room.localState;
 
         if (gameState.storyCardPile) {
-            const mySubmittedCardId = gameState.storyCardPile.find(x => x.userInfo?.id === this.room.currentUser.id)?.cardId;
-            localState.mySubmittedCardId = mySubmittedCardId;
+            const mySubmittedCardIds = gameState.storyCardPile.filter(x => x.userInfo?.id === this.room.currentUser.id).map(x => x.cardId);
+            localState.mySubmittedCardIds = mySubmittedCardIds;
             localState.voteCardIds = gameState.storyCardPile.map(x => x.cardId);
         }
 

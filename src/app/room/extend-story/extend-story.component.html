@@ -10,13 +10,14 @@
 
 <!-- Player is NOT the story teller -->
 <div
-    *ngIf="room.gameState.storyTeller.id !== room.currentUser.id && !room.localState.mySubmittedCardId && !alreadySubmittedCard; else: waitingBlock">
+    *ngIf="room.gameState.storyTeller.id !== room.currentUser.id && !room.localState.mySubmittedCardIds && !alreadySubmittedCard; else: waitingBlock">
     <p>Pick a card from your hand which you think is fit for the story.</p>
 
-    <app-card-picker [cards]="room.myState.hand" [(selectedCard)]="extendCard"></app-card-picker>
+    <app-card-picker [cards]="room.myState.hand" [(selectedCards)]="extendCards"
+        [maxSelectedCardCount]="room.gameState.rules.maxExtendCardCount"></app-card-picker>
     <br />
 
-    <button class="bigButton" (click)="extendStory()" [disabled]="!extendCard">Pick card!</button>
+    <button class="bigButton" (click)="extendStory()" [disabled]="extendCards.length === 0">Pick card!</button>
 </div>
 
 <ng-template #waitingBlock>

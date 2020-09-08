@@ -5,7 +5,7 @@ import { ClientUser } from '../services/user.service';
 import { Socket } from 'ngx-socket-io';
 
 export class LocalGameState {
-    mySubmittedCardId?: string;
+    mySubmittedCardIds?: string[];
     myVotedCardId?: string;
     voteCardIds?: string[];
     votesByCardId?: Record<string, PublicUserInfo[]>;

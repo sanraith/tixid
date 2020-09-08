@@ -103,8 +103,8 @@ export default class PlayerSocket {
         if (!this.room || !this.manager) { return { success: false, message: "Player is not part of any room!" }; }
 
         debug(`Requested extend story by ${this.userInfo.name}`);
-        const card = cardManager.cards[data.cardId];
-        return this.manager.extendStory(this.userInfo, card);
+        const cards = data.cardIds.map(cardId => cardManager.cards[cardId]);
+        return this.manager.extendStory(this.userInfo, cards);
     }
 
     voteStory(data: VoteStoryData): EmitResponse {

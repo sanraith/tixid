@@ -121,19 +121,22 @@ export default class GameManager {
         return this.successResult();
     }
 
-    extendStory(userInfo: UserInfo, card: Card): TransitionResult {
+    extendStory(userInfo: UserInfo, cards: Card[]): TransitionResult {
         const player = this.state.players.find(x => x.userInfo.id === userInfo.id);
         if (!this.state.rules.invalidStateChanges && this.state.step !== GameStep.extendStory) {
             return this.errorResult("Can only extend story in the extend story step!");
         }
         if (!player) { return this.errorResult("Cannot find user!"); }
-        if (!card) { return this.errorResult("Card is empty!"); }
-        if (!player.hasCard(card)) { return this.errorResult("Card is not in the player's hand!"); }
+        if (!cards || cards.length === 0) { return this.errorResult("Card is empty!"); }
+        if (cards.length > this.state.rules.maxExtendCardCount) { return this.errorResult("Too many cards used in extend story step!"); }
+        if (!cards.every(card => player.hasCard(card))) { return this.errorResult("Card is not in the player's hand!"); }
         if (player.isReady) { return this.errorResult("Cannot extend the story more than once!"); }
 
         // Add story card to story card pile
-        player.removeCard(card);
-        this.state.storyCardPile.push({ userInfo: userInfo, card: card });
+        for (let card of cards) {
+            player.removeCard(card);
+            this.state.storyCardPile.push({ userInfo: userInfo, card: card });
+        }
         player.isReady = true;
 
         if (this.areAllPlayersReady()) {

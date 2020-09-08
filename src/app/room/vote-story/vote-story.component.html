@@ -8,12 +8,11 @@
     </p>
 
     <app-card-picker [cards]="room.localState.voteCardIds" [(selectedCard)]="voteCard"
-        [blockedCards]="[room.localState.mySubmittedCardId]">
+        [blockedCards]="room.localState.mySubmittedCardIds">
     </app-card-picker>
     <br />
 
-    <button (click)="voteForCard()" class="bigButton"
-        [disabled]="alreadyVoted || !voteCard || voteCard === room.localState.mySubmittedCardId">
+    <button (click)="voteForCard()" class="bigButton" [disabled]="alreadyVoted || !voteCard">
         Vote for card!
     </button>
 </div>
