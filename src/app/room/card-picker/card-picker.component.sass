@@ -1,15 +1,15 @@
 div
     display: inline-block
-    
+
 div.cardPreview + div.cardPreview
     margin-left: 5px
-    
-[type=radio] + img.selectable
+
+[type=checkbox] + img.selectable
     cursor: pointer
 
 $selectedBorder: 4px solid #f00
 
-[type=radio]:checked + img 
+[type=checkbox]:checked + img
     outline: $selectedBorder
 
 .selected
@@ -108,7 +108,7 @@ $selectedBorder: 4px solid #f00
 .overlay-icon:hover
     opacity: 1
 
-.selectDisable 
+.selectDisable
     -webkit-user-select: none
     -khtml-user-select: none
     -moz-user-select: none

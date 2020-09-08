@@ -1,8 +1,12 @@
 <div *ngFor="let card of cards | emptyCardToCardback" class="cardPreview selectDisable">
-    <ng-container *ngIf="{ isBlocked: blockedCards.includes(card) } as c">
+    <ng-container *ngIf="{
+            isBlocked: blockedCards.includes(card),
+            isSelected: selectedCards.includes(card)
+        } as c">
         <label>
-            <input class="hidden" type="radio" id="{{card}}" name="card" [value]="card" [(ngModel)]="selectedCard"
-                [disabled]="!isEnabled || c.isBlocked" (change)="_selectedCardChange()" />
+            <input class="hidden" type="checkbox" id="{{card}}" name="card" [value]="card" [(ngModel)]="c.isSelected"
+                [disabled]="!isEnabled || c.isBlocked" (change)="selectCard(card, $event.target.checked)" />
+
             <img src="card/{{card}}" (dblclick)="displayCard(card)" [class.blocked]="c.isBlocked"
                 [style.height.vh]="imageHeightVh" [class.selectable]="isEnabled && !c.isBlocked">
         </label>
@@ -15,12 +19,12 @@
 <div *ngIf="displayedCard" class="modal selectDisable" (wheel)="onWheelEvent($event)">
     <div class="modal-background" (click)="displayCard()">&nbsp;</div>
     <img class="modal-content" src="card/{{displayedCard}}"
-        (click)="isEnabled ? selectCard(displayedCard) : displayCard()" (dblclick)="displayCard()"
-        [class.selected]="isEnabled && selectedCard === displayedCard">
+        (click)="isEnabled ? selectCard(displayedCard, true) : displayCard()" (dblclick)="displayCard()"
+        [class.selected]="isEnabled && selectedCards.includes(displayedCard)">
     <span class="modal-closeButton" (click)="displayCard()">x</span>
     <div class="modal-controls">
         <span (click)="changeDisplayedCard(-1)" [class.hideControl]="cards[0] === displayedCard">&lt;</span>
-        <span [style.opacity]="selectedCard === displayedCard ? 1 : 0" (click)="displayCard()">
+        <span [style.opacity]="selectedCards.includes(displayedCard) ? 1 : 0" (click)="displayCard()">
             ✔
         </span>
         <span (click)="changeDisplayedCard(1)"
