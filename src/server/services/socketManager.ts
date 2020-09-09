@@ -194,7 +194,7 @@ class SocketManager {
                 }
 
                 const votes = state.votes.map(vote => ({
-                    cardId: (canRevealAllVotes || vote.userInfo === targetPlayer) ? vote.card.id : undefined,
+                    cardIds: (canRevealAllVotes || vote.userInfo === targetPlayer) ? vote.cards.map(x => x.id) : undefined,
                     userInfo: vote.userInfo.publicInfo
                 }));
                 gameStateData.votes = votes;

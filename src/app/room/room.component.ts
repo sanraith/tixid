@@ -143,7 +143,7 @@ export class RoomComponent implements OnInit {
 
             // Play right/wrong sound imn the voteStoryResults step.
             if (currentGameState?.step !== GameStep.voteStoryResults && newState?.step === GameStep.voteStoryResults) {
-                if (this.room.currentUser.id === newState?.storyTeller.id || newState.storyCardId === this.room.localState.myVotedCardId) {
+                if (this.room.currentUser.id === newState?.storyTeller.id || this.room.localState.myVotedCardIds.includes(newState.storyCardId)) {
                     this.audioService.play(SoundEffect.GuessedRight);
                 } else {
                     this.audioService.play(SoundEffect.GuessedWrong);
@@ -193,12 +193,14 @@ export class RoomComponent implements OnInit {
         }
 
         if (gameState.votes) {
-            const myVotedCardId = gameState.votes.find(x => x.userInfo?.id === this.room.currentUser.id)?.cardId;
-            localState.myVotedCardId = myVotedCardId;
-            localState.votesByCardId = gameState.votes.reduce((votes, v) => {
-                if (!votes[v.cardId]) { votes[v.cardId] = []; }
-                votes[v.cardId].push(v.userInfo);
-                return votes;
+            const myVotedCardIds = gameState.votes.find(x => x.userInfo?.id === this.room.currentUser.id)?.cardIds ?? [];
+            localState.myVotedCardIds = myVotedCardIds;
+            localState.votesByCardId = gameState.votes.reduce((votesByCardId, vote) => {
+                for (let cardId of vote.cardIds) {
+                    if (!votesByCardId[cardId]) { votesByCardId[cardId] = []; }
+                    votesByCardId[cardId].push(vote.userInfo);
+                }
+                return votesByCardId;
             }, <Record<string, PublicUserInfo[]>>{})
         }
 

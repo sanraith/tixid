@@ -1,24 +1,24 @@
 <h2>Voting</h2>
 <app-story-title [room]="room"></app-story-title>
 <div
-    *ngIf="room.gameState.storyTeller.id !== room.currentUser.id && !room.localState.myVotedCardId && !alreadyVoted; else waitingBlock">
+    *ngIf="room.gameState.storyTeller.id !== room.currentUser.id && room.localState.myVotedCardIds.length === 0 && !alreadyVoted; else waitingBlock">
     <p>
         Try to pick the card of the story teller!<br />
         <small>(You can not pick your own cards.)</small>
     </p>
 
-    <app-card-picker [cards]="room.localState.voteCardIds" [(selectedCard)]="voteCard"
-        [blockedCards]="room.localState.mySubmittedCardIds">
+    <app-card-picker [cards]="room.localState.voteCardIds" [(selectedCards)]="voteCards"
+        [maxSelectedCardCount]="room.gameState.rules.maxVoteCount" [blockedCards]="room.localState.mySubmittedCardIds">
     </app-card-picker>
     <br />
 
-    <button (click)="voteForCard()" class="bigButton" [disabled]="alreadyVoted || !voteCard">
+    <button (click)="voteForCard()" class="bigButton" [disabled]="alreadyVoted || voteCards.length === 0">
         Vote for card!
     </button>
 </div>
 
 <ng-template #waitingBlock>
-    <app-card-picker [cards]="room.localState.voteCardIds" [(selectedCard)]="voteCard" [isEnabled]="false">
+    <app-card-picker [cards]="room.localState.voteCardIds" [(selectedCards)]="voteCards" [isEnabled]="false">
     </app-card-picker>
     <p>Waiting for others to vote...</p>
 </ng-template>

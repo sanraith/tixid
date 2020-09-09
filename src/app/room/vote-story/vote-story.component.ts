@@ -5,27 +5,27 @@ import { Socket } from 'ngx-socket-io';
 import { ClientActions, VoteStoryData, EmitResponse } from 'src/shared/socket';
 
 @Component({
-  selector: 'app-vote-story',
-  templateUrl: './vote-story.component.html',
-  styleUrls: ['./vote-story.component.sass']
+    selector: 'app-vote-story',
+    templateUrl: './vote-story.component.html',
+    styleUrls: ['./vote-story.component.sass']
 })
 export class VoteStoryComponent implements RoomContentComponent, OnInit {
-  @Input()
-  room: RoomModel;
-  voteCard: string;
-  alreadyVoted: boolean = false;
+    @Input()
+    room: RoomModel;
+    voteCards: string[] = [];
+    alreadyVoted: boolean = false;
 
-  constructor(private socket: Socket) { }
+    constructor(private socket: Socket) { }
 
-  ngOnInit(): void {
-  }
+    ngOnInit(): void {
+    }
 
-  voteForCard(): void {
-    this.alreadyVoted = true;
-    this.socket.emit(ClientActions.voteStory, <VoteStoryData>{ cardId: this.voteCard }, (resp: EmitResponse) => {
-      if (!resp.success) {
-        alert(`Error: ${resp.message}`);
-      }
-    });
-  }
+    voteForCard(): void {
+        this.alreadyVoted = true;
+        this.socket.emit(ClientActions.voteStory, <VoteStoryData>{ cardIds: this.voteCards }, (resp: EmitResponse) => {
+            if (!resp.success) {
+                alert(`Error: ${resp.message}`);
+            }
+        });
+    }
 }

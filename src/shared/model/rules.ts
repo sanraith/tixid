@@ -7,6 +7,7 @@ export interface Rules {
     invalidStateChanges: boolean;
 
     pointsSomebodyGuessedRight: number;
+    pointsSomebodyGuessedRightUsingMultipleVotes: number;
     pointsNobodyOrEverybodyGuessedRight: number;
     pointsDeceivedSomebody: number,
     maxPointsDeceivedSomebody: number,
@@ -27,6 +28,7 @@ export function getDefaultRules(): Rules {
         invalidStateChanges: true,
 
         pointsSomebodyGuessedRight: 3,
+        pointsSomebodyGuessedRightUsingMultipleVotes: 1,
         pointsNobodyOrEverybodyGuessedRight: 2,
         pointsDeceivedSomebody: 1,
         maxPointsDeceivedSomebody: 3,

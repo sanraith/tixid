@@ -69,9 +69,7 @@ export interface ExtendStoryData {
     cardIds: string[]
 }
 
-export interface VoteStoryData {
-    cardId: string
-}
+export interface VoteStoryData extends ExtendStoryData { }
 
 export interface KickPlayerData {
     publicId: string

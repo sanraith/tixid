@@ -127,7 +127,7 @@ export default class GameManager {
             return this.errorResult("Can only extend story in the extend story step!");
         }
         if (!player) { return this.errorResult("Cannot find user!"); }
-        if (!cards || cards.length === 0) { return this.errorResult("Card is empty!"); }
+        if (!cards || cards.length === 0) { return this.errorResult("No cards provided!"); }
         if (cards.length > this.state.rules.maxExtendCardCount) { return this.errorResult("Too many cards used in extend story step!"); }
         if (!cards.every(card => player.hasCard(card))) { return this.errorResult("Card is not in the player's hand!"); }
         if (player.isReady) { return this.errorResult("Cannot extend the story more than once!"); }
@@ -153,18 +153,19 @@ export default class GameManager {
         return this.successResult();
     }
 
-    voteStory(userInfo: UserInfo, card: Card): TransitionResult {
+    voteStory(userInfo: UserInfo, cards: Card[]): TransitionResult {
         const player = this.state.players.find(x => x.userInfo.id === userInfo.id);
         if (!this.state.rules.invalidStateChanges && this.state.step !== GameStep.voteStory) {
             return this.errorResult("Can only vote in the vote story step!");
         }
         if (!player) { return this.errorResult("Cannot find user!"); }
-        if (!card) { return this.errorResult("Card is empty!"); }
-        if (!this.state.storyCardPile.find(sc => sc.card === card)) { return this.errorResult("Card is not in the story card pile!"); }
+        if (!cards || cards.length === 0) { return this.errorResult("No cards provided!"); }
+        if (cards.length > this.state.rules.maxVoteCount) { return this.errorResult("Voted for too many cards!"); }
+        if (!cards.every(card => this.state.storyCardPile.find(sc => sc.card === card))) { return this.errorResult("Voted card is not in the story card pile!"); }
         if (player.isReady) { return this.errorResult("Cannot vote more than once!"); }
 
-        // Register vote
-        this.state.votes.push({ userInfo: userInfo, card: card });
+        // Register votes
+        this.state.votes.push({ userInfo: userInfo, cards: cards });
         player.isReady = true;
 
         if (this.areAllPlayersReady()) {
@@ -254,11 +255,12 @@ export default class GameManager {
         const state = this.state;
         const points = state.roundPoints;
         const storyTeller = state.storyTeller!;
+        const storyCard = state.storyCard!;
 
         let isEverybodyGuessed = true;
         let isNobodyGuessed = true;
         for (let vote of state.votes) {
-            const guessed = vote.card === state.storyCard;
+            const guessed = vote.cards.includes(storyCard);
             isEverybodyGuessed = isEverybodyGuessed && guessed;
             isNobodyGuessed = isNobodyGuessed && !guessed;
         }
@@ -273,17 +275,18 @@ export default class GameManager {
         } else {
             // Add points to the storyteller and everyone who guessed right
             const rewardedPoints = state.rules.pointsSomebodyGuessedRight;
+            const rewardedPointsForMultiVote = state.rules.pointsSomebodyGuessedRightUsingMultipleVotes;
             points.push({
                 userInfo: storyTeller.userInfo,
                 points: rewardedPoints,
                 reason: RoundPointReason.somebodyGuessedRight
             });
             this.state.votes
-                .filter(vote => vote.card === state.storyCard)
+                .filter(vote => vote.cards.includes(storyCard))
                 .forEach(vote => points.push({
                     userInfo: vote.userInfo,
-                    points: rewardedPoints,
-                    reason: RoundPointReason.guessedRight
+                    points: vote.cards.length == 1 ? rewardedPoints : rewardedPointsForMultiVote,
+                    reason: vote.cards.length == 1 ? RoundPointReason.guessedRight : RoundPointReason.guessedRightWithMultiVotes
                 }));
         }
 
@@ -291,10 +294,9 @@ export default class GameManager {
         const maxDeceivePoints = state.rules.maxPointsDeceivedSomebody;
         const normalDeceivePoints = state.rules.pointsDeceivedSomebody;
         const userDeceivePoints = state.players.reduce((dict, p) => { dict[p.userInfo.id] = 0; return dict; }, <Record<string, number>>{});
-        state.votes
-            .filter(vote => vote.card !== state.storyCard)
-            .forEach(vote => {
-                const receivingUser = state.storyCardPile.find(sc => sc.card === vote.card)!.userInfo;
+        for (let vote of state.votes) {
+            for (let votedCard of vote.cards.filter(x => x !== state.storyCard)) {
+                const receivingUser = state.storyCardPile.find(sc => sc.card === votedCard)!.userInfo;
                 const currentPoints = userDeceivePoints[receivingUser.id];
                 const alreadyAtMaximum = normalDeceivePoints + currentPoints > maxDeceivePoints;
                 const receivedPoints = alreadyAtMaximum ? 0 : normalDeceivePoints;
@@ -304,8 +306,8 @@ export default class GameManager {
                     userInfo: receivingUser
                 });
                 userDeceivePoints[receivingUser.id] += receivedPoints;
-            });
-
+            }
+        }
         points.sort((a, b) => a.userInfo.name.localeCompare(b.userInfo.name));
 
         // Apply points to players

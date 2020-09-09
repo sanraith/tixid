@@ -33,6 +33,7 @@ export enum RoundPointReason {
     nobodyGuessedRight = "nobody guessing right",
 
     guessedRight = "guessing right",
+    guessedRightWithMultiVotes = "guessing right with multiple votes",
     somebodyGuessedRight = "somebody guessing their card",
 
     deceivedSomebody = "deceiving somebody",
@@ -50,7 +51,7 @@ export default class GameState {
     story?: string;
     storyCard?: Card;
     storyCardPile: { userInfo: UserInfo, card: Card }[] = [];
-    votes: { userInfo: UserInfo, card: Card }[] = [];
+    votes: { userInfo: UserInfo, cards: Card[] }[] = [];
 
     roundPoints: {
         userInfo: UserInfo,

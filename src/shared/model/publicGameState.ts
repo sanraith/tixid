@@ -15,6 +15,6 @@ export default interface PublicGameState {
     storyCardId?: string;
     storyCardPile?: PickedCard[];
 
-    votes?: { userInfo: PublicUserInfo, cardId?: string }[];
+    votes?: { userInfo: PublicUserInfo, cardIds?: string[] }[];
     votePoints?: { userInfo: PublicUserInfo, points: number, reason: RoundPointReason }[];
 }
