@@ -3,8 +3,6 @@
 <div
     *ngIf="room.gameState.storyTeller.id !== room.currentUser.id && room.localState.myVotedCardIds.length === 0 && !alreadyVoted; else waitingBlock">
     <p>
-        Try to pick the card of the story teller!<br />
-        <small>(You can not pick your own cards.)</small>
     </p>
 
     <app-card-picker [cards]="room.localState.voteCardIds" [(selectedCards)]="voteCards"
@@ -15,6 +13,25 @@
     <button (click)="voteForCard()" class="bigButton" [disabled]="alreadyVoted || voteCards.length === 0">
         Vote for card!
     </button>
+
+    <div style="margin-top: 2em;">
+        <img src="assets\info.png" width="30px"><br />
+        Try to pick the card of the story teller! You can not pick your own cards.<br />
+        If you guess right using 1 vote, you get
+        <span [ngPlural]="room.gameState.rules.pointsSomebodyGuessedRight">
+            {{room.gameState.rules.pointsSomebodyGuessedRight}}
+            <ng-template ngPluralCase="=1">point</ng-template>
+            <ng-template ngPluralCase="other">points</ng-template>
+        </span>!<br>
+        <span *ngIf="room.gameState.rules.maxVoteCount > 1">
+            If you guess right using {{room.gameState.rules.maxVoteCount}} votes, you get
+            <span [ngPlural]="room.gameState.rules.pointsSomebodyGuessedRightUsingMultipleVotes">
+                {{room.gameState.rules.pointsSomebodyGuessedRightUsingMultipleVotes}}
+                <ng-template ngPluralCase="=1">point</ng-template>
+                <ng-template ngPluralCase="other">points</ng-template>
+            </span>!<br>
+        </span>
+    </div>
 </div>
 
 <ng-template #waitingBlock>

@@ -196,7 +196,7 @@ export class RoomComponent implements OnInit {
             const myVotedCardIds = gameState.votes.find(x => x.userInfo?.id === this.room.currentUser.id)?.cardIds ?? [];
             localState.myVotedCardIds = myVotedCardIds;
             localState.votesByCardId = gameState.votes.reduce((votesByCardId, vote) => {
-                for (let cardId of vote.cardIds) {
+                for (let cardId of vote.cardIds ?? []) {
                     if (!votesByCardId[cardId]) { votesByCardId[cardId] = []; }
                     votesByCardId[cardId].push(vote.userInfo);
                 }

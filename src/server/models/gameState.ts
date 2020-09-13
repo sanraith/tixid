@@ -33,6 +33,7 @@ export enum RoundPointReason {
     nobodyGuessedRight = "nobody guessing right",
 
     guessedRight = "guessing right",
+    guessedRightWithOneVote = "guessing right using only 1 vote",
     guessedRightWithMultiVotes = "guessing right with multiple votes",
     somebodyGuessedRight = "somebody guessing their card",
 

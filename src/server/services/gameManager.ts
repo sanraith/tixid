@@ -286,7 +286,9 @@ export default class GameManager {
                 .forEach(vote => points.push({
                     userInfo: vote.userInfo,
                     points: vote.cards.length == 1 ? rewardedPoints : rewardedPointsForMultiVote,
-                    reason: vote.cards.length == 1 ? RoundPointReason.guessedRight : RoundPointReason.guessedRightWithMultiVotes
+                    reason: vote.cards.length == 1
+                        ? (state.rules.maxVoteCount > 1 ? RoundPointReason.guessedRightWithOneVote : RoundPointReason.guessedRight)
+                        : RoundPointReason.guessedRightWithMultiVotes
                 }));
         }
 
