@@ -57,7 +57,7 @@
     },
     "devDependencies": {
         "@angular-devkit/build-angular": "^0.1000.8",
-        "@angular/cli": "^10.1.0",
+        "@angular/cli": "^11.0.2",
         "@angular/compiler-cli": "^10.0.5",
         "@types/cookie": "^0.4.0",
         "@types/cookie-parser": "^1.4.2",
