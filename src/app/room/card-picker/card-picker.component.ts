@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, HostListener } from '@angular/core';
 
 @Component({
     selector: 'app-card-picker',
@@ -82,5 +82,23 @@ export class CardPickerComponent implements OnInit {
     onWheelEvent(scrollEventArgs: { preventDefault: () => void, deltaY: number }) {
         scrollEventArgs.preventDefault();
         this.changeDisplayedCard(scrollEventArgs.deltaY > 0 ? 1 : -1);
+    }
+
+    @HostListener('window:keyup', ['$event'])
+    onKeyEvent(keyEventArgs: KeyboardEvent): void {
+        if (!this.displayedCard) {
+            return;
+        }
+
+        switch (keyEventArgs.key) {
+            case "ArrowLeft":
+                keyEventArgs.preventDefault();
+                this.changeDisplayedCard(-1);
+                break;
+            case "ArrowRight":
+                keyEventArgs.preventDefault();
+                this.changeDisplayedCard(1);
+                break;
+        }
     }
 }

@@ -50,6 +50,7 @@ class RoomManager {
         if (room.players.length === 0) {
             // Delete room after some time if no players rejoin
             // TODO refine this to cancel timeout after someone rejoins
+            debug(`Delete room in 60 sec: ${room.id}`);
             setTimeout(() => {
                 if (room.players.length === 0) { this.deleteRoom(room); }
             }, 60000);
@@ -58,6 +59,7 @@ class RoomManager {
         socketManager.emitPlayersChanged(room);
 
         debug(`Client ${leftPlayer.name} left room ${room.id}`);
+        debug(`Remaining: ${room.players.length}`);
     }
 
     deleteRoom(room: Room) {
