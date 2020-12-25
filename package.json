@@ -45,7 +45,7 @@
         "debug": "^4.3.1",
         "express": "^4.17.1",
         "morgan": "^1.10.0",
-        "ngx-cookie-service": "^11.0.0",
+        "ngx-cookie-service": "^11.0.2",
         "ngx-socket-io": "^3.0.1",
         "rxjs": "^6.6.3",
         "shortid": "^2.2.16",
