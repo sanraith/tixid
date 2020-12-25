@@ -1,7 +1,7 @@
 <h2>Welcome! </h2>
 <p>
     <span style="font-style: italic;">Tixid</span> is an online multiplayer card guessing game, based on Dixit.<br />
-    Create a room, or join one of the available rooms!
+    Create a room, or join one of the available rooms using a link or QR code!
 </p>
 <div class="section">
     <h3>Create a room!</h3>
@@ -18,10 +18,4 @@
     <hr>
     <label>User nickname:</label>
     <input [(ngModel)]="userName" type="text" placeholder="Player" (input)="onUserNameInput()" />
-</div>
-
-<br />
-
-<div class="section">
-    <app-room-list></app-room-list>
 </div>
