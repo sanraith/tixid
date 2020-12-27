@@ -99,6 +99,15 @@ export class CardPickerComponent implements OnInit {
                 keyEventArgs.preventDefault();
                 this.changeDisplayedCard(1);
                 break;
+            case "Escape":
+                keyEventArgs.preventDefault();
+                this.displayedCard = null;
+                break;
+            case "Enter":
+            case " ":
+                keyEventArgs.preventDefault;
+                this.selectCard(this.displayedCard, !this.selectedCards.includes(this.displayedCard));
+                break;
         }
     }
 }

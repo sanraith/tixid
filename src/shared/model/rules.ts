@@ -24,7 +24,7 @@ export function getDefaultRules(): Rules {
         maxExtendCardCount: 1,
         maxVoteCount: 1,
 
-        onlyOwnerCanStart: false,
+        onlyOwnerCanStart: true,
         invalidStateChanges: true,
 
         pointsSomebodyGuessedRight: 3,
