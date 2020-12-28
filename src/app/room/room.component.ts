@@ -17,6 +17,7 @@ import { PublicUserInfo } from 'src/shared/model/publicUserInfo';
 import { FinalResultsComponent } from './final-results/final-results.component';
 import { PreJoinComponent } from './pre-join/pre-join.component';
 import { AudioService, SoundEffect } from '../services/audio.service';
+import { RoundPointReason } from 'src/server/models/gameState';
 
 @Component({
     selector: 'app-room',
@@ -141,12 +142,26 @@ export class RoomComponent implements OnInit {
                 this.audioService.play(SoundEffect.PlaceCard);
             }
 
-            // Play right/wrong sound imn the voteStoryResults step.
+            // Play right/wrong sound in the voteStoryResults step.
             if (currentGameState?.step !== GameStep.voteStoryResults && newState?.step === GameStep.voteStoryResults) {
-                if (this.room.currentUser.id === newState?.storyTeller.id || this.room.localState.myVotedCardIds.includes(newState.storyCardId)) {
-                    this.audioService.play(SoundEffect.GuessedRight);
+                if (this.room.currentUser.id === newState?.storyTeller.id) {
+                    const somebodyGuessedRight = newState.votePoints
+                        .filter(x => x.userInfo.id === this.room.currentUser.id)
+                        .some(x => x.reason === RoundPointReason.somebodyGuessedRight);
+                    if (somebodyGuessedRight) {
+                        this.audioService.play(SoundEffect.GuessedRight);
+                    } else {
+                        this.audioService.play(SoundEffect.GuessedWrong);
+                    }
                 } else {
-                    this.audioService.play(SoundEffect.GuessedWrong);
+                    const guessedRightOrNobodyGuessedRight = newState.votePoints
+                        .filter(x => x.userInfo.id === this.room.currentUser.id)
+                        .some(x => x.reason === RoundPointReason.guessedRight || x.reason === RoundPointReason.nobodyGuessedRight);
+                    if (guessedRightOrNobodyGuessedRight) {
+                        this.audioService.play(SoundEffect.GuessedRight);
+                    } else {
+                        this.audioService.play(SoundEffect.GuessedWrong);
+                    }
                 }
             }
 
