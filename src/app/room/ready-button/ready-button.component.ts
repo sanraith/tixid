@@ -3,53 +3,53 @@ import { Socket } from 'ngx-socket-io';
 import { ClientActions, EmitResponse } from 'src/shared/socket';
 
 @Component({
-  selector: 'app-ready-button',
-  template: `
+    selector: 'app-ready-button',
+    template: `
     <button class="bigButton" [disabled]="!isEnabled || readyCompleted" (click)="indicateReady()">Ready</button>
     <button class="bigButton" [class.hidden]="!allowForce || isEnabled || pendingAction || waitingForTimeout" (click)="forceReady()">
       Force everyone to ready
     </button>
   `,
-  styleUrls: ['./ready-button.component.sass']
+    styleUrls: ['./ready-button.component.sass']
 })
 export class ReadyButtonComponent implements OnInit {
-  @Input() isEnabled: boolean = true;
-  @Input() allowForce: boolean = false;
+    @Input() isEnabled: boolean = true;
+    @Input() allowForce: boolean = false;
 
-  pendingAction: boolean = false;
-  readyCompleted: boolean = false;
-  waitingForTimeout: boolean = true;
+    pendingAction: boolean = false;
+    readyCompleted: boolean = false;
+    waitingForTimeout: boolean = true;
 
-  constructor(private roomSocket: Socket) { }
+    constructor(private roomSocket: Socket) { }
 
-  ngOnInit(): void {
-    this.waitTimeout();
-  }
-
-  indicateReady() {
-    this.emitAction(ClientActions.indicateReady);
-  }
-
-  forceReady() {
-    if (confirm("Are you sure you want to force everybody else to be ready?")) {
-      this.emitAction(ClientActions.forceReady);
+    ngOnInit(): void {
+        this.waitTimeout();
     }
-  }
 
-  private emitAction(action: ClientActions) {
-    this.pendingAction = true;
-    this.roomSocket.emit(action, null, (resp: EmitResponse) => {
-      if (!resp.success) {
-        alert(resp.message);
-        this.isEnabled = true;
-      }
-      this.pendingAction = false;
-      this.waitTimeout();
-    });
-  }
+    indicateReady() {
+        this.emitAction(ClientActions.indicateReady);
+    }
 
-  private waitTimeout() {
-    this.waitingForTimeout = true;
-    setTimeout(() => this.waitingForTimeout = false, 5000);
-  }
+    forceReady() {
+        if (confirm("Are you sure you want to force everybody else to be ready?")) {
+            this.emitAction(ClientActions.forceReady);
+        }
+    }
+
+    private emitAction(action: ClientActions) {
+        this.pendingAction = true;
+        this.roomSocket.emit(action, null, (resp: EmitResponse) => {
+            if (!resp.success) {
+                alert(resp.message);
+                this.isEnabled = true;
+            }
+            this.pendingAction = false;
+            this.waitTimeout();
+        });
+    }
+
+    private waitTimeout() {
+        this.waitingForTimeout = true;
+        setTimeout(() => this.waitingForTimeout = false, 5000);
+    }
 }

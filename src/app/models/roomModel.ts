@@ -17,9 +17,14 @@ export default class RoomModel {
     name?: string;
     currentUser: ClientUser;
     socket: Socket;
+    isSpectator: boolean;
 
     owner: PublicUserInfo;
     players: PublicUserInfo[] = [];
+    get spectators(): PublicUserInfo[] {
+        const playerStateIds = this.playerStates.map(ps => ps.userInfo.id);
+        return this.players.filter(p => !playerStateIds.includes(p.id));
+    };
 
     playerStates: PublicPlayerState[] = [];
     myState?: PrivatePlayerState;

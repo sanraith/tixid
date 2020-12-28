@@ -1,7 +1,8 @@
 <h2>Final results</h2>
 
 <table>
-    <tr *ngFor="let player of results; index as index" [style.font-size.px]="index<3?20+(3-index)*5:20">
+    <tr *ngFor="let player of results; index as index"
+        [style.font-size.px]="player.place < 4 ? 20 + (4 - player.place) * 5 : 20">
         <td>{{player.place}}.</td>
         <td style="padding-left: 20px; padding-right: 20px;">{{player.userInfo.name}}</td>
         <td>{{player.points}}p</td>
@@ -10,4 +11,6 @@
 
 <br />
 
-<app-ready-button [isEnabled]="!room.myState.isReady"></app-ready-button>
+<app-ready-button *ngIf="!room.isSpectator" [isEnabled]="!room.myState.isReady"
+    [allowForce]="this.room.owner.id === this.room.currentUser.id">
+</app-ready-button>

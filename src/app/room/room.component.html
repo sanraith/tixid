@@ -1,31 +1,49 @@
-<h2>Room: {{room.name || room.id}}</h2>
+<h2>
+    Room: {{room.name || room.id}}
+    <span *ngIf="room.isSpectator" style="color: red;">(SPECTATOR MODE)</span>
+</h2>
 
 <div class="playerList" *ngIf="this.room.players.length > 0">
     <h2 class="title">Players</h2>
-    <ul
+    <div style="width: 100%;"
         *ngIf="this.room.gameState && this.room.gameState.step !== types.GameStep.lobby && room.playerStates.length > 0; else statelessPlayers">
-        <li *ngFor="let playerState of room.playerStates">
-            <div class="pName">
-                {{playerState.isReady ? '✔' : '⏳'}}
 
-                {{playerState.isConnected ? '' : '⚠'}}
-                <a class="hoverButton" nohref
-                    *ngIf="!playerState.isConnected && room.owner.id === playerState.userInfo.id"
-                    style="cursor: pointer" (click)="takeOwnership()">👑</a>
+        <!-- Players -->
+        <ul>
+            <li *ngFor="let playerState of room.playerStates">
+                <div class="pName">
+                    {{playerState.isReady ? '✔' : '⏳'}}
 
-                {{room.gameState.storyTeller.id === playerState.userInfo.id ? '📖' : ''}}
+                    {{playerState.isConnected ? '' : '⚠'}}
+                    <a class="hoverButton" nohref
+                        *ngIf="!playerState.isConnected && room.owner.id === playerState.userInfo.id"
+                        style="cursor: pointer" (click)="takeOwnership()">👑</a>
 
-                <a class="hoverButton" nohref
-                    *ngIf="room.currentUser.id === room.owner.id && playerState.userInfo.id !== room.currentUser.id"
-                    style="cursor: pointer" (click)="kick(playerState.userInfo)">🦶</a>
+                    {{room.gameState.storyTeller.id === playerState.userInfo.id ? '📖' : ''}}
 
-                {{playerState.userInfo.name}}:&nbsp;
-            </div>
-            <div class="pPoints">
-                {{playerState.points}} p
-            </div>
-        </li>
-    </ul>
+                    <a class="hoverButton" nohref
+                        *ngIf="room.currentUser.id === room.owner.id && playerState.userInfo.id !== room.currentUser.id"
+                        style="cursor: pointer" (click)="kick(playerState.userInfo)">🦶</a>
+
+                    {{playerState.userInfo.name}}:&nbsp;
+                </div>
+                <div class="pPoints">
+                    {{playerState.points}} p
+                </div>
+            </li>
+        </ul>
+
+        <!-- Spectators -->
+        <div *ngIf="room.spectators.length > 0" style="width: 100%;">
+            <h2 class="title">Spectators</h2>
+            <ul>
+                <li *ngFor="let spectator of room.spectators">
+                    <div class="pName">{{spectator.name}}</div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
     <ng-template #statelessPlayers>
         <ul>
             <li *ngFor="let playerState of room.players">

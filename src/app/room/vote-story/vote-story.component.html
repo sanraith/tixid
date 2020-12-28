@@ -1,7 +1,10 @@
 <h2>Voting</h2>
 <app-story-title [room]="room"></app-story-title>
-<div
-    *ngIf="room.gameState.storyTeller.id !== room.currentUser.id && room.localState.myVotedCardIds.length === 0 && !alreadyVoted; else waitingBlock">
+<div *ngIf="!room.isSpectator &&
+           room.gameState.storyTeller.id !== room.currentUser.id &&
+           room.localState.myVotedCardIds.length === 0 &&
+           !alreadyVoted;
+           else waitingBlock">
     <p>
     </p>
 

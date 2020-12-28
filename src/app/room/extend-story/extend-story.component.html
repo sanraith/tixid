@@ -9,8 +9,11 @@
 </div>
 
 <!-- Player is NOT the story teller -->
-<div
-    *ngIf="room.gameState.storyTeller.id !== room.currentUser.id && room.localState.mySubmittedCardIds.length === 0 && !alreadySubmittedCard; else: waitingBlock">
+<div *ngIf="!room.isSpectator &&
+           room.gameState.storyTeller.id !== room.currentUser.id &&
+           room.localState.mySubmittedCardIds.length === 0 &&
+           !alreadySubmittedCard;
+           else: waitingBlock">
     <p>Pick a card from your hand which you think is fit for the story.</p>
 
     <app-card-picker [cards]="room.myState.hand" [(selectedCards)]="extendCards"
