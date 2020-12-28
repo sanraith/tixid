@@ -14,6 +14,7 @@ import PickedCard from 'src/shared/model/pickedCard';
 import roomManager from './roomManager';
 import shortid from 'shortid';
 const debug = Debug('tixid:services:socketManager');
+const socketTableDebug = Debug('tixidv:socketTable');
 const errorDebug = Debug('tixid:services:socketManager:ERROR');
 
 type ErrorHandler = (action: () => void) => void;
@@ -45,7 +46,10 @@ class SocketManager {
             playerSockets.push(playerSocket);
             debug(`Client ${userInfo.name} #${playerSockets.length - 1} connected: ${socket.client.id}`);
 
-            const errorHandler: ErrorHandler = action => this.handlePlayerSocketError(playerSocket, action);
+            const errorHandler: ErrorHandler = action => {
+                this.handlePlayerSocketError(playerSocket, action);
+                this.logSocketRoomTable();
+            }
 
             socket.on(SocketEvents.disconnect, () => {
                 errorHandler(() => {
@@ -62,7 +66,7 @@ class SocketManager {
                     debug(`Disconnecting player ${userInfo.name} socket ${socket.client.id}. ${playerSockets.length} connections remain.`);
                     playerSocket.socket.removeAllListeners();
                     playerSockets.splice(index, 1);
-                    if (playerSockets.length === 0) {
+                    if (playerSockets.filter(x => x.room === playerSocket.room).length === 0) {
                         playerSocket.markPlayerAsDisconnected();
                         playerSocket.leaveRoom();
                         delete this.playerSockets[userInfo.id];
@@ -108,6 +112,7 @@ class SocketManager {
         });
 
         this.io = io;
+        this.logSocketRoomTable();
     }
 
     emitPlayersChanged(room: Room) {
@@ -135,7 +140,7 @@ class SocketManager {
 
         const recipients = recipient ? [recipient] : room.players;
         for (const targetPlayer of recipients) {
-            const targetSockets = this.playerSockets[targetPlayer.id];
+            const targetSockets = this.getTargetSockets(room, targetPlayer);
             if (!targetSockets?.length) { debug(`Cannot reach player ${targetPlayer.name}`); continue; }
 
             for (const targetSocket of targetSockets) {
@@ -176,7 +181,7 @@ class SocketManager {
 
         const recipients = recipient ? [recipient] : room.players;
         for (const targetPlayer of recipients) {
-            const targetSockets = this.playerSockets[targetPlayer.id];
+            const targetSockets = this.getTargetSockets(room, targetPlayer);
             if (!targetSockets?.length) { debug(`Cannot reach player ${targetPlayer.name}`); continue; }
 
             for (const targetSocket of targetSockets) {
@@ -205,7 +210,7 @@ class SocketManager {
     }
 
     emitKickedFromRoom(room: Room, targetPlayer: UserInfo, reason: string) {
-        const targetSockets = this.playerSockets[targetPlayer.id];
+        const targetSockets = this.getTargetSockets(room, targetPlayer);
         if (!targetSockets?.length) { debug(`Cannot reach player ${targetPlayer.name}`); return; }
 
         for (let targetSocket of targetSockets) {
@@ -228,32 +233,35 @@ class SocketManager {
             errorDebug(`${errorId}:`, error);
 
             if (playerSocket.room) {
-                const players = playerSocket.room.players;
-                for (let player of players) {
+                const room = playerSocket.room;
+                const roomPlayers = playerSocket.room.players;
+                for (let player of roomPlayers) {
                     this.emitKickedFromRoom(playerSocket.room, player, `Game server error. Id: ${errorId}`);
                 }
                 roomManager.deleteRoom(playerSocket.room);
 
-                // TODO this have to be changed as if players can be part of multiple rooms
-                for (let player of players) {
-                    this.disconnectAllSocketsFor(player);
+                const socketsToDisconnect = roomPlayers
+                    .map(x => this.getTargetSockets(room, x))
+                    .reduce((a, x) => { a.push(...x); return a; }, []);
+                for (let socketToDisconnect of socketsToDisconnect) {
+                    this.disconnectPlayerSocket(socketToDisconnect);
                 }
             } else {
-                this.disconnectAllSocketsFor(playerSocket.userInfo);
+                this.disconnectPlayerSocket(playerSocket);
             }
 
             errorDebug(`${errorId} cleanup finished.`);
         }
     }
 
-    private disconnectAllSocketsFor(player: UserInfo) {
-        const sockets = this.playerSockets[player.id];
-        for (let socket of sockets ?? []) {
-            socket.markPlayerAsDisconnected();
-            socket.socket.disconnect();
-            socket.socket.removeAllListeners();
+    private disconnectPlayerSocket(socket: PlayerSocket) {
+        socket.markPlayerAsDisconnected();
+        socket.socket.disconnect();
+        socket.socket.removeAllListeners();
+
+        if (!this.playerSockets[socket.userInfo.id]?.length) {
+            delete this.playerSockets[socket.userInfo.id];
         }
-        delete this.playerSockets[player.id];
     }
 
     private getUserFromSocketCookies(cookies: any): UserInfo | undefined {
@@ -264,10 +272,46 @@ class SocketManager {
         return userManager.getUserFromCookies(userCookies);
     }
 
+    private getTargetSockets(room: Room, player: UserInfo): PlayerSocket[] {
+        const availableSockets = this.playerSockets[player.id];
+        if (!availableSockets) {
+            debug(`No target socket is found for user ${player.name} - ${player.id}`);
+            return [];
+        }
+
+        return availableSockets.filter(x => x.room === room);
+    }
+
     private callbackMaybe(value: EmitResponse, callback: ((resp: EmitResponse) => void) | undefined) {
         if (callback) {
             callback(value);
         }
+    }
+
+    private logSocketRoomTable() {
+        if (!Debug.enabled('tixidv:socketTable') || Object.keys(this.playerSockets).length === 0) { return; }
+
+        const hSeparator = '|';
+        const cSeparator = '+';
+        const vSeparator = '-';
+        const cornerText = 'SCKT\\ROOM';
+        const playerNames = Object.keys(this.playerSockets).map(x => userManager.getUserByPrivateId(x).name);
+        const playerColumnWidth = [...playerNames, cornerText].reduce((a, x) => x.length > a ? x.length : a, 0);
+
+        let tableText = cornerText.padStart(playerColumnWidth, ' ') + hSeparator +
+            roomManager.getRooms().map(x => x.name).join(hSeparator);
+        tableText += '\n' + ''.padStart(playerColumnWidth, vSeparator) + cSeparator +
+            roomManager.getRooms().map(x => x.name.length).map(x => ''.padStart(x, vSeparator)).join(cSeparator);
+
+        for (let player in this.playerSockets) {
+            const roomParts = roomManager.getRooms()
+                .map(room => ({ room, isJoined: this.playerSockets[player].filter(ps => ps.room === room).length }))
+                .map(x => (x.isJoined ? `${x.isJoined}${x.room.state.players.some(x => x.userInfo.id === player) ? 'P' : 'S'}` : ' ')
+                    .padStart(x.room.name.length, ' '))
+                .join(hSeparator);
+            tableText += '\n' + userManager.getUserByPrivateId(player).name.padStart(playerColumnWidth, ' ') + hSeparator + roomParts;
+        }
+        socketTableDebug(tableText);
     }
 
     private io!: Server;

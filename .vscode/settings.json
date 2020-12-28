@@ -12,8 +12,10 @@
         "**/lib/**"
     ],
     "cSpell.words": [
+        "SCKT",
         "devb",
         "tixid",
+        "tixidv",
         "ttsc",
         "ttypescript",
         "uuidv"

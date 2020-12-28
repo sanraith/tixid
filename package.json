@@ -4,7 +4,7 @@
     "description": "Tixid is an online multiplayer card quessing game.",
     "main": "dist/start.js",
     "scripts": {
-        "dev": "SET DEBUG=tixid:* && nodemon --config \"./util/nodemon.json\"",
+        "dev": "SET DEBUG=tixid:*,tixidv:* && nodemon --config \"./util/nodemon.json\"",
         "dev2": "ng build --watch",
         "localBuild": "node util/build.js",
         "start": "node dist/server/start.js",
