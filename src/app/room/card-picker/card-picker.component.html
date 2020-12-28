@@ -4,14 +4,19 @@
             isSelected: selectedCards.includes(card)
         } as c">
         <label>
-            <input class="hidden" type="checkbox" id="{{card}}" name="card" [value]="card" [(ngModel)]="c.isSelected"
-                [disabled]="!isEnabled || c.isBlocked" (change)="selectCard(card, $event.target.checked)" />
-
-            <img src="card/{{card}}" (dblclick)="displayCard(card)" [class.blocked]="c.isBlocked"
-                [style.height.vh]="imageHeightVh" [class.selectable]="isEnabled && !c.isBlocked">
+            <div [style.height.vh]="imageHeightVh" [style.minWidth.vh]="imageHeightVh * .665">
+                <img *ngIf="!loadedCards.has(card)" src="assets/loading-cardback.jpg" [style.height.vh]="imageHeightVh"
+                    style="position: absolute; top:0; left:0;">
+                <input class="hidden" type="checkbox" id="{{card}}" name="card" [value]="card"
+                    [(ngModel)]="c.isSelected" [disabled]="!isEnabled || c.isBlocked"
+                    (change)="selectCard(card, $event.target.checked)" />
+                <img src="card/{{card}}" (dblclick)="displayCard(card)" [class.blocked]="c.isBlocked"
+                    [style.height.vh]="imageHeightVh" [class.selectable]="isEnabled && !c.isBlocked"
+                    (load)="loadedCards.add(card)" style="position: relative; top:0; left:0;">
+            </div>
         </label>
-        <img *ngIf="isOverlayIconEnabled" class="overlay-icon" src="assets/maximize.png" (click)="displayCard(card)"
-            [style.height.vh]="imageHeightVh / 6">
+        <img *ngIf="isOverlayIconEnabled && loadedCards.has(card)" class="overlay-icon" src="assets/maximize.png"
+            (click)="displayCard(card)" [style.height.vh]="imageHeightVh / 6">
     </ng-container>
 </div>
 

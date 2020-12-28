@@ -23,6 +23,7 @@ export class CardPickerComponent implements OnInit {
     @Input() imageHeightVh: number = 20;
 
     displayedCard: string;
+    loadedCards = new Set<string>();
 
     ngOnInit(): void {
         if (this.selectedCard) {
