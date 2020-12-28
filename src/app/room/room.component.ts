@@ -186,6 +186,7 @@ export class RoomComponent implements OnInit {
         const gameState = this.room.gameState;
         const localState = this.room.localState;
         this.room.isSpectator = this.room.gameState.step !== GameStep.lobby &&
+            this.room.playerStates.length > 0 &&
             !this.room.playerStates.some(x => x.userInfo.id === this.room.currentUser.id);
 
         if (gameState.storyCardPile) {
