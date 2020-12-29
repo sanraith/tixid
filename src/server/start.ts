@@ -2,8 +2,14 @@
 
 import * as appInsights from 'applicationinsights';
 const appInsightsKey = process.env.APPINSIGHTS_INSTRUMENTATIONKEY;
+const appInsightsSendLiveMetrics = process.env.APPINSIGHTS_SENDLIVEMETRICS;
+
 if (appInsightsKey) {
-    appInsights.setup(appInsightsKey).start();
+    let insightsConfig = appInsights.setup(appInsightsKey);
+    if (appInsightsSendLiveMetrics) {
+        insightsConfig = insightsConfig.setSendLiveMetrics(true);
+    }
+    insightsConfig.start();
 }
 
 import expressServer from './server';
