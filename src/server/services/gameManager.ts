@@ -231,24 +231,26 @@ export default class GameManager {
 
     kickPlayer(kickedUserInfo: UserInfo): TransitionResult {
         const state = this.state;
-        const kickedPlayerIndex = state.players.findIndex(x => x.userInfo === kickedUserInfo);
-        if (kickedPlayerIndex < 0) {
-            return this.errorResult("Kicked player is not currently playing in the room!");
+        const kickedPlayerStateIndex = state.players.findIndex(x => x.userInfo === kickedUserInfo);
+        if (kickedPlayerStateIndex >= 0) {
+            // Change the story teller to the previous player if the kicked player is the story teller.
+            // Doing so will correctly advance the storyteller to the next available player.
+            if (state.storyTeller?.userInfo === kickedUserInfo) {
+                state.storyTeller = state.players[(kickedPlayerStateIndex + state.players.length - 1) % state.players.length];
+            }
+
+            // Remove the kicked player from the list of players.
+            state.players.splice(kickedPlayerStateIndex, 1);
+            socketManager.emitPlayerStateChanged(this.room, state.players, undefined, true);
         }
+        socketManager.emitKickedFromRoom(this.room, kickedUserInfo, "Game owner kicked you from the room.");
 
-        // Change the story teller to the previous player if the kicked player is the story teller.
-        // Doing so will correctly advance the storyteller to the next available player.
-        if (state.storyTeller?.userInfo === kickedUserInfo) {
-            state.storyTeller = state.players[(kickedPlayerIndex + state.players.length - 1) % state.players.length];
+        if (state.step !== GameStep.lobby) {
+            // Start a new round with the remaining players.
+            return this.startRound();
+        } else {
+            return { success: true };
         }
-
-        // Remove the kicked player from the list of players.
-        state.players.splice(kickedPlayerIndex, 1);
-        socketManager.emitKickedFromRoom(this.room, kickedUserInfo, "Game owner kicked player from the room.");
-        socketManager.emitPlayerStateChanged(this.room, state.players, undefined, true);
-
-        // Start a new round with the remaining players.
-        return this.startRound();
     }
 
     private scoreVotes() {

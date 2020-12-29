@@ -63,13 +63,17 @@ class SocketManager {
                         debug(`Disconnecting ${socket.id}, but cannot find saved socket for player ${userInfo.name}!`);
                     }
 
-                    debug(`Disconnecting player ${userInfo.name} socket ${socket.client.id}. ${playerSockets.length} connections remain.`);
                     playerSocket.socket.removeAllListeners();
                     playerSockets.splice(index, 1);
-                    if (playerSockets.filter(x => x.room === playerSocket.room).length === 0) {
+                    debug(`Disconnecting player ${userInfo.name} socket ${socket.client.id}. ${playerSockets.length} connections remain.`);
+
+                    const areThereRemainingSocketsForTheSameRoom = playerSockets.filter(x => x.room === playerSocket.room).length > 0;
+                    if (!areThereRemainingSocketsForTheSameRoom) {
                         playerSocket.markPlayerAsDisconnected();
                         playerSocket.leaveRoom();
-                        delete this.playerSockets[userInfo.id];
+                        if (this.playerSockets[userInfo.id].length === 0) {
+                            delete this.playerSockets[userInfo.id];
+                        }
                     }
                 })
             });
@@ -218,11 +222,16 @@ class SocketManager {
                 roomId: room.id,
                 reason: reason
             });
+            this.disconnectPlayerSocket(targetSocket);
         }
     }
 
     getRoomChannel(roomId: string): SocketIo.Namespace {
         return this.io.to(`room_${roomId}`);
+    }
+
+    _getSocketsForDebug() {
+        return this.playerSockets;
     }
 
     private handlePlayerSocketError(playerSocket: PlayerSocket, action: () => void) {

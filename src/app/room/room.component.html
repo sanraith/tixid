@@ -47,7 +47,13 @@
     <ng-template #statelessPlayers>
         <ul>
             <li *ngFor="let playerState of room.players">
-                <div class="pName">{{playerState.name}}</div>
+                <div class="pName">
+                    <a class="hoverButton" nohref
+                        *ngIf="room.currentUser.id === room.owner.id && playerState.id !== room.currentUser.id"
+                        style="cursor: pointer" (click)="kick(playerState)">🦶</a>
+
+                    {{playerState.name}}
+                </div>
             </li>
         </ul>
     </ng-template>

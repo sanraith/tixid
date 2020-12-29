@@ -154,9 +154,16 @@ export class RoomComponent implements OnInit {
                         this.audioService.play(SoundEffect.GuessedWrong);
                     }
                 } else {
+                    const favoredReasons = new Set<RoundPointReason>([
+                        RoundPointReason.guessedRight,
+                        RoundPointReason.guessedRightWithOneVote,
+                        RoundPointReason.guessedRightWithMultiVotes,
+                        RoundPointReason.everybodyGuessedRight,
+                        RoundPointReason.nobodyGuessedRight]);
                     const guessedRightOrNobodyGuessedRight = newState.votePoints
                         .filter(x => x.userInfo.id === this.room.currentUser.id)
-                        .some(x => x.reason === RoundPointReason.guessedRight || x.reason === RoundPointReason.nobodyGuessedRight);
+                        .some(x => favoredReasons.has(x.reason));
+
                     if (guessedRightOrNobodyGuessedRight) {
                         this.audioService.play(SoundEffect.GuessedRight);
                     } else {
@@ -237,7 +244,6 @@ export class RoomComponent implements OnInit {
 
     private leave(): void {
         console.log("Leaving...");
-        this.roomSocket.emit(ClientActions.leaveRooms, null, (resp: EmitResponse) => { });
         this.roomSocket.removeAllListeners();
         this.roomSocket.disconnect();
     }
