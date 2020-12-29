@@ -1,5 +1,11 @@
 #!/usr/bin/env node
 
+import * as appInsights from 'applicationinsights';
+const appInsightsKey = process.env.APPINSIGHTS_INSTRUMENTATIONKEY;
+if (appInsightsKey) {
+    appInsights.setup(appInsightsKey).start();
+}
+
 import expressServer from './server';
 import http from 'http';
 import Debug from 'debug';

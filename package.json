@@ -39,6 +39,7 @@
         "@angular/platform-browser-dynamic": "~11.0.5",
         "@angular/router": "~11.0.5",
         "angularx-qrcode": "^10.0.10",
+        "applicationinsights": "^1.8.8",
         "assert-never": "^1.2.1",
         "cookie": "^0.4.1",
         "cookie-parser": "^1.4.5",
