@@ -6,5 +6,6 @@ export default interface Room {
     name: string,
     owner: UserInfo,
     players: UserInfo[],
-    state: GameState
+    state: GameState,
+    lastInteraction: Date
 }

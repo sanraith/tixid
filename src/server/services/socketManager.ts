@@ -46,13 +46,16 @@ class SocketManager {
             playerSockets.push(playerSocket);
             debug(`Client ${userInfo.name} #${playerSockets.length - 1} connected: ${socket.client.id}`);
 
-            const errorHandler: ErrorHandler = action => {
+            const handleErrorAndLog: ErrorHandler = action => {
                 this.handlePlayerSocketError(playerSocket, action);
+                if (playerSocket.room) {
+                    roomManager.interact(playerSocket.room);
+                }
                 this.logSocketRoomTable();
             }
 
             socket.on(SocketEvents.disconnect, () => {
-                errorHandler(() => {
+                handleErrorAndLog(() => {
                     if (!this.playerSockets[userInfo.id]) {
                         debug(`Disconnecting ${socket.id}, but cannot find any saved sockets for player ${userInfo.name}!`);
                     }
@@ -78,40 +81,40 @@ class SocketManager {
                 })
             });
             socket.on(ClientActions.joinRoom, (data: JoinRoomData, callback?: (resp: JoinRoomResponse) => void) => {
-                errorHandler(() => this.callbackMaybe(playerSocket.joinRoom(data), callback));
+                handleErrorAndLog(() => this.callbackMaybe(playerSocket.joinRoom(data), callback));
             });
             socket.on(ClientActions.leaveRooms, (data: JoinRoomData, callback?: (resp: EmitResponse) => void) => {
-                errorHandler(() => this.callbackMaybe(playerSocket.leaveRoom(), callback));
+                handleErrorAndLog(() => this.callbackMaybe(playerSocket.leaveRoom(), callback));
             });
             socket.on(ClientActions.startGame, (data: StartGameData | undefined, callback?: (resp: EmitResponse) => void) => {
-                errorHandler(() => this.callbackMaybe(playerSocket.startGame(data), callback));
+                handleErrorAndLog(() => this.callbackMaybe(playerSocket.startGame(data), callback));
             });
             socket.on(ClientActions.makeStory, (data: MakeStoryData, callback?: (resp: EmitResponse) => void) => {
-                errorHandler(() => this.callbackMaybe(playerSocket.makeStory(data), callback));
+                handleErrorAndLog(() => this.callbackMaybe(playerSocket.makeStory(data), callback));
             });
             socket.on(ClientActions.extendStory, (data: ExtendStoryData, callback?: (resp: EmitResponse) => void) => {
-                errorHandler(() => this.callbackMaybe(playerSocket.extendStory(data), callback));
+                handleErrorAndLog(() => this.callbackMaybe(playerSocket.extendStory(data), callback));
             });
             socket.on(ClientActions.voteStory, (data: VoteStoryData, callback?: (resp: EmitResponse) => void) => {
-                errorHandler(() => this.callbackMaybe(playerSocket.voteStory(data), callback));
+                handleErrorAndLog(() => this.callbackMaybe(playerSocket.voteStory(data), callback));
             });
             socket.on(ClientActions.startRound, (data: any, callback?: (resp: EmitResponse) => void) => {
-                errorHandler(() => this.callbackMaybe(playerSocket.startRound(), callback));
+                handleErrorAndLog(() => this.callbackMaybe(playerSocket.startRound(), callback));
             });
             socket.on(ClientActions.goToLobby, (data: any, callback?: (resp: EmitResponse) => void) => {
-                errorHandler(() => this.callbackMaybe(playerSocket.goToLobby(), callback));
+                handleErrorAndLog(() => this.callbackMaybe(playerSocket.goToLobby(), callback));
             });
             socket.on(ClientActions.indicateReady, (data: any, callback?: (resp: EmitResponse) => void) => {
-                errorHandler(() => this.callbackMaybe(playerSocket.indicateReady(), callback));
+                handleErrorAndLog(() => this.callbackMaybe(playerSocket.indicateReady(), callback));
             });
             socket.on(ClientActions.forceReady, (data: any, callback?: (resp: EmitResponse) => void) => {
-                errorHandler(() => this.callbackMaybe(playerSocket.forceReady(), callback));
+                handleErrorAndLog(() => this.callbackMaybe(playerSocket.forceReady(), callback));
             });
             socket.on(ClientActions.takeOwnership, (data: any, callback?: (resp: EmitResponse) => void) => {
-                errorHandler(() => this.callbackMaybe(playerSocket.takeOwnership(), callback));
+                handleErrorAndLog(() => this.callbackMaybe(playerSocket.takeOwnership(), callback));
             });
             socket.on(ClientActions.kickPlayer, (data: KickPlayerData, callback?: (resp: EmitResponse) => void) => {
-                errorHandler(() => this.callbackMaybe(playerSocket.kickPlayer(data), callback));
+                handleErrorAndLog(() => this.callbackMaybe(playerSocket.kickPlayer(data), callback));
             });
         });
 

@@ -3,11 +3,15 @@ import shortid from 'shortid';
 import Room from '../models/room';
 import UserInfo from '../models/userInfo';
 import socketManager from './socketManager';
-import { GameStep } from '../../shared/model/gameStep';
 import GameState from '../models/gameState';
+import dayjs from 'dayjs';
 const debug = Debug("tixid:services:roomManager");
 
 class RoomManager {
+    constructor() {
+        this.periodicallyRemoveInactiveRooms();
+    }
+
     createRoom(owner: UserInfo, name: string): Room {
         const newRoom: Room = {
             id: this._roomIdGenerator.generate(),
@@ -15,6 +19,7 @@ class RoomManager {
             owner: owner,
             players: [],
             state: new GameState(),
+            lastInteraction: new Date()
         };
         this._rooms[newRoom.id] = newRoom;
 
@@ -47,15 +52,6 @@ class RoomManager {
         if (existingUserIndex < 0) { return; }
 
         const leftPlayer = room.players.splice(existingUserIndex, 1)[0];
-        if (room.players.length === 0) {
-            // Delete room after some time if no players rejoin
-            // TODO refine this to cancel timeout after someone rejoins
-            debug(`Delete room in 60 sec: ${room.id}`);
-            setTimeout(() => {
-                if (room.players.length === 0) { this.deleteRoom(room); }
-            }, 60000);
-        }
-
         socketManager.emitPlayersChanged(room);
 
         debug(`Client ${leftPlayer.name} left room ${room.id}`);
@@ -67,7 +63,40 @@ class RoomManager {
         debug(`Room ${room.id} deleted.`);
     }
 
+    /** Updates the room's 'lastInteraction' field indicating that the room is active. */
+    interact(room: Room) {
+        room.lastInteraction = new Date();
+    }
+
+    private periodicallyRemoveInactiveRooms() {
+        const rooms = this.getRooms();
+        if (rooms.length > 0) {
+            debug(`Deleting rooms inactive for at least ${this.minInactiveMinutesToDeleteRoom} minutes. ` +
+                `Interval: every ${this.houseKeepingIntervalMs / 1000 / 60} minutes.`);
+
+            const now = dayjs();
+            for (let room of this.getRooms()) {
+                const diffMinutes = now.diff(dayjs(room.lastInteraction), 'minute');
+                if (diffMinutes < this.minInactiveMinutesToDeleteRoom) {
+                    continue;
+                }
+
+                debug(`Deleting room ${room.id} because it was inactive for ${diffMinutes} minutes.`);
+                for (let player of room.players) {
+                    socketManager.emitKickedFromRoom(room, player,
+                        `Room has been deleted because it has been inactive for at least ${this.minInactiveMinutesToDeleteRoom} minutes.`);
+                }
+                this.deleteRoom(room);
+            }
+        }
+
+        setTimeout(() => this.periodicallyRemoveInactiveRooms(), this.houseKeepingIntervalMs);
+    }
+
     _roomIdGenerator: { generate(): string } = shortid;
+
+    private houseKeepingIntervalMs = 15 * 60 * 1000; // Every 15 minutes
+    private minInactiveMinutesToDeleteRoom = 4 * 60; // 4 hours
     private _rooms: { [id: string]: Room } = {};
 }
 
