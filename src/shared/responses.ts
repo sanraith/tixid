@@ -1,30 +1,32 @@
 import { PublicUserInfo } from './model/publicUserInfo';
 
-export interface CreateRoomRequest{
-    name: string
+export interface CreateRoomRequest {
+    name: string;
 }
 
 export interface CreateRoomResponse {
-    id: string,
-    name: string
+    id: string;
+    name: string;
 }
 
 export interface GetRoomListResponse {
     rooms: {
-        id: string,
-        name: string,
-        owner: PublicUserInfo,
-        players: PublicUserInfo[]
-    }[]
+        id: string;
+        name: string;
+        owner: PublicUserInfo;
+        players: PublicUserInfo[];
+        creationDate: Date;
+        lastInteraction: Date;
+    }[];
 }
 
 export interface CardSetInfo {
-    id: string,
-    name: string,
-    cardCount: number,
-    cards: string[]
+    id: string;
+    name: string;
+    cardCount: number;
+    cards: string[];
 }
 
 export interface GetCardSetsResponse {
-    cardSets: CardSetInfo[]
+    cardSets: CardSetInfo[];
 }

@@ -20,11 +20,13 @@ router.get("/", (req, res) => {
                 id: r.id,
                 name: r.name,
                 owner: r.owner.publicInfo,
-                players: r.players.map(p => p.publicInfo)
+                players: r.players.map(p => p.publicInfo),
+                creationDate: r.creationDate,
+                lastInteraction: r.lastInteraction
             }))
         });
     });
-})
+});
 
 router.post("/create", (req, res) => {
     errorHandler(res, () => {
@@ -67,6 +69,6 @@ router.get("/debug/:secret", (req, res) => {
                 }))
         });
     });
-})
+});
 
 export default router;

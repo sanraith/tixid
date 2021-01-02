@@ -19,6 +19,7 @@ class RoomManager {
             owner: owner,
             players: [],
             state: new GameState(),
+            creationDate: new Date(),
             lastInteraction: new Date()
         };
         this._rooms[newRoom.id] = newRoom;
@@ -93,11 +94,11 @@ class RoomManager {
         setTimeout(() => this.periodicallyRemoveInactiveRooms(), this.houseKeepingIntervalMs);
     }
 
-    _roomIdGenerator: { generate(): string } = shortid;
+    _roomIdGenerator: { generate(): string; } = shortid;
 
     private houseKeepingIntervalMs = 15 * 60 * 1000; // Every 15 minutes
     private minInactiveMinutesToDeleteRoom = 4 * 60; // 4 hours
-    private _rooms: { [id: string]: Room } = {};
+    private _rooms: { [id: string]: Room; } = {};
 }
 
 export default new RoomManager();
