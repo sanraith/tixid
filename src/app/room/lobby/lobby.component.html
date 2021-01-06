@@ -15,7 +15,9 @@
             (click)="copyRoomAddressToClipboard(roomAddressInput, copyRoomAddressButton)">Copy</button>
         <span [hidden]="true">Copied!</span>
     </p>
-    <h2 *ngIf="room.players.length < 3; else enoughPlayersJoined">Waiting for more players to join...</h2>
+    <h2 *ngIf="room.players.length < 3; else enoughPlayersJoined">
+        Waiting for more players to join...
+    </h2>
     <ng-template #enoughPlayersJoined>
         <h2>Waiting for {{room.owner.name}} to start the game...</h2>
     </ng-template>
@@ -23,7 +25,14 @@
 
 <!-- Show room controls to owner -->
 <div *ngIf="room.currentUser.id === room.owner.id">
-    <button class="bigButton" (click)="startGame()">Start game</button>
+    <button class="bigButton" [disabled]="room.players.length < 3 && !overrideMinPlayers" (click)="startGame()">
+        <ng-container *ngIf="room.players.length < 3">
+            At least 3 players are needed to start the game. Waiting for {{3 - room.players.length}} more.
+        </ng-container>
+        <ng-container *ngIf="room.players.length >= 3">
+            Start the game with {{room.players.length}} players
+        </ng-container>
+    </button>
 
     <h3>Change the active card sets:</h3>
     <table *ngIf="sets; else setsNotLoaded">
@@ -39,7 +48,8 @@
                 </label>
             </td>
             <td>
-                <app-card-picker [cards]="set.info.cards" [isEnabled]="false" [imageHeightVh]="10" [isOverlayIconEnabled]="false">
+                <app-card-picker [cards]="set.info.cards" [isEnabled]="false" [imageHeightVh]="10"
+                    [isOverlayIconEnabled]="false">
                 </app-card-picker>
             </td>
         </tr>

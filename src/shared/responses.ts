@@ -15,6 +15,7 @@ export interface GetRoomListResponse {
         name: string;
         owner: PublicUserInfo;
         players: PublicUserInfo[];
+        spectators: PublicUserInfo[];
         creationDate: Date;
         lastInteraction: Date;
     }[];

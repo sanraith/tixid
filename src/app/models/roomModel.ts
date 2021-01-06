@@ -1,4 +1,4 @@
-import { PublicUserInfo } from 'src/shared/model/publicUserInfo'
+import { PublicUserInfo } from 'src/shared/model/publicUserInfo';
 import { PublicPlayerState, PrivatePlayerState } from 'src/shared/model/sharedPlayerState';
 import PublicGameState from 'src/shared/model/publicGameState';
 import { ClientUser } from '../services/user.service';
@@ -9,7 +9,7 @@ export class LocalGameState {
     myVotedCardIds: string[] = [];
     voteCardIds: string[] = [];
     votesByCardId?: Record<string, PublicUserInfo[]>;
-    orderedPlayerResults?: { userInfo: PublicUserInfo, newPoints: number, totalPoints: number }[];
+    orderedPlayerResults?: { userInfo: PublicUserInfo, newPoints: number, totalPoints: number; }[];
 }
 
 export default class RoomModel {
@@ -17,14 +17,13 @@ export default class RoomModel {
     name?: string;
     currentUser: ClientUser;
     socket: Socket;
-    isSpectator: boolean;
+    get isSpectator(): boolean {
+        return this.spectators.some(x => x.id === this.currentUser.id);
+    };
 
     owner: PublicUserInfo;
     players: PublicUserInfo[] = [];
-    get spectators(): PublicUserInfo[] {
-        const playerStateIds = this.playerStates.map(ps => ps.userInfo.id);
-        return this.players.filter(p => !playerStateIds.includes(p.id));
-    };
+    spectators: PublicUserInfo[] = [];
 
     playerStates: PublicPlayerState[] = [];
     myState?: PrivatePlayerState;

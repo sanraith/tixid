@@ -3,8 +3,8 @@
     <span *ngIf="room.isSpectator" style="color: red;">(SPECTATOR MODE)</span>
 </h2>
 
-<div class="playerList" *ngIf="this.room.players.length > 0">
-    <h2 class="title">Players</h2>
+<div class="playerList">
+    <h2 class="title">Players <span style="font-size: small;">({{room.players.length}})</span></h2>
     <div style="width: 100%;"
         *ngIf="this.room.gameState && this.room.gameState.step !== types.GameStep.lobby && room.playerStates.length > 0; else statelessPlayers">
 
@@ -33,15 +33,6 @@
             </li>
         </ul>
 
-        <!-- Spectators -->
-        <div *ngIf="room.spectators.length > 0" style="width: 100%;">
-            <h2 class="title">Spectators</h2>
-            <ul>
-                <li *ngFor="let spectator of room.spectators">
-                    <div class="pName">{{spectator.name}}</div>
-                </li>
-            </ul>
-        </div>
     </div>
 
     <ng-template #statelessPlayers>
@@ -57,6 +48,27 @@
             </li>
         </ul>
     </ng-template>
+
+    <button class="mediumButton" *ngIf="!room.isSpectator && room.gameState?.step === types.GameStep.lobby"
+        (click)="changeSpectatorState(true)">
+        Join as spectator
+    </button>
+
+    <!-- Spectators -->
+    <div *ngIf="room.spectators.length > 0" style="width: 100%;">
+        <h2 class="title">Spectators</h2>
+        <ul>
+            <li *ngFor="let spectator of room.spectators">
+                <div class="pName">{{spectator.name}}</div>
+            </li>
+        </ul>
+    </div>
+
+    <button class="mediumButton" *ngIf="room.isSpectator && room.gameState?.step === types.GameStep.lobby"
+        (click)="changeSpectatorState(false)">
+        Join as player
+    </button>
+
 </div>
 
 <div class="main">

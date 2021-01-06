@@ -1,13 +1,14 @@
 import SocketIo from 'socket.io';
 import roomManager from './roomManager';
 import UserInfo from '../models/userInfo';
-import { JoinRoomData, EmitResponse, MakeStoryData, ExtendStoryData, VoteStoryData, StartGameData, KickPlayerData, JoinRoomResponse } from '../../shared/socket';
+import { JoinRoomData, EmitResponse, MakeStoryData, ExtendStoryData, VoteStoryData, StartGameData, KickPlayerData, JoinRoomResponse, ChangeSpectatorStateData } from '../../shared/socket';
 import Room from '../models/room';
 import GameManager from './gameManager';
 import { getDefaultRules } from '../../shared/model/rules';
 import cardManager from './cardManager';
 import Debug from 'debug';
 import socketManager from './socketManager';
+import { GameStep } from '../../shared/model/gameStep';
 const debug = Debug('tixid:services:playerSocket');
 
 /**
@@ -24,14 +25,15 @@ export default class PlayerSocket {
         this.socket = socket;
     }
 
-    // TODO handle room player info (before game started) or refactor the 2 kinds of player infos into one.
     joinRoom(data: JoinRoomData): JoinRoomResponse {
         debug(`Client ${this.userInfo.name} joins room`, data);
         this.room = roomManager.getRoom(data.roomId);
         if (this.room) {
             this.manager = new GameManager(this.room);
             this.socket.join(this.getRoomChannelId(this.room.id));
-            roomManager.joinRoom(this.room, this.userInfo);
+
+            const joinAsPlayer = this.room.state.step === GameStep.lobby || this.room.state?.players.some(x => x.userInfo === this.userInfo);
+            roomManager.joinRoom(this.room, this.userInfo, !joinAsPlayer);
             socketManager.emitGameStateChanged(this.room, this.userInfo);
 
             // Set connection state
@@ -83,7 +85,7 @@ export default class PlayerSocket {
         if (rules.cardSets && rules.cardSets.length > 0) {
             sets = rules.cardSets.map(x => cardManager.sets[x]);
             if (sets.some(x => !x)) {
-                return { success: false, message: "Some of the requested sets do not exists!" }
+                return { success: false, message: "Some of the requested sets do not exists!" };
             }
         }
 
@@ -181,7 +183,7 @@ export default class PlayerSocket {
             return { success: false, message: "Only the owner can kick other players from the room!" };
         }
 
-        const player = this.room.players.find(x => x.publicId === data.publicId);
+        const player = this.room.players.find(x => x.publicId === data.publicId) ?? this.room.spectators.find(x => x.publicId === data.publicId);
         if (!player) {
             return { success: false, message: "Kicked player is not part of the room!" };
         }
@@ -191,6 +193,22 @@ export default class PlayerSocket {
             roomManager.leaveRoom(this.room, player);
         }
         return result;
+    }
+
+    changeSpectatorStateData(data: ChangeSpectatorStateData): EmitResponse {
+        if (!this.room || !this.manager) { return { success: false, message: "Player is not part of any room!" }; }
+        if (this.room.state.step !== GameStep.lobby) { return { success: false, message: "Can only change spectators in the lobby!" }; }
+
+        const source = data.toSpectator ? this.room.players : this.room.spectators;
+        const target = data.toSpectator ? this.room.spectators : this.room.players;
+
+        const index = source.indexOf(this.userInfo);
+        source.splice(index, 1);
+        target.push(this.userInfo);
+
+        socketManager.emitPlayersChanged(this.room);
+
+        return { success: true };
     }
 
     getRoomChannelId(roomId: string) {

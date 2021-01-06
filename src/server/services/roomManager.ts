@@ -18,6 +18,7 @@ class RoomManager {
             name: name,
             owner: owner,
             players: [],
+            spectators: [],
             state: new GameState(),
             creationDate: new Date(),
             lastInteraction: new Date()
@@ -36,11 +37,12 @@ class RoomManager {
         return this._rooms[id];
     }
 
-    joinRoom(room: Room, player: UserInfo): boolean {
-        const playerIndex = room.players.findIndex(x => player.id == x.id);
+    joinRoom(room: Room, player: UserInfo, isSpectator: boolean): boolean {
+        const targetGroup = isSpectator ? room.spectators : room.players;
+        const playerIndex = targetGroup.findIndex(x => player.id == x.id);
         const isPlayerAlreadyJoined = playerIndex >= 0;
         if (!isPlayerAlreadyJoined) {
-            room.players.push(player);
+            targetGroup.push(player);
         }
 
         socketManager.emitPlayersChanged(room);
@@ -49,14 +51,15 @@ class RoomManager {
     }
 
     leaveRoom(room: Room, player: UserInfo): void {
-        const existingUserIndex = room.players.findIndex(x => player.id == x.id);
+        const targetGroup = room.players.includes(player) ? room.players : room.spectators;
+        const existingUserIndex = targetGroup.findIndex(x => player.id == x.id);
         if (existingUserIndex < 0) { return; }
 
-        const leftPlayer = room.players.splice(existingUserIndex, 1)[0];
+        const leftPlayer = targetGroup.splice(existingUserIndex, 1)[0];
         socketManager.emitPlayersChanged(room);
 
-        debug(`Client ${leftPlayer.name} left room ${room.id}`);
-        debug(`Remaining: ${room.players.length}`);
+        debug(`Client ${leftPlayer.name} left room ${room.id}.`);
+        debug(`Remaining: ${room.players.length} players, ${room.spectators.length} spectators`);
     }
 
     deleteRoom(room: Room) {
@@ -83,7 +86,7 @@ class RoomManager {
                 }
 
                 debug(`Deleting room ${room.id} because it was inactive for ${diffMinutes} minutes.`);
-                for (let player of room.players) {
+                for (let player of [...room.players, ...room.spectators]) {
                     socketManager.emitKickedFromRoom(room, player,
                         `Room has been deleted because it has been inactive for at least ${this.minInactiveMinutesToDeleteRoom} minutes.`);
                 }

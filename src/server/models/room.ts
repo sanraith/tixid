@@ -6,6 +6,7 @@ export default interface Room {
     name: string;
     owner: UserInfo;
     players: UserInfo[];
+    spectators: UserInfo[];
     state: GameState;
     creationDate: Date;
     lastInteraction: Date;

@@ -15,7 +15,8 @@ export enum ClientActions {
     indicateReady = "indicate_ready",
     forceReady = "force_ready",
     takeOwnership = "take_ownership",
-    kickPlayer = "kick_player"
+    kickPlayer = "kick_player",
+    changeSpectatorState = "change_spectator_state"
 }
 
 export enum ClientEvents {
@@ -44,38 +45,43 @@ export interface GameStateChangedData extends PublicGameState { }
 
 export interface PlayerStateChangedData {
     playerStates: (PublicPlayerState | PrivatePlayerState)[],
-    isCompleteList: boolean
+    isCompleteList: boolean;
 }
 
 export interface PlayersChangedData {
-    owner: PublicUserInfo,
-    players: PublicUserInfo[],
+    owner: PublicUserInfo;
+    players: PublicUserInfo[];
+    spectators: PublicUserInfo[];
 }
 
 export interface StartGameData {
-    rules: Rules
+    rules: Rules;
 }
 
 export interface JoinRoomData {
-    roomId: string
+    roomId: string;
 }
 
 export interface MakeStoryData {
     story: string,
-    cardId: string
+    cardId: string;
 }
 
 export interface ExtendStoryData {
-    cardIds: string[]
+    cardIds: string[];
 }
 
 export interface VoteStoryData extends ExtendStoryData { }
 
+export interface ChangeSpectatorStateData {
+    toSpectator: boolean;
+}
+
 export interface KickPlayerData {
-    publicId: string
+    publicId: string;
 }
 
 export interface KickedFromRoomData {
     roomId: string,
-    reason: string
+    reason: string;
 }

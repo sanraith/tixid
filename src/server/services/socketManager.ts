@@ -4,7 +4,7 @@ import cookie from 'cookie';
 import Debug from 'debug';
 import userManager, { UserCookies } from './userManager';
 import UserInfo from '../models/userInfo';
-import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse, PlayerStateChangedData, GameStateChangedData, MakeStoryData, ExtendStoryData, VoteStoryData, StartGameData, KickPlayerData, KickedFromRoomData, JoinRoomResponse } from '../../shared/socket';
+import { ClientActions, JoinRoomData, ClientEvents, PlayersChangedData, EmitResponse, PlayerStateChangedData, GameStateChangedData, MakeStoryData, ExtendStoryData, VoteStoryData, StartGameData, KickPlayerData, KickedFromRoomData, JoinRoomResponse, ChangeSpectatorStateData } from '../../shared/socket';
 import Room from '../models/room';
 import { PublicPlayerState, PrivatePlayerState } from 'src/shared/model/sharedPlayerState';
 import { PlayerGameData } from '../models/gameState';
@@ -34,7 +34,7 @@ class SocketManager {
         io.on(SocketEvents.connection, (socket) => {
             const userInfo = this.getUserFromSocketCookies(socket.handshake.headers.cookie);
             if (userInfo === undefined) {
-                debug(`Disconnected client, no user data: ${socket.client.id}`)
+                debug(`Disconnected client, no user data: ${socket.client.id}`);
                 socket.disconnect();
                 return;
             }
@@ -52,7 +52,7 @@ class SocketManager {
                     roomManager.interact(playerSocket.room);
                 }
                 this.logSocketRoomTable();
-            }
+            };
 
             socket.on(SocketEvents.disconnect, () => {
                 handleErrorAndLog(() => {
@@ -78,7 +78,7 @@ class SocketManager {
                             delete this.playerSockets[userInfo.id];
                         }
                     }
-                })
+                });
             });
             socket.on(ClientActions.joinRoom, (data: JoinRoomData, callback?: (resp: JoinRoomResponse) => void) => {
                 handleErrorAndLog(() => this.callbackMaybe(playerSocket.joinRoom(data), callback));
@@ -116,6 +116,9 @@ class SocketManager {
             socket.on(ClientActions.kickPlayer, (data: KickPlayerData, callback?: (resp: EmitResponse) => void) => {
                 handleErrorAndLog(() => this.callbackMaybe(playerSocket.kickPlayer(data), callback));
             });
+            socket.on(ClientActions.changeSpectatorState, (data: ChangeSpectatorStateData, callback?: (resp: EmitResponse) => void) => {
+                handleErrorAndLog(() => this.callbackMaybe(playerSocket.changeSpectatorStateData(data), callback));
+            });
         });
 
         this.io = io;
@@ -125,7 +128,8 @@ class SocketManager {
     emitPlayersChanged(room: Room) {
         this.getRoomChannel(room.id).emit(ClientEvents.playersChanged, <PlayersChangedData>{
             owner: room.owner.publicInfo,
-            players: room.players.map(p => p.publicInfo)
+            players: room.players.map(p => p.publicInfo),
+            spectators: room.spectators.map(p => p.publicInfo)
         });
     }
 
@@ -145,7 +149,7 @@ class SocketManager {
                 isConnected: p.isConnected
             });
 
-        const recipients = recipient ? [recipient] : room.players;
+        const recipients = recipient ? [recipient] : [...room.players, ...room.spectators];
         for (const targetPlayer of recipients) {
             const targetSockets = this.getTargetSockets(room, targetPlayer);
             if (!targetSockets?.length) { debug(`Cannot reach player ${targetPlayer.name}`); continue; }
@@ -153,7 +157,7 @@ class SocketManager {
             for (const targetSocket of targetSockets) {
                 const emittedData = <PlayerStateChangedData>{
                     playerStates: changedPlayers.map(p => {
-                        const publicState = publicPlayerStates[p.userInfo.id]
+                        const publicState = publicPlayerStates[p.userInfo.id];
                         if (p.userInfo === targetPlayer) {
                             return <PrivatePlayerState>{ ...publicState, hand: p.hand.map(c => c.id) };
                         }
@@ -186,7 +190,7 @@ class SocketManager {
         const canRevealAllCardOwners = state.step >= GameStep.voteStoryResults;
         const canRevealAllVotes = state.step >= GameStep.voteStoryResults;
 
-        const recipients = recipient ? [recipient] : room.players;
+        const recipients = recipient ? [recipient] : [...room.players, ...room.spectators];
         for (const targetPlayer of recipients) {
             const targetSockets = this.getTargetSockets(room, targetPlayer);
             if (!targetSockets?.length) { debug(`Cannot reach player ${targetPlayer.name}`); continue; }
@@ -246,13 +250,13 @@ class SocketManager {
 
             if (playerSocket.room) {
                 const room = playerSocket.room;
-                const roomPlayers = playerSocket.room.players;
-                for (let player of roomPlayers) {
+                const roomPlayersAndSpectators = [...playerSocket.room.players, ...playerSocket.room.spectators];
+                for (let player of roomPlayersAndSpectators) {
                     this.emitKickedFromRoom(playerSocket.room, player, `Game server error. Id: ${errorId}`);
                 }
                 roomManager.deleteRoom(playerSocket.room);
 
-                const socketsToDisconnect = roomPlayers
+                const socketsToDisconnect = roomPlayersAndSpectators
                     .map(x => this.getTargetSockets(room, x))
                     .reduce((a, x) => { a.push(...x); return a; }, []);
                 for (let socketToDisconnect of socketsToDisconnect) {

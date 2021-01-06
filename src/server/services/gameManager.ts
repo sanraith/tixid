@@ -12,7 +12,7 @@ const debug = Debug('tixid:services:gameManager');
 
 interface TransitionResult {
     success: boolean,
-    message?: string
+    message?: string;
 }
 
 export default class GameManager {

@@ -21,6 +21,7 @@ router.get("/", (req, res) => {
                 name: r.name,
                 owner: r.owner.publicInfo,
                 players: r.players.map(p => p.publicInfo),
+                spectators: r.spectators.map(s => s.publicInfo),
                 creationDate: r.creationDate,
                 lastInteraction: r.lastInteraction
             }))
