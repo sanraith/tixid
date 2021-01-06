@@ -78,8 +78,17 @@ export class RoomComponent implements OnInit {
     startGame() { this.emitAction(ClientActions.startGame); }
     startRound() { this.emitAction(ClientActions.startRound); }
 
-    changeSpectatorState(toSpectator: boolean) {
-        this.emitAction(ClientActions.changeSpectatorState, <ChangeSpectatorStateData>{ toSpectator: toSpectator });
+    changeSpectatorState(toSpectator: boolean, targetUser: PublicUserInfo = undefined) {
+        if (targetUser) {
+            if (!confirm(`Do you want to set ${targetUser.name} as ${toSpectator ? 'spectator' : 'player'}?`)) {
+                return;
+            }
+        }
+
+        this.emitAction(ClientActions.changeSpectatorState, <ChangeSpectatorStateData>{
+            toSpectator: toSpectator,
+            targetUserPublicId: targetUser?.id ?? undefined
+        });
     }
 
     private emitAction(action: ClientActions, data?: any) {

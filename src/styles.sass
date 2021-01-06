@@ -8,6 +8,22 @@ $globalWidth: 800px
 body
     margin: 5px
 
+.pointer
+    cursor: pointer
+
+.tooltip
+    display: none
+    margin-left: 10px /* moves the tooltip to the right */
+    margin-top: 10px /* moves it down */
+    position: absolute
+    z-index: 1000
+    background-color: rgba(200,200,200,0.9)
+    padding: 3px
+    border-radius: 5px
+
+a:hover .tooltip
+    display: block
+
 .hidden
     display: none
 

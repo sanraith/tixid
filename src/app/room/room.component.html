@@ -12,18 +12,32 @@
         <ul>
             <li *ngFor="let playerState of room.playerStates">
                 <div class="pName">
-                    {{playerState.isReady ? '✔' : '⏳'}}
+                    <a nohref class="pointer" *ngIf="playerState.isReady">
+                        ✔<span class="tooltip">Player is ready</span>
+                    </a>
+                    <a nohref class="pointer" *ngIf="!playerState.isReady">
+                        ⏳<span class="tooltip">Waiting for player</span>
+                    </a>
 
-                    {{playerState.isConnected ? '' : '⚠'}}
+                    <a nohref class="pointer" *ngIf="!playerState.isConnected">
+                        ⚠<span class="tooltip">Player lost connection</span>
+                    </a>
+
                     <a class="hoverButton" nohref
                         *ngIf="!playerState.isConnected && room.owner.id === playerState.userInfo.id"
-                        style="cursor: pointer" (click)="takeOwnership()">👑</a>
+                        style="cursor: pointer" (click)="takeOwnership()">
+                        👑<span class="tooltip">Take room ownership</span>
+                    </a>
 
-                    {{room.gameState.storyTeller.id === playerState.userInfo.id ? '📖' : ''}}
+                    <a nohref class="pointer" *ngIf="room.gameState.storyTeller.id === playerState.userInfo.id">
+                        📖<span class="tooltip">Player is the current story teller</span>
+                    </a>
 
                     <a class="hoverButton" nohref
                         *ngIf="room.currentUser.id === room.owner.id && playerState.userInfo.id !== room.currentUser.id"
-                        style="cursor: pointer" (click)="kick(playerState.userInfo)">🦶</a>
+                        style="cursor: pointer" (click)="kick(playerState.userInfo)">
+                        🦶<span class="tooltip">Kick player</span>
+                    </a>
 
                     {{playerState.userInfo.name}}:&nbsp;
                 </div>
@@ -37,13 +51,21 @@
 
     <ng-template #statelessPlayers>
         <ul>
-            <li *ngFor="let playerState of room.players">
+            <li *ngFor="let player of room.players">
                 <div class="pName">
                     <a class="hoverButton" nohref
-                        *ngIf="room.currentUser.id === room.owner.id && playerState.id !== room.currentUser.id"
-                        style="cursor: pointer" (click)="kick(playerState)">🦶</a>
+                        *ngIf="room.currentUser.id === room.owner.id && player.id !== room.currentUser.id"
+                        style="cursor: pointer" (click)="kick(player)">
+                        🦶<span class="tooltip">Kick player</span>
+                    </a>
 
-                    {{playerState.name}}
+                    <a class="hoverButton" nohref
+                        *ngIf="room.currentUser.id === room.owner.id && player.id !== room.currentUser.id"
+                        style="cursor: pointer" (click)="changeSpectatorState(true, player)">
+                        👓<span class="tooltip">Move to spectators</span>
+                    </a>
+
+                    {{player.name}}
                 </div>
             </li>
         </ul>
@@ -59,7 +81,15 @@
         <h2 class="title">Spectators</h2>
         <ul>
             <li *ngFor="let spectator of room.spectators">
-                <div class="pName">{{spectator.name}}</div>
+                <div class="pName">
+                    <a class="hoverButton" nohref
+                        *ngIf="room.currentUser.id === room.owner.id && spectator.id !== room.currentUser.id"
+                        style="cursor: pointer" (click)="changeSpectatorState(false, spectator)">
+                        🎲<span class="tooltip">Move to players</span>
+                    </a>
+
+                    {{spectator.name}}
+                </div>
             </li>
         </ul>
     </div>

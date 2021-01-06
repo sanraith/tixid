@@ -75,6 +75,7 @@ export interface VoteStoryData extends ExtendStoryData { }
 
 export interface ChangeSpectatorStateData {
     toSpectator: boolean;
+    targetUserPublicId?: string;
 }
 
 export interface KickPlayerData {

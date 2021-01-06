@@ -198,13 +198,18 @@ export default class PlayerSocket {
     changeSpectatorStateData(data: ChangeSpectatorStateData): EmitResponse {
         if (!this.room || !this.manager) { return { success: false, message: "Player is not part of any room!" }; }
         if (this.room.state.step !== GameStep.lobby) { return { success: false, message: "Can only change spectators in the lobby!" }; }
+        if (data.targetUserPublicId && this.room.owner !== this.userInfo) { return { success: false, message: "Only room owner can change spectator state of other players!" }; }
 
         const source = data.toSpectator ? this.room.players : this.room.spectators;
         const target = data.toSpectator ? this.room.spectators : this.room.players;
+        const targetUser = data.targetUserPublicId ? [...source, ...target].find(x => x.publicId === data.targetUserPublicId) : this.userInfo;
+        if (!targetUser) {
+            return { success: false, message: "Could not find user with given id in the room!" };
+        }
 
-        const index = source.indexOf(this.userInfo);
+        const index = source.indexOf(targetUser);
         source.splice(index, 1);
-        target.push(this.userInfo);
+        target.push(targetUser);
 
         socketManager.emitPlayersChanged(this.room);
 

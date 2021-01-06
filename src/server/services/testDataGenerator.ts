@@ -9,7 +9,7 @@ const user3 = new UserInfo("user C", "6e2d4e41-4231-40e7-b968-206532253a06", "9c
 
 class TestIdGenerator {
     private currentIndex = 0;
-    private ids = ["aaaaaa", "bbbbbb", "cccccc"]
+    private ids = ["aaaaaa", "bbbbbb", "cccccc"];
 
     generate() {
         if (this.currentIndex < this.ids.length) {
@@ -25,7 +25,7 @@ export default function () {
     const room1 = roomManager.createRoom(user1, "user1's room");
     const room2 = roomManager.createRoom(user2, "user2's room");
     const room3 = roomManager.createRoom(user3, "user3's room");
-    roomManager.joinRoom(room1, user1);
-    roomManager.joinRoom(room1, user2);
-    roomManager.joinRoom(room1, user3);
+    roomManager.joinRoom(room1, user1, false);
+    roomManager.joinRoom(room1, user2, false);
+    roomManager.joinRoom(room1, user3, false);
 }
