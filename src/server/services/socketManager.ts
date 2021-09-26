@@ -117,7 +117,7 @@ class SocketManager {
                 handleErrorAndLog(() => this.callbackMaybe(playerSocket.kickPlayer(data), callback));
             });
             socket.on(ClientActions.changeSpectatorState, (data: ChangeSpectatorStateData, callback?: (resp: EmitResponse) => void) => {
-                handleErrorAndLog(() => this.callbackMaybe(playerSocket.changeSpectatorStateData(data), callback));
+                handleErrorAndLog(() => this.callbackMaybe(playerSocket.changeSpectatorState(data), callback));
             });
         });
 

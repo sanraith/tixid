@@ -195,16 +195,16 @@ export default class PlayerSocket {
         return result;
     }
 
-    changeSpectatorStateData(data: ChangeSpectatorStateData): EmitResponse {
+    changeSpectatorState(data: ChangeSpectatorStateData): EmitResponse {
         if (!this.room || !this.manager) { return { success: false, message: "Player is not part of any room!" }; }
         if (this.room.state.step !== GameStep.lobby) { return { success: false, message: "Can only change spectators in the lobby!" }; }
         if (data.targetUserPublicId && this.room.owner !== this.userInfo) { return { success: false, message: "Only room owner can change spectator state of other players!" }; }
 
         const source = data.toSpectator ? this.room.players : this.room.spectators;
         const target = data.toSpectator ? this.room.spectators : this.room.players;
-        const targetUser = data.targetUserPublicId ? [...source, ...target].find(x => x.publicId === data.targetUserPublicId) : this.userInfo;
+        const targetUser = data.targetUserPublicId ? source.find(x => x.publicId === data.targetUserPublicId) : this.userInfo;
         if (!targetUser) {
-            return { success: false, message: "Could not find user with given id in the room!" };
+            return { success: false, message: "Could not find user with given id in the given part of the room!" };
         }
 
         const index = source.indexOf(targetUser);
