@@ -52,7 +52,7 @@
         "rxjs": "^6.6.3",
         "shortid": "^2.2.16",
         "shuffle-array": "^1.0.1",
-        "socket.io": "^2.3.0",
+        "socket.io": "^4.5.0",
         "tslib": "^2.0.3",
         "uuid": "^8.3.2",
         "zone.js": "~0.10.2"
