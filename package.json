@@ -45,7 +45,7 @@
         "cookie-parser": "^1.4.5",
         "dayjs": "^1.9.8",
         "debug": "^4.3.1",
-        "express": "^4.17.1",
+        "express": "^4.17.3",
         "morgan": "^1.10.0",
         "ngx-cookie-service": "^11.0.2",
         "ngx-socket-io": "^3.0.1",
